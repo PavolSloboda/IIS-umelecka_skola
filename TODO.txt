@@ -1,1 +1,5 @@
 Create a login and register screen with all the gabagoo in the framework behind it
+
+GO over the database and work out kinks
+
+Create a separate table for the restricted items and the users they are restricted to
