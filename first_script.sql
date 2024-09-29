@@ -249,3 +249,11 @@ VALUES (4, 4), (4, 5), (4, 6);
 INSERT INTO role_permissions (role_id, permission_id) 
 VALUES (5, 6);
 
+/*Kontrola oprávnění v aplikaci*/
+SELECT 1
+FROM users u
+JOIN role_permissions rp ON u.role_id = rp.role_id
+JOIN permissions p ON rp.permission_id = p.permission_id
+WHERE u.user_id = ? AND p.permission_name = 'manage_devices';
+
+/**/
