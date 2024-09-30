@@ -7,9 +7,6 @@ namespace App\Core;
 use Nette;
 use Nette\Database\Explorer;
 
-//TODO
-//figure out what this should extend
-
 //Main Service, other services will be derived from it
 final class Service
 {
