@@ -11,7 +11,7 @@ use Nette\Database\Explorer;
 //figure out what this should extend
 
 //Main Service, other services will be derived from it
-final class Service extends Nette\Application\Router
+final class Service
 {
 	private Explorer $database;
 
