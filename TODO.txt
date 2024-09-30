@@ -1,5 +1,13 @@
 Create a login and register screen with all the gabagoo in the framework behind it
 
+Think about different user logins and authentification i.e.:
+	-registered_user is default login
+	-teachers can be registered only by an admin
+	-admin can be registered only through another admin
+	-so do the atelier_managers
+	-unregistred users don't have access to any tables, only to the login srceen
+#we should go over this and figure out the specifics
+
 GO over the database and work out kinks
 
 Create a separate table for the restricted items and the users they are restricted to
