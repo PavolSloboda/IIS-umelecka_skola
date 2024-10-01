@@ -27,9 +27,15 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		$form->addEmail('email', 'Email:')->setRequired('Plase enter an email');
 		$form->addPassword('password', 'Password:')->setRequired('Plase enter your password');
 		$form->addSubmit('login', 'Log in');
+		$form->addButton('signup', 'Sign up')->setHtmlAttribute('onclick', 'redirectToSign()');
 		
 		$form->onSuccess[] = [$this, 'validateLogin']; 
 		return $form;
+	}
+
+	public function redirectToSign() : void
+	{
+		$this->redirect('Devices:devices');
 	}
 
 	public function validateLogin(Form $form, \stdClass $data) : void
@@ -43,5 +49,24 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		{
 			$form->addError('Invalid email or password');
 		}
+	}
+
+	public function createSignUpForm(Form $form, \stdClass $data) : Form
+	{
+		
+		$form = new Form;
+
+		$form->addEmail('email', 'Email:')->setRequired('Plase enter an email');
+		$form->addPassword('password', 'Password:')->setRequired('Plase enter your password');
+		$form->addSubmit('signup', 'Sign up');
+		$form->addButton('signup', 'Log in')->setHtmlAttribute('onclick', 'redirectToSign()');
+		
+		$form->onSuccess[] = [$this, 'validateSignUp']; 
+		return $form;
+	}
+
+	public function validateSignUp() : void
+	{
+
 	}
 }

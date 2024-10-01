@@ -1,1 +1,4 @@
 umelecka_skola/config/common.neon
+umelecka_skola/temp
+./first_script.sql
+umelecka_skola/config/common.neon
