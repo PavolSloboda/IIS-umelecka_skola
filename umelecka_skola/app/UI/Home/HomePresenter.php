@@ -19,8 +19,4 @@ final class HomePresenter extends Nette\Application\UI\Presenter
 		$this->loginService = $loginService;
 	}
 
-	public function renderLogin(): void
-	{
-		$this->loginService->renderLogin();
-	}
 }

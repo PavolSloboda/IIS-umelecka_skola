@@ -6,7 +6,7 @@ namespace App\Core;
 
 final class LoginService
 {
-	public function renderLogin() : void
+	public function validateLogin() : void
 	{
 
 	}
