@@ -42,6 +42,11 @@ final class LoginService implements Nette\Security\Authenticator
 
 	public function signUp(string $email, string $password): void
 	{
+		$user =  $this->database->table('users')->where('email', $email)->fetch();
+		if($user)
+		{
+			throw new Nette\Security\AuthenticationException('User already exists, please log in instead');
+		}
 		$this->database->table('users')->insert(['email' => $email, 'password' => $this->passwords->hash($password),]);
 	}
 }

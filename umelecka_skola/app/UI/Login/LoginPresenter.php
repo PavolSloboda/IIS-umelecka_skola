@@ -17,7 +17,6 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 	{
 		//initialises the login service
 		$this->loginService = $loginService;
-		//$this->loginService->signUp('test@test.com', 'test');
 	}
 
 	public function createComponentLoginForm() : Form
@@ -27,15 +26,20 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		$form->addEmail('email', 'Email:')->setRequired('Plase enter an email');
 		$form->addPassword('password', 'Password:')->setRequired('Plase enter your password');
 		$form->addSubmit('login', 'Log in');
-		$form->addButton('signup', 'Sign up')->setHtmlAttribute('onclick', 'redirectToSign()');
+		$form->addButton('signup', 'Sign up')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('signupClicked!').'"');
 		
 		$form->onSuccess[] = [$this, 'validateLogin']; 
 		return $form;
 	}
 
-	public function redirectToSign() : void
+	public function handleSignupClicked() : void
 	{
-		$this->redirect('Devices:devices');
+		$this->redirect('Login:signup');
+	}
+
+	public function handleLoginClicked() : void
+	{
+		$this->redirect('Login:login');
 	}
 
 	public function validateLogin(Form $form, \stdClass $data) : void
@@ -51,7 +55,7 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		}
 	}
 
-	public function createSignUpForm(Form $form, \stdClass $data) : Form
+	public function createComponentSignUpForm() : Form
 	{
 		
 		$form = new Form;
@@ -59,14 +63,22 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		$form->addEmail('email', 'Email:')->setRequired('Plase enter an email');
 		$form->addPassword('password', 'Password:')->setRequired('Plase enter your password');
 		$form->addSubmit('signup', 'Sign up');
-		$form->addButton('signup', 'Log in')->setHtmlAttribute('onclick', 'redirectToSign()');
+		$form->addButton('login', 'Log in')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('loginClicked!').'"');
 		
 		$form->onSuccess[] = [$this, 'validateSignUp']; 
 		return $form;
 	}
 
-	public function validateSignUp() : void
+	public function validateSignUp(Form $form, \stdClass $data) : void
 	{
-
+		try
+		{
+			$this->loginService->signUp($data->email, $data->password);
+			$this->redirect('Login:login');
+		}
+		catch(Nette\Security\AuthenticationException $e)
+		{
+			$form->addError('An error occured during sign up');
+		}
 	}
 }
