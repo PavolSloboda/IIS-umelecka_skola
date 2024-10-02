@@ -18,6 +18,6 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 	public function renderDevices() : void
 	{
-		$this->template->result = $this->devices->showAllDevices();
+		$this->template->result = $this->devices->showAllAvailableDevices();
 	}
 }

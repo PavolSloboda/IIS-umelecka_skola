@@ -47,6 +47,6 @@ final class LoginService implements Nette\Security\Authenticator
 		{
 			throw new Nette\Security\AuthenticationException('User already exists, please log in instead');
 		}
-		$this->database->table('users')->insert(['email' => $email, 'password' => $this->passwords->hash($password),]);
+		$this->database->table('users')->insert(['email' => $email, 'password' => $this->passwords->hash($password),'role_id' => 1,]);
 	}
 }

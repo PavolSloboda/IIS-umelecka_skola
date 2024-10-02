@@ -23,4 +23,9 @@ final class DevicesService
 		$result = $this->database->table('devices')->fetchAll();
 		return $result;
 	}
+	public function showAllAvailableDevices() : array
+	{
+		$result = $this->database->table('devices')->where('available', true)->fetchAll();
+		return $result;
+	}
 }
