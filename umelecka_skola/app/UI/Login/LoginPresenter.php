@@ -26,7 +26,7 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		$form->addEmail('email', 'Email:')->setRequired('Plase enter an email');
 		$form->addPassword('password', 'Password:')->setRequired('Plase enter your password');
 		$form->addSubmit('login', 'Log in');
-		$form->addButton('signup', 'Sign up')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('signupClicked!').'"');
+		//$form->addButton('signup', 'Sign up')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('signupClicked!').'"');
 		
 		$form->onSuccess[] = [$this, 'validateLogin']; 
 		return $form;
@@ -63,7 +63,7 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		$form->addEmail('email', 'Email:')->setRequired('Plase enter an email');
 		$form->addPassword('password', 'Password:')->setRequired('Plase enter your password');
 		$form->addSubmit('signup', 'Sign up');
-		$form->addButton('login', 'Log in')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('loginClicked!').'"');
+		//$form->addButton('login', 'Log in')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('loginClicked!').'"');
 		
 		$form->onSuccess[] = [$this, 'validateSignUp']; 
 		return $form;
