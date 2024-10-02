@@ -1,6 +1,5 @@
 services:
 	- App\Core\RouterFactory::createRouter
-	- App\Core\Service
 	- App\Core\LoginService
 	- App\Core\DevicesService
 
