@@ -81,4 +81,15 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 			$form->addError('An error occured during sign up');
 		}
 	}
+
+	public function renderLogin(): void
+	{
+    	$this->template->pageClass = 'login-page'; // Pro přihlášení
+	}
+
+	public function renderSignup(): void
+	{
+    	$this->template->pageClass = 'signup-page'; // Pro registraci
+	}
+
 }

@@ -1,8 +1,12 @@
 <block head>
 	<link rel="stylesheet" href="{$basePath}/css/centered_divs.css">
 </block>
-<div class="container">
-	<div class="centered-content">
-		{control signUpForm}
-	</div>
+
+<div class="container {$pageClass}">
+    <div class="centered-content">
+        <h1>Create a New Account</h1>
+        <p>Join us today! Fill in the details below to create your account.</p>
+        {control signUpForm}
+        <p>Already have an account? <a href="{$presenter->link('Login:login')}">Login here</a>.</p>
+    </div>
 </div>
