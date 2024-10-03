@@ -27,7 +27,7 @@ https://doc.nette.org/en/database/configuration
 
 ## Rozdelenie prace:
     - devices => Terka
-    -`atelier => Palo
+    - atelier => Palo
     - users(user management of the admin => ?
     - my_profile(account management of the given user) => David
 
