@@ -22,16 +22,29 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		$this->template->result = $this->atelier->showAllAteliers();
 	}
 
-	public function createComponentLogoutForm() : Form
+	protected function createComponentAddAtelierForm(): Form
 	{
 		$form = new Form;
 
-		$form->addButton('logout', 'Log out')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('loginClicked!').'"');
+		$form->addText('name', 'Name:');  
+		$form->addText('admin_email', 'Email of atelier admin:');
+
+		$form->addSubmit('submit', 'Add atelier');
+
+		$form->onSuccess[] = [$this, 'processAddAtelierForm'];
+		
 		return $form;
 	}
 
-	public function handleLoginClicked() : void
+	public function processAddAtelierForm(Form $form, \stdClass $data) : void
 	{
-		$this->redirect('Login:login');
+		try
+		{
+			$this->atelier->createAtelier($data->name, $data->admin_email);
+		}
+		catch (\Exception $e)
+		{
+			$form->addError('An error occured while atempting to ad an atelier');
+		}
 	}
 }

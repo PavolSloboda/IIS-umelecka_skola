@@ -1,6 +1,6 @@
 <ul>                
-{foreach $result as $item}         
-	<li>{$item->id}: {$item->name} with {$item->description}</li> 
+{foreach $result as $atelier}         
+	<li>{$atelier->atelier_id}: {$atelier->name} with {$atelier->admin_id}</li> 
 {/foreach}
 </ul>
-{control logoutForm}
+{control addAtelierForm}

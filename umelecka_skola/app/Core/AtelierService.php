@@ -30,7 +30,7 @@ final class AtelierService
 	//		throw new \Exception("User with email: {$admin_email} does not have the required roles to aminister an atelier");
 	//	}
 
-		$this->database->table('ateliers')->insert(['name' => $name, 'admin_id' => $admin->id,]);
+		$this->database->table('ateliers')->insert(['name' => $name, 'admin_id' => $admin->user_id,]);
 	}
 
 	/*
