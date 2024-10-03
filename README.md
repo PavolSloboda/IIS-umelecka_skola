@@ -25,4 +25,10 @@ Hooking up the database:
 https://doc.nette.org/en/database/configuration
 (this hoe is in config and has a xyz.neon format, I'm guessing database.neon)
 
+## Rozdelenie prace:
+    - devices => Terka
+    -`atelier => Palo
+    - users(user management of the admin => ?
+    - my_profile(account management of the given user) => ?
+
 May god have mercy on our souls.
