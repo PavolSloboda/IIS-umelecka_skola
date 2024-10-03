@@ -32,3 +32,6 @@ https://doc.nette.org/en/database/configuration
     - my_profile(account management of the given user) => ?
 
 May god have mercy on our souls.
+```
+php -S localhost:8000 -t www
+```
