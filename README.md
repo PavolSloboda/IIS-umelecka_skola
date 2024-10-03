@@ -29,7 +29,7 @@ https://doc.nette.org/en/database/configuration
     - devices => Terka
     -`atelier => Palo
     - users(user management of the admin => ?
-    - my_profile(account management of the given user) => ?
+    - my_profile(account management of the given user) => David
 
 May god have mercy on our souls.
 ```
