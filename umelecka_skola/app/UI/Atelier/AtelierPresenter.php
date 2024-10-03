@@ -16,4 +16,22 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 	{
 		$this->atelier = $atelier;
 	}
+
+	public function renderAtelier() : void
+	{
+		$this->template->result = $this->atelier->showAllAteliers();
+	}
+
+	public function createComponentLogoutForm() : Form
+	{
+		$form = new Form;
+
+		$form->addButton('logout', 'Log out')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('loginClicked!').'"');
+		return $form;
+	}
+
+	public function handleLoginClicked() : void
+	{
+		$this->redirect('Login:login');
+	}
 }

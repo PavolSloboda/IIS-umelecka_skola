@@ -32,4 +32,13 @@ final class AtelierService
 
 		$this->database->table('ateliers')->insert(['name' => $name, 'admin_id' => $admin->id,]);
 	}
+
+	/*
+	* @return Nette\Database\table\ActiveRow[]
+	*/
+	public function showAllAteliers() : array
+	{
+		return $this->database->table('ateliers')->fetchAll();
+	}
+
 }
