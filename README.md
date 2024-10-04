@@ -25,10 +25,21 @@ Hooking up the database:
 https://doc.nette.org/en/database/configuration
 (this hoe is in config and has a xyz.neon format, I'm guessing database.neon)
 
+Authentication:
+
+https://doc.nette.org/en/security/authentication
+
+cool git:
+
+https://github.com/nobledeed/Podcast_Collective/blob/main
+
 ## Rozdelenie prace:
     - devices => Terka
-    -`atelier => Palo
+    - atelier => Palo
     - users(user management of the admin => ?
-    - my_profile(account management of the given user) => ?
+    - my_profile(account management of the given user) => David
 
 May god have mercy on our souls.
+```
+php -S localhost:8000 -t www
+```
