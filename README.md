@@ -29,6 +29,10 @@ Authentication:
 
 https://doc.nette.org/en/security/authentication
 
+cool git:
+
+https://github.com/nobledeed/Podcast_Collective/blob/main
+
 ## Rozdelenie prace:
     - devices => Terka
     - atelier => Palo
