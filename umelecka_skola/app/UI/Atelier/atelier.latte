@@ -1,6 +1,9 @@
+{layout '../layout.latte'}
+{block content}
 <ul>                
 {foreach $result as $atelier}         
 	<li>{$atelier->atelier_id}: {$atelier->name} with {$atelier->admin_id}</li> 
 {/foreach}
 </ul>
 {control addAtelierForm}
+{/block}
