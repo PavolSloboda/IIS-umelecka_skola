@@ -17,6 +17,15 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		$this->atelier = $atelier;
 	}
 
+	protected function startup() : void
+	{
+		parent::startup();
+		if(!$this->getUser()->isLoggedIn())
+		{
+			$this->redirect('Login:login');
+		}
+	}
+
 	public function renderAtelier() : void
 	{
 		$this->template->result = $this->atelier->showAllAteliers();
