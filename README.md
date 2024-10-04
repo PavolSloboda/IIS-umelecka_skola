@@ -25,6 +25,10 @@ Hooking up the database:
 https://doc.nette.org/en/database/configuration
 (this hoe is in config and has a xyz.neon format, I'm guessing database.neon)
 
+Authentication:
+
+https://doc.nette.org/en/security/authentication
+
 ## Rozdelenie prace:
     - devices => Terka
     - atelier => Palo
