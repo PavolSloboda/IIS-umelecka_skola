@@ -17,6 +17,15 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->devices = $devices;
 	}
 
+	protected function startup() : void
+	{
+		parent::startup();
+		if(!$this->getUser()->isLoggedIn())
+		{
+			$this->redirect('Login:login');
+		}
+	}
+
 	public function renderDevices() : void
 	{
 		$this->template->result = $this->devices->showAllAvailableDevices();
@@ -31,6 +40,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	}
 	public function handleLoginClicked() : void
 	{
+		$this->getUser()->logout();
 		$this->redirect('Login:login');
 	}
 }

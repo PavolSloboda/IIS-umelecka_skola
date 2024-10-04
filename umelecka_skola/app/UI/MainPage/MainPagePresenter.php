@@ -9,7 +9,17 @@ use Nette;
 
 final class MainPagePresenter extends Nette\Application\UI\Presenter
 {
-    public function createComponentMainPageForm() : Form
+
+	protected function startup() : void
+	{
+		parent::startup();
+		if(!$this->getUser()->isLoggedIn())
+		{
+			$this->redirect('Login:login');
+		}
+	}
+
+	public function createComponentMainPageForm() : Form
 	{
 		$form = new Form;
 		$form->addButton('devicemanagement', 'Device management')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('DevicesClicked!').'"');
@@ -20,6 +30,7 @@ final class MainPagePresenter extends Nette\Application\UI\Presenter
 
 	public function handleLoginClicked() : void
 	{
+		$this->getUser()->logout();
 		$this->redirect('Login:login');
 	}
 

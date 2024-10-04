@@ -19,6 +19,15 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		$this->loginService = $loginService;
 	}
 
+	protected function startup() : void
+	{
+		parent::startup();
+		if($this->getUser()->isLoggedIn())
+		{
+			$this->redirect('MainPage:mainpage');
+		}
+	}
+
 	public function createComponentLoginForm() : Form
 	{
 		$form = new Form;
