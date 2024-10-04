@@ -1,6 +1,9 @@
+{layout '../layout.latte'}
+{block content}
 <ul>                
 {foreach $result as $item}         
 	<li>{$item->id}: {$item->name} with {$item->description}</li> 
 {/foreach}
 </ul>
 {control logoutForm}
+{/block}
