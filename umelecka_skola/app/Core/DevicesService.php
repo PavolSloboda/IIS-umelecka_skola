@@ -18,14 +18,18 @@ final class DevicesService
 	/*
 	* @return Nette\Database\table\ActiveRow[]
 	*/
+	public function showAllAvailableDevices() : array
+	{
+		$result = $this->database->table('devices')->fetchAll();
+
+		//$result = $this->database->table('devices')->where('reserved', false)->where('borrow',false)->fetchAll();
+		return $result;
+	}
 	public function showAllDevices() : array
 	{
 		$result = $this->database->table('devices')->fetchAll();
 		return $result;
 	}
-	public function showAllAvailableDevices() : array
-	{
-		$result = $this->database->table('devices')->where('available', true)->fetchAll();
-		return $result;
-	}
 }
+//maximalni doba vypujcky
+//vyucujici si vypujcuje jen z vlastnich atelieru
