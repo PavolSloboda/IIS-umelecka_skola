@@ -1,9 +1,20 @@
 {layout '../layout.latte'}
 {block content}
-<ul>                
-{foreach $result as $atelier}         
-	<li>{$atelier->atelier_id}: {$atelier->name} with {$atelier->admin_id}</li> 
-{/foreach}
-</ul>
+<table>
+	<thead>
+		<tr>
+			<th scope = "col">Atelier ID</th>
+			<th scope = "col">Name</th>
+			<th scope = "col">admin_id</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr n:foreach="$result as $atelier">
+			<td> {$atelier->atelier_id} </td>
+			<td> {$atelier->name} </td>
+			<td> {$atelier->admin_id} </td>
+		</tr>
+	</tbody>
+</table>
 {control addAtelierForm}
 {/block}
