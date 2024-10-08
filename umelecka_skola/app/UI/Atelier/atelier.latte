@@ -13,6 +13,7 @@
 			<td> {$atelier->atelier_id} </td>
 			<td> {$atelier->name} </td>
 			<td> {$atelier->admin_id} </td>
+			<td> <button hx-get = "{link delete! $atelier->atelier_id}">Delete</button> </td>
 		</tr>
 	</tbody>
 </table>
