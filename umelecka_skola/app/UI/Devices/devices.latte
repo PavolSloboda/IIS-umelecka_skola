@@ -1,8 +1,16 @@
 {layout '../layout.latte'}
 {block content}
 <ul>                
-{foreach $result as $item}         
-	<li>{$item->id}: {$item->name} with {$item->description}</li> 
+{foreach $devices as $item}         
+	<li>{$item->device_id}: Item: {$item->name}  Description: {$item->description} Max loan period : {$item->max_loan_duration}</li> 
+{/foreach}
+</ul>
+<h2>device loan</h2>
+{control addDeviceLoanForm}
+
+<ul>                
+{foreach $loans as $item}         
+	<li>{$item->loan_id}: start: {$item->loan_start}  end: {$item->loan_end} status : {$item->status}</li> 
 {/foreach}
 </ul>
 {/block}
