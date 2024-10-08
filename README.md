@@ -37,6 +37,10 @@ eva tutorials (number 13 is useful):
 
 https://www.fit.vut.cz/units/cvt/faq/.cs
 
+Naja documentation:
+
+https://naja.js.org/?fbclid=IwZXh0bgNhZW0CMTEAAR1IPUnEAk0hYfJeCfO3uxTlbLRtD6o4IdUQ-T5UJA_9e6NOBXsxEM4fY0E_aem_YepY0nOpjOyNY3JN6ykTNQ#/
+
 ## Rozdelenie prace:
     - devices => Terka
     - atelier => Palo
