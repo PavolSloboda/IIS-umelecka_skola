@@ -33,6 +33,10 @@ cool git:
 
 https://github.com/nobledeed/Podcast_Collective/blob/main
 
+eva tutorials (number 13 is useful):
+
+https://www.fit.vut.cz/units/cvt/faq/.cs
+
 ## Rozdelenie prace:
     - devices => Terka
     - atelier => Palo
