@@ -9,9 +9,9 @@ application:
 
 
 database:
-	dsn: 'sqlite::memory:'
-	user:
-	password:
+	dsn: 'mysql:host=127.0.0.1;dbname=iis_test_database'
+	user: 'root'
+	password: 'root'
 
 
 latte:
