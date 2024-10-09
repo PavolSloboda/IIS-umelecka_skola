@@ -1,0 +1,23 @@
+{snippet "nazov"}
+<div id="target_table">
+<table>
+	<thead>
+		<tr>
+			<th scope = "col">Atelier ID</th>
+			<th scope = "col">Name</th>
+			<th scope = "col">admin_id</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr n:foreach="$result as $atelier">
+			<td> {$atelier->atelier_id} </td>
+			<td> {$atelier->name} </td>
+			<td> {$atelier->admin_id} </td>
+			<td> <button hx-get = "{link delete! $atelier->atelier_id}" hx-target="#target_table" hx-swap="innerHTML">Delete</button>  </td>
+			<td> <button hx-get = "{link edit! $atelier->atelier_id}" hx-target="#target_table" hx-swap="innerHTML">Edit</button>  </td>
+		</tr>
+	</tbody>
+</table>
+{control addAtelierForm}
+</div>
+{/snippet}

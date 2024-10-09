@@ -41,4 +41,13 @@ final class AtelierService
 		return $this->database->table('ateliers')->fetchAll();
 	}
 
+	public function editAtelier(int $id, string $name, int $admin_id) : void
+	{
+		$this->database->table('ateliers')->where('atelier_id', $id)->update(['name' => $name, 'admin_id' => $admin_id]);
+	}
+
+	public function deleteAtelier(int $id) : void
+	{
+		$this->database->table('ateliers')->where('atelier_id', $id)->delete();
+	}
 }

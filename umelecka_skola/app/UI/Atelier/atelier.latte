@@ -1,21 +1,4 @@
 {layout '../layout.latte'}
 {block content}
-<table>
-	<thead>
-		<tr>
-			<th scope = "col">Atelier ID</th>
-			<th scope = "col">Name</th>
-			<th scope = "col">admin_id</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr n:foreach="$result as $atelier">
-			<td> {$atelier->atelier_id} </td>
-			<td> {$atelier->name} </td>
-			<td> {$atelier->admin_id} </td>
-			<td> <button hx-get = "{link delete! $atelier->atelier_id}">Delete</button> </td>
-		</tr>
-	</tbody>
-</table>
-{control addAtelierForm}
+{include "table.latte"}
 {/block}
