@@ -38,4 +38,24 @@ final class MyProfileService
     {
         return $this->database->table('loan')->where('user_id', $userId)->fetchAll();
     }
+
+    // Získání aktuálních a budoucích výpůjček pro uživatele
+    public function getCurrentAndFutureLoans(int $userId): array
+    {
+        $now = new \DateTime(); // Aktuální čas
+        return $this->database->table('loan')
+            ->where('user_id', $userId)
+            ->where('loan_end > ?', $now) // Filtrujeme výpůjčky, které ještě neskončily
+            ->fetchAll();
+    }
+
+    // Získání minulých výpůjček pro uživatele
+    public function getPastLoans(int $userId): array
+    {
+        $now = new \DateTime(); // Aktuální čas
+        return $this->database->table('loan')
+            ->where('user_id', $userId)
+            ->where('loan_end <= ?', $now) // Filtrujeme výpůjčky, které již skončily
+            ->fetchAll();
+    }
 }

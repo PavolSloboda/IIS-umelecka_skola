@@ -32,6 +32,11 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         $this->template->profile = $this->profileService->getUserProfile($userId);
         $this->template->devices = $this->profileService->getAvailableDevices();
         $this->template->loans = $this->profileService->getUserLoans($userId);
+         // Získání aktuálních a budoucích výpůjček
+         $this->template->currentLoans = $this->profileService->getCurrentAndFutureLoans($userId);
+
+         // Získání minulých výpůjček
+         $this->template->pastLoans = $this->profileService->getPastLoans($userId);
     }
 
     // Formulář pro úpravu údajů o profilu
@@ -101,4 +106,6 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         $this->flashMessage('Device reserved successfully.', 'success');
         $this->redirect('this');
     }
+
+    
 }

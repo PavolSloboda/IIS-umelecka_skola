@@ -1,50 +1,66 @@
 {layout '../layout.latte'}
+
 {block content}
 
 <block head>
 	<link rel="stylesheet" href="{$basePath}/css/style.css">
 </block>
 
-<div class="container">
-
-    <h2>Profile Information</h2>
+<!-- Profilová sekce -->
+<h2>Profile Information</h2>
     <div class="profile-section">
         <p><strong>Name:</strong> {$profile->password}</p>
         <p><strong>Email:</strong> {$profile->email}</p>
-        <button class="edit-profile">Edit Profile</button>
     </div>
 
     <h2>Edit Profile</h2>
     {control profileForm}
 
-    <h2>Available Devices</h2>
-    <div class="devices-section">
-        <ul>
-        {foreach $devices as $device}
-            <li>
-                <strong>{$device->name}</strong> - Max Loan Duration: {$device->max_loan_duration} days
-            </li>
-        {/foreach}
-        </ul>
-    </div>
+<hr>
 
-    <h2>Reserve a Device</h2>
-    {control reserveDeviceForm}
-
+<!-- Sekce výpůjček -->
+<div class="loans-section">
     <h2>Your Loans</h2>
-    <div class="loans-section">
-        <ul class="loans-list">
-        {foreach $loans as $loan}
-            <li>
-                <p><strong>Device:</strong> {$loan->device_id}</p>
-                <p><strong>Start:</strong> {$loan->loan_start}</p>
-                <p><strong>End:</strong> {$loan->loan_end}</p>
-                <p><strong>Status:</strong> {$loan->status}</p>
-            </li>
-        {/foreach}
-        </ul>
+
+    <!-- Aktuální a budoucí výpůjčky -->
+    <div class="current-loans">
+        <h3>Current and Upcoming Loans</h3>
+
+        {if count($currentLoans)}
+            <ul>
+                {foreach $currentLoans as $loan}
+                    <li>
+                        <strong>Device:</strong> {$loan->device->name}<br>
+                        <strong>Loan Start:</strong> {$loan->loan_start|date:'d-m-Y H:i'}<br>
+                        <strong>Loan End:</strong> {$loan->loan_end|date:'d-m-Y H:i'}<br>
+                        <strong>Status:</strong> {$loan->status}
+                    </li>
+                {/foreach}
+            </ul>
+        {else}
+            <p>No current or upcoming loans.</p>
+        {/if}
     </div>
 
+    <!-- Minulé výpůjčky -->
+    <div class="past-loans">
+        <h3>Past Loans</h3>
+
+        {if count($pastLoans)}
+            <ul>
+                {foreach $pastLoans as $loan}
+                    <li>
+                        <strong>Device:</strong> {$loan->device->name}<br>
+                        <strong>Loan Start:</strong> {$loan->loan_start|date:'d-m-Y H:i'}<br>
+                        <strong>Loan End:</strong> {$loan->loan_end|date:'d-m-Y H:i'}<br>
+                        <strong>Status:</strong> {$loan->status}
+                    </li>
+                {/foreach}
+            </ul>
+        {else}
+            <p>No past loans.</p>
+        {/if}
+    </div>
 </div>
 
 {/block}
