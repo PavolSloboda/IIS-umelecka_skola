@@ -58,4 +58,16 @@ final class MyProfileService
             ->where('loan_end <= ?', $now) // Filtrujeme výpůjčky, které již skončily
             ->fetchAll();
     }
+
+    public function changePassword(int $userId, string $oldPassword, string $newPassword): void
+    {
+        $user = $this->database->table('users')->get($userId);
+
+        if (!$user || !$this->passwords->verify($oldPassword, $user->password)) {
+            throw new \Exception('Current password is incorrect.');
+        }
+
+        $newPasswordHash = $this->passwords->hash($newPassword);
+        $user->update(['password' => $newPasswordHash]);
+    }
 }

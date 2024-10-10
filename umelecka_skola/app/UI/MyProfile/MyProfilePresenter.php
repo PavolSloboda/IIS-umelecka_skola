@@ -107,5 +107,46 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         $this->redirect('this');
     }
 
+    protected function createComponentChangePasswordForm(): Form
+    {
+        $form = new Form;
+
+        // Původní heslo
+        $form->addPassword('old_password', 'Current Password:')
+            ->setRequired('Please enter your current password.');
+
+        // Nové heslo
+        $form->addPassword('new_password', 'New Password:')
+            ->setRequired('Please enter a new password.')
+            ->addRule($form::MIN_LENGTH, 'Password must be at least %d characters long.', 8);
+
+        // Potvrzení nového hesla
+        $form->addPassword('confirm_password', 'Confirm New Password:')
+            ->setRequired('Please confirm your new password.')
+            ->addRule($form::EQUAL, 'Passwords do not match.', $form['new_password']);
+
+        // Tlačítko pro změnu hesla
+        $form->addSubmit('submit', 'Change Password');
+
+        $form->onSuccess[] = [$this, 'processChangePasswordForm'];
+
+        return $form;
+    }
+
+    public function processChangePasswordForm(Form $form, \stdClass $values): void
+    {
+        $userId = $this->getUser()->getId();
+        $oldPassword = $values->old_password;
+        $newPassword = $values->new_password;
+
+        try {
+            // Ověření a změna hesla pomocí služby
+            $this->profileService->changePassword($userId, $oldPassword, $newPassword);
+            $this->flashMessage('Password successfully changed.', 'success');
+            $this->redirect('this');
+        } catch (\Exception $e) {
+            $form->addError('Failed to change password. ' . $e->getMessage());
+        }
+    }
     
 }
