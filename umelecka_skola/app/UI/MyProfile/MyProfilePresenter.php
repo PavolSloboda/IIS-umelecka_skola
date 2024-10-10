@@ -88,12 +88,6 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         return $form;
     }
 
-    // Validace rezervace zařízení
-    public function validateReserveDeviceForm(Form $form): void
-    {
-        // Implementace podobná jako ve vašem předchozím kódu
-    }
-
     public function processReserveDeviceForm(Form $form, \stdClass $values): void
     {
         if ($form->hasErrors()) {
