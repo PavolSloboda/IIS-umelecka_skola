@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Core;
+
+use Nette\Database\Explorer;
+
+final class ProfileService
+{
+    private Explorer $database;
+
+    public function __construct(Explorer $database)
+    {
+        $this->database = $database;
+    }
+
+    // Získání údajů o uživateli podle jeho ID
+    public function getUserProfile(int $userId): ?\Nette\Database\Table\ActiveRow
+    {
+        return $this->database->table('users')->get($userId);
+    }
+
+    // Uložení změněných údajů o uživateli
+    public function updateUserProfile(int $userId, array $data): void
+    {
+        $this->database->table('users')->where('id', $userId)->update($data);
+    }
+
+    // Získání všech dostupných zařízení, která si uživatel může vypůjčit
+    public function getAvailableDevices(): array
+    {
+        return $this->database->table('devices')->where('loan', false)->fetchAll();
+    }
+
+    // Získání aktuálních výpůjček uživatele
+    public function getUserLoans(int $userId): array
+    {
+        return $this->database->table('loan')->where('user_id', $userId)->fetchAll();
+    }
+}

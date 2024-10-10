@@ -1,1 +1,29 @@
 {layout '../layout.latte'}
+{layout '../layout.latte'}
+{block content}
+
+<h2>Profile Information</h2>
+<p>Name: {$profile->name}</p>
+<p>Email: {$profile->email}</p>
+
+<h2>Edit Profile</h2>
+{control profileForm}
+
+<h2>Available Devices</h2>
+<ul>
+{foreach $devices as $device}
+    <li>{$device->name} - Max Loan Duration: {$device->max_loan_duration}</li>
+{/foreach}
+</ul>
+
+<h2>Reserve a Device</h2>
+{control reserveDeviceForm}
+
+<h2>Your Loans</h2>
+<ul>
+{foreach $loans as $loan}
+    <li>Device: {$loan->device_id}, Start: {$loan->loan_start}, End: {$loan->loan_end}, Status: {$loan->status}</li>
+{/foreach}
+</ul>
+
+{/block}
