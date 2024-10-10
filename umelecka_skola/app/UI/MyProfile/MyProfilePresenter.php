@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\UI\MyProfile;
 
-use App\Core\ProfileService;
+use App\Core\MyProfileService;
 use Nette;
 use Nette\Application\UI\Form;
 
 final class MyProfilePresenter extends Nette\Application\UI\Presenter
 {
-    private ProfileService $profileService;
+    private MyProfileService $profileService;
 
-    public function __construct(ProfileService $profileService)
+    public function __construct(MyProfileService $profileService)
     {
         $this->profileService = $profileService;
     }

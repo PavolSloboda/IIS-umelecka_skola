@@ -6,7 +6,7 @@ namespace App\Core;
 
 use Nette\Database\Explorer;
 
-final class ProfileService
+final class MyProfileService
 {
     private Explorer $database;
 
@@ -30,7 +30,7 @@ final class ProfileService
     // Získání všech dostupných zařízení, která si uživatel může vypůjčit
     public function getAvailableDevices(): array
     {
-        return $this->database->table('devices')->where('loan', false)->fetchAll();
+        return $this->database->table('devices')->where('available', false)->fetchAll();
     }
 
     // Získání aktuálních výpůjček uživatele
