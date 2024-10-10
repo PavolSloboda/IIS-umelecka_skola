@@ -26,7 +26,7 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     }
 
     // Zobrazení údajů o profilu
-    public function renderDefault(): void
+    public function renderMyProfile(): void
     {
         $userId = $this->getUser()->getId();
         $this->template->profile = $this->profileService->getUserProfile($userId);

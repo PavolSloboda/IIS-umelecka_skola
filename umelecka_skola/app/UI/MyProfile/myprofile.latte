@@ -1,29 +1,50 @@
 {layout '../layout.latte'}
-{layout '../layout.latte'}
 {block content}
 
-<h2>Profile Information</h2>
-<p>Name: {$profile->name}</p>
-<p>Email: {$profile->email}</p>
+<block head>
+	<link rel="stylesheet" href="{$basePath}/css/style.css">
+</block>
 
-<h2>Edit Profile</h2>
-{control profileForm}
+<div class="container">
 
-<h2>Available Devices</h2>
-<ul>
-{foreach $devices as $device}
-    <li>{$device->name} - Max Loan Duration: {$device->max_loan_duration}</li>
-{/foreach}
-</ul>
+    <h2>Profile Information</h2>
+    <div class="profile-section">
+        <p><strong>Name:</strong> {$profile->password}</p>
+        <p><strong>Email:</strong> {$profile->email}</p>
+        <button class="edit-profile">Edit Profile</button>
+    </div>
 
-<h2>Reserve a Device</h2>
-{control reserveDeviceForm}
+    <h2>Edit Profile</h2>
+    {control profileForm}
 
-<h2>Your Loans</h2>
-<ul>
-{foreach $loans as $loan}
-    <li>Device: {$loan->device_id}, Start: {$loan->loan_start}, End: {$loan->loan_end}, Status: {$loan->status}</li>
-{/foreach}
-</ul>
+    <h2>Available Devices</h2>
+    <div class="devices-section">
+        <ul>
+        {foreach $devices as $device}
+            <li>
+                <strong>{$device->name}</strong> - Max Loan Duration: {$device->max_loan_duration} days
+            </li>
+        {/foreach}
+        </ul>
+    </div>
+
+    <h2>Reserve a Device</h2>
+    {control reserveDeviceForm}
+
+    <h2>Your Loans</h2>
+    <div class="loans-section">
+        <ul class="loans-list">
+        {foreach $loans as $loan}
+            <li>
+                <p><strong>Device:</strong> {$loan->device_id}</p>
+                <p><strong>Start:</strong> {$loan->loan_start}</p>
+                <p><strong>End:</strong> {$loan->loan_end}</p>
+                <p><strong>Status:</strong> {$loan->status}</p>
+            </li>
+        {/foreach}
+        </ul>
+    </div>
+
+</div>
 
 {/block}
