@@ -24,6 +24,7 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		{
 			$this->redirect('Login:login');
 		}
+		$this->template->addFunction('getAdminEmailById', function (int $id) {return $this->atelier->getAdminEmailByAtelierId(intval($id));});
 	}
 
 	public function renderAtelier() : void
@@ -96,7 +97,6 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 
 	public function processEditAtelierForm(Form $form, \stdClass $data) : void
 	{
-		bdump($data->atelier_id);
 		$this->atelier->editAtelier(intval($data->atelier_id), $data->name, $data->admin_email);
 		$this->redirect('Atelier:atelier');
 	}
