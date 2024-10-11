@@ -31,16 +31,39 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		$this->template->result = $this->atelier->showAllAteliers();
 	}
 
+	public function renderTable() : void
+	{
+		$this->template->result = $this->atelier->showAllAteliers();
+	}
+
 	protected function createComponentAddAtelierForm(): Form
 	{
 		$form = new Form;
 
-		$form->addText('name', 'Name:');  
-		$form->addText('admin_email', 'Email of atelier admin:');
+		$form->addHidden('atelier_id');
+		$form->addText('name', 'Name:')->setRequired();  
+		$form->addText('admin_email', 'Email of atelier admin:')->setRequired();
 
 		$form->addSubmit('submit', 'Add atelier');
 
 		$form->onSuccess[] = [$this, 'processAddAtelierForm'];
+		
+		return $form;
+	}
+
+	protected function createComponentEditAtelierForm(): Form
+	{
+		$form = new Form;
+
+		$form->addHidden('atelier_id');
+		$form->addText('name', 'Name:')->setRequired();  
+		$form->addText('admin_email', 'Email of atelier admin:')->setRequired();
+
+		$form->addSubmit('submit', 'Confirm changes');
+
+		$form->onSuccess[] = [$this, 'processEditAtelierForm'];
+
+		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
 		
 		return $form;
 	}
@@ -59,6 +82,27 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 
 	public function handleDelete(int $id) : void
 	{
-		bdump($id);
+		$this->atelier->deleteAtelier($id);
+		$this->forward('Atelier:table');
 	}	
+
+	public function actionEdit(string $atelierId) : void
+	{
+		$atelier = $this->atelier->getAtelierById(intval($atelierId));
+		$form = $this->getComponent('editAtelierForm');
+		$form->setDefaults(['atelier_id' => $atelier->atelier_id, 'name' => $atelier->name, 'admin_email' => $this->atelier->getAdminEmailByAtelierId($atelier->atelier_id)]);
+		$form->onSuccess[] = [$this, 'editFormSucceeded'];
+	}
+
+	public function processEditAtelierForm(Form $form, \stdClass $data) : void
+	{
+		bdump($data->atelier_id);
+		$this->atelier->editAtelier(intval($data->atelier_id), $data->name, $data->admin_email);
+		$this->redirect('Atelier:atelier');
+	}
+
+	public function handleCancelClicked() : void
+	{
+		$this->redirect('Atelier:atelier');
+	}
 }

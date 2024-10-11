@@ -14,7 +14,7 @@
 			<td> {$atelier->name} </td>
 			<td> {$atelier->admin_id} </td>
 			<td> <button hx-get = "{link delete! $atelier->atelier_id}" hx-target="#target_table" hx-swap="innerHTML">Delete</button>  </td>
-			<td> <button hx-get = "{link edit! $atelier->atelier_id}" hx-target="#target_table" hx-swap="innerHTML">Edit</button>  </td>
+			<td> <button hx-get = "{link Atelier:edit $atelier->atelier_id}" hx-target="#target_table" hx-swap="innerHTML">Edit</button>  </td>
 		</tr>
 	</tbody>
 </table>
