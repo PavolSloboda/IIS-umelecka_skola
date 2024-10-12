@@ -1,0 +1,37 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Core;
+
+use Nette\Database\Explorer;
+
+final class RolesService
+{
+	private Explorer $database;
+
+	public function __construct(Explorer $database)
+	{
+		$this->database = $database;
+	}
+
+	public function userWithIdHasRoleWithId(int $user_id, int $role_id) : bool
+	{
+		return is_null($this->database->table('user_role')->where('user_id', $user_id)->where('role_id', $role_id)->fetch());
+	}
+
+	public function userWithEmailHasRoleWithName(string $email, string $name) : bool
+	{
+		$user = $this->database->table('users')->where('email', $email)->fetch();
+		if(!$user)
+		{
+			throw new \Exception('User with email {$email} does not exist');
+		}
+		$role = $this->database->table('roles')->where('name', $name)->fetch();
+		if(!$role)
+		{
+			throw new \Exception('Role with name {$name} does not exist');
+		}
+		return $this->userWithIdHasRoleWithId($user->user_id, $role->role_id);
+	}
+}
