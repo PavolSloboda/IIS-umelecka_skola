@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace App\Core;
 
 use Nette\Database\Explorer;
+use App\Core\RolesService;
 
 final class AtelierService
 {
 	private Explorer $database;
+	private RolesService $roles;
 
-	public function __construct(Explorer $database)
+	public function __construct(Explorer $database, RolesService $roles)
 	{
 		$this->database = $database;
+		$this->roles = $roles;
 	}
 
 	public function createAtelier(string $name, string $admin_email) : void
@@ -48,6 +51,11 @@ final class AtelierService
 		if(!$admin)
 		{
 			throw new \Exception("User with email: {$admin_email} not found, please make sure you've entered the correct email");
+		}
+
+		if(!$this->roles->userWithEmailHasRoleWithName($admin_email, 'teacher'))
+		{
+			throw new \Exception("User with email: {$admin_email} is not a teacher and can't be assigned an atelier");
 		}
 
 		$this->database->table('ateliers')->where('atelier_id', $id)->update(['name' => $name, 'admin_id' => $admin->user_id]);
