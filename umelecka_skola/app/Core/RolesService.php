@@ -17,7 +17,7 @@ final class RolesService
 
 	public function userWithIdHasRoleWithId(int $user_id, int $role_id) : bool
 	{
-		return is_null($this->database->table('user_role')->where('user_id', $user_id)->where('role_id', $role_id)->fetch());
+		return !is_null($this->database->table('user_role')->where('user_id', $user_id)->where('role_id', $role_id)->fetch());
 	}
 
 	public function userWithEmailHasRoleWithName(string $email, string $name) : bool
