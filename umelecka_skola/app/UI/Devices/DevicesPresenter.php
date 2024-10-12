@@ -31,16 +31,4 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->template->result = $this->devices->showAllAvailableDevices();
 	}
 
-	public function createComponentLogoutForm() : Form
-	{
-		$form = new Form;
-
-		$form->addButton('logout', 'Log out')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('loginClicked!').'"');
-		return $form;
-	}
-	public function handleLoginClicked() : void
-	{
-		$this->getUser()->logout();
-		$this->redirect('Login:login');
-	}
 }
