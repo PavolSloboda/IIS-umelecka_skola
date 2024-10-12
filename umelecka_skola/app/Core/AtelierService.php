@@ -68,4 +68,9 @@ final class AtelierService
 		$atelier = $this->getAtelierById($id);
 		return $this->database->table('users')->where('user_id', $atelier->admin_id)->fetch()->email;
 	}
+
+	public function isCurrUserAdminOfAtelierWithId(int $atelier_id, int $user_id) : bool
+	{
+		return($user_id == $this->database->table('ateliers')->where('atelier_id', $atelier_id)->fetch()->admin_id);
+	}
 }
