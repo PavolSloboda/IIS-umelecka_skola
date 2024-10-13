@@ -27,11 +27,17 @@ final class RolesService
 		{
 			throw new \Exception('User with email {$email} does not exist');
 		}
+		$role_id = $this->getRoleIdWithName($name);
+		return $this->userWithIdHasRoleWithId($user->user_id, $role_id);
+	}
+
+	public function getRoleIdWithName(string $name) : int
+	{
 		$role = $this->database->table('roles')->where('name', $name)->fetch();
 		if(!$role)
 		{
 			throw new \Exception('Role with name {$name} does not exist');
 		}
-		return $this->userWithIdHasRoleWithId($user->user_id, $role->role_id);
+		return $role->role_id;
 	}
 }

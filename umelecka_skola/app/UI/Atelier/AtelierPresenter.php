@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace App\UI\Atelier;
 
 use App\Core\AtelierService;
+use App\Core\RolesService;
 use Nette\Application\UI\Form;
 use Nette;
 
 final class AtelierPresenter extends Nette\Application\UI\Presenter
 {
 	private $atelier;
+	private $roles;
 
-	public function __construct(AtelierService $atelier)
+	public function __construct(AtelierService $atelier, RolesService $roles)
 	{
 		$this->atelier = $atelier;
+		$this->roles = $roles;
 	}
 
 	protected function startup() : void
@@ -26,6 +29,7 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		}
 		$this->template->addFunction('getAdminEmailById', function (int $id) {return $this->atelier->getAdminEmailByAtelierId(intval($id));});
 		$this->template->addFunction('isCurrUserAdmin', function (int $id) {return $this->atelier->isCurrUserAdminOfAtelierWithId(intval($id), $this->getUser()->getId());});
+		$this->template->addFunction('hasCurrUserRole', function (string $role_name) {return $this->roles->userWithIdHasRoleWithId($this->getUser()->getId(), $this->roles->getRoleIdWithName($role_name));});
 	}
 
 	public function renderAtelier() : void

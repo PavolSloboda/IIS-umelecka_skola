@@ -13,13 +13,15 @@
 			<td> {$atelier->atelier_id} </td>
 			<td> {$atelier->name} </td>
 			<td> {getAdminEmailById($atelier->atelier_id)} </td>
-			{if isCurrUserAdmin($atelier->atelier_id)}
+			{if isCurrUserAdmin($atelier->atelier_id) || hasCurrUserRole('admin')}
 			<td> <button hx-get = "{link delete! $atelier->atelier_id}" hx-target="#target_table" hx-swap="innerHTML">Delete</button>  </td>
 			<td> <button hx-get = "{link Atelier:edit $atelier->atelier_id}" hx-target="#target_table" hx-swap="innerHTML">Edit</button>  </td>
 			{/if}
 		</tr>
 	</tbody>
 </table>
-{control addAtelierForm}
+{if hasCurrUserRole('admin') || hasCurrUserRole('atelier_manager')}
+	{control addAtelierForm}
+{/if}
 </div>
 {/snippet}
