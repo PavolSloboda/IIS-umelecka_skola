@@ -3,6 +3,7 @@ services:
 	- App\Core\LoginService
 	- App\Core\DevicesService
 	- App\Core\RolesService
+	- App\Core\UsersService
 
 
 search:
