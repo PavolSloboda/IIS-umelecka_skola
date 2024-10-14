@@ -6,6 +6,7 @@ namespace App\UI\Atelier;
 
 use App\Core\AtelierService;
 use App\Core\RolesService;
+use App\Core\UsersService;
 use Nette\Application\UI\Form;
 use Nette;
 
@@ -13,11 +14,13 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 {
 	private $atelier;
 	private $roles;
+	private $users;
 
-	public function __construct(AtelierService $atelier, RolesService $roles)
+	public function __construct(AtelierService $atelier, RolesService $roles, UsersService $users)
 	{
 		$this->atelier = $atelier;
 		$this->roles = $roles;
+		$this->users = $users;
 	}
 
 	protected function startup() : void
@@ -40,6 +43,12 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 	public function renderTable() : void
 	{
 		$this->template->result = $this->atelier->showAllAteliers();
+	}
+
+	public function renderEdit(): void
+	{
+		$this->template->user_items = $this->users->getUsersBelongingToAtelier(5);
+		$this->template->user_items_not = $this->users->getUsersNotBelongingToAtelier(5);
 	}
 
 	protected function createComponentAddAtelierForm(): Form
@@ -110,4 +119,12 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 	{
 		$this->redirect('Atelier:atelier');
 	}
+
+	public function handleAdd(int $user_id) : void
+	{
+		$form = $this->getComponent('editAtelierForm');
+		bdump($form->data->atelier_id);
+		//$this->atelier->AddUserWithIdToAtelierWithId($user_id, $form->atelier_id);
+		//$this->forward('Atelier:table');
+	}	
 }

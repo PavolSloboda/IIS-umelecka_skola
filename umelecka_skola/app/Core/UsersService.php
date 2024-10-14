@@ -22,4 +22,16 @@ final class UsersService
 	{
 		return $this->database->table('users')->fetch();
 	}
+
+	public function getUsersBelongingToAtelier(int $id) : \Nette\Database\Table\Selection
+	{
+		$ateliers = $this->database->table('user_atelier')->where('atelier_id', $id);
+		return $this->database->table('users')->where('user_id', $ateliers->select('user_id'));
+	}
+
+	public function getUsersNotBelongingToAtelier(int $id): \Nette\Database\Table\Selection 
+	{
+		$ateliers = $this->database->table('user_atelier')->where('atelier_id', $id);
+		return $this->database->table('users')->where('user_id NOT', $ateliers->select('user_id'));
+	}
 }
