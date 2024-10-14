@@ -19,15 +19,15 @@ final class DevicesService
 	/*
 	* @return Nette\Database\table\ActiveRow[]
 	*///vypis vsech dostupnych zarizeni
-	public function showAllAvailableDevices() : array
+	public function showAllDevices() : array
 	{
-		$result = $this->database->table('devices')->where('loan',false)->fetchAll();
+		$result = $this->database->table('devices')->fetchAll();
 		return $result;
 	}
 
 	public function showAllAvailableLoans(int $userId) : array
 	{
-		$result = $this->database->table('loan')->where('user_id',$userId)->fetchAll();
+		$result = $this->database->table('loan')->where('user_id',$userId)->where('status IN ?', ['reservation', 'loan'])->fetchAll();
 		return $result;
 	}
 
@@ -36,6 +36,36 @@ final class DevicesService
 		$result = $this->database->table('device_groups')->fetchAll();
 		return $result;
 	}
+
+	public function ChangeStateReservation(): void
+    {
+        
+        $currentTime = new \DateTime();
+
+        // stav se aktualizuje na zruseno pokud majitel nezmenil stav a tedy si predmet nikdo nevyzvedl
+        $this->database->table('loan')
+            ->where('loan_start < ? AND status = ?', $currentTime->format('Y-m-d H:i:s'), 'reservation')
+            ->update(['status' => 'cancelled']);
+		
+    }
+
+	public function updateLoanStatus(): void
+	{
+		$deviceIds = $this->database->table('loan')
+			->select('device_id') 
+			->where('status IN ?', ['completed', 'cancelled']) 
+			->fetchAll(); 
+
+		if (!empty($deviceIds)) {
+			
+			foreach ($deviceIds as $device) {
+				$this->database->table('devices')
+				->where('device_id IN ?', $device->device_id)
+				->update(['loan' => false]);
+			}
+		}
+	}
+
 	
 	//vypis jmen vsech dostupnych zarizeni
 	public function getAvailableDevices(): array
@@ -80,6 +110,13 @@ final class DevicesService
 		bdump($id);
 		$this->database->table('devices')->where('device_id', $id)->delete();
 		
+	}
+
+	public function isNotDeviceReserve(int $device_id) : bool
+	{
+		$device = $this->database->table('devices')->where('device_id', $device_id)->where('loan', false)->fetch();
+
+    	return $device !== null;
 	}
 }
 //maximalni doba vypujcky

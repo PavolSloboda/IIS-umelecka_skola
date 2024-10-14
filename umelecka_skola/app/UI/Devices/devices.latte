@@ -1,6 +1,6 @@
 {layout '../layout.latte'}
 {block content}
-
+<div  hx-target="this" hx-swap= "outerHTML">
 <table>
 	<thead>
 		<tr>
@@ -18,12 +18,13 @@
 			<td> {$item->max_loan_duration} </td>
 			<td> <button hx-get="{link delete! $item->device_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
 			<td> <button hx-get="{link Devices:edit $item->device_id}" >Edit</button>  </td>
+			{if isNotDeviceReserve($item->device_id)}
+				<td> <button hx-get="{link Devices:reserve $item->name}" >Reserve</button>  </td>
+			{/if}
 		</tr>
 	</tbody>
 </table>
 
-<h2>my device reservations</h2>
-{control addDeviceLoanForm}
 
 
 <table>
@@ -41,6 +42,7 @@
 			<td> {$item->loan_start} </td>
 			<td> {$item->loan_end} </td>
 			<td> {$item->status} </td>
+			<td> <button hx-get="{link Devices:edit $item->loan_id}">Edit</button> </td>
 		</tr>
 	</tbody>
 </table>
@@ -57,8 +59,9 @@
 		<tr n:foreach="$types as $item">
 			<td> {$item->group_id} </td>
 			<td> {$item->name} </td>
-			<td> <button hx-get="{link Devices:group $item->group_id}" hx-swap="innerHTML">Edit</button>  </td>
+			<td> <button hx-get="{link Devices:edit $item->group_id}">Edit</button> </td>
 		</tr>
 	</tbody>
 </table>
+</div>
 {/block}

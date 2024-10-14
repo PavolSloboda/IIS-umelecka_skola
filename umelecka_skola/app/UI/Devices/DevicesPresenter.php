@@ -29,12 +29,16 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		{
 			$this->redirect('Login:login');
 		}
+		$this->template->addFunction('isNotDeviceReserve', function (int $id) {return $this->devices->isNotDeviceReserve(intval($id));});
+		$this->devices->ChangeStateReservation();
+		$this->devices->updateLoanStatus();
 	}
 
 	//vypis vsech dostupnych zarizeni
 	public function renderDevices() : void
 	{
-		$this->template->devices = $this->devices->showAllAvailableDevices();
+		//$this->devices->ChangeStateReservation();
+		$this->template->devices = $this->devices->showAllDevices();
 		$this->template->loans = $this->devices->showAllAvailableLoans($this->getUser()->getId());
 		$this->template->types = $this->devices->showAllAvailableTypes();
 	}
@@ -45,8 +49,6 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	{
 		$form = new Form;
 
-		$form->addSelect('device_id', 'Select Device:', $this->DevicesService->getAvailableDevices())->setPrompt('Choose a device')->setRequired('Please select a device.');
-
 		// Zadání začátku výpůjčky (datum a čas)
 		$form->addDateTime('loan_start', 'Start Date and Time:')->setFormat('Y-m-d H:i:s')
         ->setRequired('Please enter the start date and time.');
@@ -55,6 +57,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
         ->setRequired('Please enter the end date and time.');
 		
 		$form->addSubmit('submit', 'Borrow Device');
+		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
 
 		$form->onValidate[] = [$this, 'validateAddDeviceLoanForm'];
 
@@ -102,7 +105,11 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$device = $this->devices->getDeviceById(intval($deviceId));
 		$form = $this->getComponent('editDeviceForm');
 		$form->setDefaults(['device_id' => $device->device_id, 'name' => $device->name]);
-		
+	}
+
+	public function actionReserve($name)
+	{
+		$this->template->deviceName = $name;
 	}
 
 	public function validateAddDeviceLoanForm(Form $form): void
