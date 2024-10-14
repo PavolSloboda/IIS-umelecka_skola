@@ -106,7 +106,7 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		$atelier = $this->atelier->getAtelierById(intval($atelierId));
 		$form = $this->getComponent('editAtelierForm');
 		$form->setDefaults(['atelier_id' => $atelier->atelier_id, 'name' => $atelier->name, 'admin_email' => $this->atelier->getAdminEmailByAtelierId($atelier->atelier_id)]);
-		$form->onSuccess[] = [$this, 'editFormSucceeded'];
+		//$form->onSuccess[] = [$this, 'editFormSucceeded'];
 	}
 
 	public function processEditAtelierForm(Form $form, \stdClass $data) : void
@@ -123,7 +123,7 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 	public function handleAdd(int $user_id) : void
 	{
 		$form = $this->getComponent('editAtelierForm');
-		bdump($form->data->atelier_id);
+		//bdump($form->);
 		//$this->atelier->AddUserWithIdToAtelierWithId($user_id, $form->atelier_id);
 		//$this->forward('Atelier:table');
 	}	
