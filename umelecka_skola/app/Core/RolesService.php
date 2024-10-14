@@ -40,4 +40,11 @@ final class RolesService
 		}
 		return $role->role_id;
 	}
+
+	public function getMyRoles(int $id) : \Nette\Database\Table\Selection
+	{
+		$user_roles = $this->database->table('user_role')->where('user_id', $id);
+
+		return $this->database->table('roles')->where('role_id', $user_roles->select('role_id'));
+	}
 }
