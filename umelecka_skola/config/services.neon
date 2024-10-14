@@ -4,6 +4,7 @@ services:
 	- App\Core\DevicesService
 	- App\Core\AtelierService
 	- App\Core\RolesService
+	- App\Core\UsersService
 
 
 search:
