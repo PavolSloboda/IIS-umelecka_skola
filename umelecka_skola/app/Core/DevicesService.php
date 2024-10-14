@@ -31,6 +31,12 @@ final class DevicesService
 		return $result;
 	}
 
+	public function showAllAvailableTypes() : array
+	{
+		$result = $this->database->table('device_groups')->fetchAll();
+		return $result;
+	}
+	
 	//vypis jmen vsech dostupnych zarizeni
 	public function getAvailableDevices(): array
     {
@@ -55,10 +61,27 @@ final class DevicesService
         }
     }
 
+	public function editDevice( int $deviceId, string $name): void
+    {
+        $device = $this->database->table('devices')->get($deviceId);
+
+        if ($device) {
+            $device->update(['name' => $name]);
+        }
+    }
+
 	public function getDeviceById(int $deviceId)
     {
         return $this->database->table('devices')->get($deviceId);
     }
+
+	public function deleteDevice(int $id) : void
+	{
+		bdump($id);
+		$this->database->table('devices')->where('device_id', $id)->delete();
+		
+	}
 }
 //maximalni doba vypujcky
 //vyucujici si vypujcuje jen z vlastnich atelieru
+//kdyz majitel nezmeni ze si to clovek vyzvedl automaticky pada reservace

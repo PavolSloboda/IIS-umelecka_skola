@@ -36,9 +36,9 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	{
 		$this->template->devices = $this->devices->showAllAvailableDevices();
 		$this->template->loans = $this->devices->showAllAvailableLoans($this->getUser()->getId());
-
+		$this->template->types = $this->devices->showAllAvailableTypes();
 	}
-	
+
 
 	//formular na pujceni zarizeni
 	public function createComponentAddDeviceLoanForm() : Form
@@ -61,6 +61,47 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->onSuccess[] = [$this, 'processAddDeviceLoanForm'];
 
 		return $form;
+		
+	}
+
+	public function createComponentEditDeviceForm() : Form
+	{
+		$form = new Form;
+		
+		$form->addHidden('device_id');
+		$form->addText('name', 'Name:')->setRequired();
+		$form->addSubmit('submit', 'Submit changes');
+		
+		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
+
+		$form->onSuccess[] = [$this, 'processDeviceEditForm'];
+		return $form;
+		
+	}
+
+	public function handleCancelClicked() : void
+	{
+		$this->redirect('Devices:devices');
+	}
+
+	public function processDeviceEditForm(Form $form, \stdClass $values): void
+	{
+		try {
+			$this->DevicesService->editDevice(intval($values->device_id), $values->name);
+			$this->flashMessage('Device has been successfully edited.', 'success');
+			
+			$this->redirect('Devices:devices');
+		}catch(Nette\Security\AuthenticationException $e)
+		{
+			$form->addError('An error occured');
+		}
+	}
+	
+	public function actionEdit($deviceId)
+	{
+		$device = $this->devices->getDeviceById(intval($deviceId));
+		$form = $this->getComponent('editDeviceForm');
+		$form->setDefaults(['device_id' => $device->device_id, 'name' => $device->name]);
 		
 	}
 
@@ -112,5 +153,17 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 			$form->addError('An error occured');
 		}
 	}
+
+	public function handleDelete(int $id) : void
+	{
+		$this->devices->deleteDevice($id);
+		$this->forward('Devices:devices');
+	}
+
+	public function renderGroup(string $id): void
+	{
+		
+	}
+
 
 }

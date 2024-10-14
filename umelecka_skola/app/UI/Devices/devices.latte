@@ -1,16 +1,64 @@
 {layout '../layout.latte'}
 {block content}
-<ul>                
-{foreach $devices as $item}         
-	<li>{$item->device_id}: Item: {$item->name}  Description: {$item->description} Max loan period : {$item->max_loan_duration}</li> 
-{/foreach}
-</ul>
-<h2>device loan</h2>
+
+<table>
+	<thead>
+		<tr>
+			<th scope = "col">Device ID</th>
+			<th scope = "col">Name</th>
+			<th scope = "col">Description</th>
+			<th scope = "col">Max loan period</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr n:foreach="$devices as $item">
+			<td> {$item->device_id} </td>
+			<td> {$item->name} </td>
+			<td> {$item->description} </td>
+			<td> {$item->max_loan_duration} </td>
+			<td> <button hx-get="{link delete! $item->device_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
+			<td> <button hx-get="{link Devices:edit $item->device_id}" >Edit</button>  </td>
+		</tr>
+	</tbody>
+</table>
+
+<h2>my device reservations</h2>
 {control addDeviceLoanForm}
 
-<ul>                
-{foreach $loans as $item}         
-	<li>{$item->loan_id}: start: {$item->loan_start}  end: {$item->loan_end} status : {$item->status}</li> 
-{/foreach}
-</ul>
+
+<table>
+	<thead>
+		<tr>
+			<th scope = "col">Reservation ID</th>
+			<th scope = "col">NStart</th>
+			<th scope = "col">End</th>
+			<th scope = "col">Status</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr n:foreach="$loans as $item">
+			<td> {$item->loan_id} </td>
+			<td> {$item->loan_start} </td>
+			<td> {$item->loan_end} </td>
+			<td> {$item->status} </td>
+		</tr>
+	</tbody>
+</table>
+
+<h2>Device groups</h2>
+<table>
+	<thead>
+		<tr>
+			<th scope = "col">Group ID</th>
+			<th scope = "col">Name</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr n:foreach="$types as $item">
+			<td> {$item->group_id} </td>
+			<td> {$item->name} </td>
+			<td> <button hx-get="{link Devices:group $item->group_id}" hx-swap="innerHTML">Edit</button>  </td>
+		</tr>
+	</tbody>
+</table>
 {/block}
