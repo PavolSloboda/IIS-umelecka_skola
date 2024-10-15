@@ -61,7 +61,15 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     public function processProfileForm(Form $form, \stdClass $values): void
     {
         $userId = $this->getUser()->getId();
-        $this->profileService->updateUserProfile($userId, [
+
+        // Kontrola, zda je e-mail unikátní
+        if (!$this->profileService->isEmailUnique($values->email, $userId)) {
+            $form->addError('The email address is already in use by another account.');
+            return;
+        }
+
+        // Pokud je e-mail unikátní, pokračujeme s aktualizací profilu
+        $this->profileService->updateUserProfileEditForm($userId, [
             'name' => $values->name,
             'email' => $values->email,
         ]);
