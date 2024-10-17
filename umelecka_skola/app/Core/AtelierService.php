@@ -81,4 +81,14 @@ final class AtelierService
 	{
 		return($user_id == $this->database->table('ateliers')->where('atelier_id', $atelier_id)->fetch()->admin_id);
 	}
+
+	public function addUserWithIdToAtelierWithId(int $user_id, int $atelier_id): void
+	{
+		$this->database->table('user_atelier')->insert(['user_id' => $user_id, 'atelier_id' => $atelier_id]);
+	}
+
+	public function removeUserWithIdFromAtelierWithId(int $user_id, int $atelier_id) : void
+	{
+		$this->database->table('user_atelier')->where('user_id', $user_id)->where('atelier_id', $atelier_id)->delete();
+	}
 }

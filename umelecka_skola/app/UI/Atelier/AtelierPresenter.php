@@ -15,12 +15,14 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 	private $atelier;
 	private $roles;
 	private $users;
+	private	$curr_edit; 
 
 	public function __construct(AtelierService $atelier, RolesService $roles, UsersService $users)
 	{
 		$this->atelier = $atelier;
 		$this->roles = $roles;
 		$this->users = $users;
+		$this->curr_edit = null;
 	}
 
 	protected function startup() : void
@@ -47,8 +49,8 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 
 	public function renderEdit(): void
 	{
-		$this->template->user_items = $this->users->getUsersBelongingToAtelier(5);
-		$this->template->user_items_not = $this->users->getUsersNotBelongingToAtelier(5);
+		$this->template->user_items = $this->users->getUsersBelongingToAtelier(intval($this->curr_edit));
+		$this->template->user_items_not = $this->users->getUsersNotBelongingToAtelier(intval($this->curr_edit));
 	}
 
 	protected function createComponentAddAtelierForm(): Form
@@ -106,6 +108,7 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		$atelier = $this->atelier->getAtelierById(intval($atelierId));
 		$form = $this->getComponent('editAtelierForm');
 		$form->setDefaults(['atelier_id' => $atelier->atelier_id, 'name' => $atelier->name, 'admin_email' => $this->atelier->getAdminEmailByAtelierId($atelier->atelier_id)]);
+		$this->curr_edit = $atelierId;
 		//$form->onSuccess[] = [$this, 'editFormSucceeded'];
 	}
 
@@ -122,9 +125,11 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 
 	public function handleAdd(int $user_id) : void
 	{
-		$form = $this->getComponent('editAtelierForm');
-		//bdump($form->);
-		//$this->atelier->AddUserWithIdToAtelierWithId($user_id, $form->atelier_id);
-		//$this->forward('Atelier:table');
+		$this->atelier->addUserWithIdToAtelierWithId($user_id, intval($this->curr_edit));
 	}	
+
+	public function handleRemove(int $user_id) : void
+	{
+		$this->atelier->removeUserWithIdFromAtelierWithId($user_id, intval($this->curr_edit));
+	}
 }

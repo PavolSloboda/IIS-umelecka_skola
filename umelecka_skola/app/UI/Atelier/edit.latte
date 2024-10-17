@@ -1,18 +1,19 @@
 <div id="edit_div">
 	{control editAtelierForm}
-	<table>
-		<thead>
-			<tr>
-				<th scope = "col">Email</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr n:foreach="$user_items as $user_item">
-				<td> {$user_item->email} </td>
-			</tr>
-		</tbody>
-	</table>
 	<div id="non_atelier_div">
+		<table>
+			<thead>
+				<tr>
+					<th scope = "col">Email</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr n:foreach="$user_items as $user_item">
+					<td> {$user_item->email} </td>
+					<td> <button hx-get="{link remove! $user_item->user_id}" hx-target="#edit_div" hx-swap="innerHTML">Remove</button></td>
+				</tr>
+			</tbody>
+		</table>
 		<table>
 			<thead>
 				<tr>
@@ -22,7 +23,7 @@
 			<tbody>
 				<tr n:foreach="$user_items_not as $user_item">
 					<td> {$user_item->email} </td>
-					<td> <button hx-get="{link add! $user_item->user_id}" hx-target="#non_atelier_div" hx-swap="innerHTML">Add</button></td>
+					<td> <button hx-get="{link add! $user_item->user_id}" hx-target="#edit_div" hx-swap="innerHTML">Add</button></td>
 				</tr>
 			</tbody>
 		</table>
