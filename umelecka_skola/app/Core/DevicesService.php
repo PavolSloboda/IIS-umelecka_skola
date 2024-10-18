@@ -34,6 +34,13 @@ final class DevicesService
 	public function showAllAvailableTypes() : array
 	{
 		$result = $this->database->table('device_groups')->fetchAll();
+	
+		return $result;
+	}
+	public function getDeviceTypes() : array
+	{
+		$result = $this->database->table('device_groups')->fetchPairs('group_id', 'name');
+	
 		return $result;
 	}
 
@@ -91,12 +98,21 @@ final class DevicesService
         }
     }
 
-	public function editDevice( int $deviceId, string $name): void
+	public function editDevice( int $deviceId, string $name, string $description, int $max_loan_duration, int $group_id): void
     {
         $device = $this->database->table('devices')->get($deviceId);
 
         if ($device) {
-            $device->update(['name' => $name]);
+            $device->update(['name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id]);
+        }
+    }
+
+	public function editGroup( int $group_id, string $name, string $description): void
+    {
+        $group = $this->database->table('device_groups')->get($group_id);
+
+        if ($group) {
+            $group->update(['name' => $name, 'description' => $description]);
         }
     }
 
@@ -107,10 +123,14 @@ final class DevicesService
 
 	public function deleteDevice(int $id) : void
 	{
-		bdump($id);
 		$this->database->table('devices')->where('device_id', $id)->delete();
 		
 	}
+	
+	public function getGroupById(int $group_id) 
+    {
+        return $this->database->table('device_groups')->get($group_id);
+    }
 
 	public function isNotDeviceReserve(int $device_id) : bool
 	{
@@ -118,7 +138,23 @@ final class DevicesService
 
     	return $device !== null;
 	}
+
+	public function addDevice(string $name,string $description, int $max_loan_duration,int $group_id) : void
+    {
+        $this->database->table('devices')->insert(['name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id]);
+    }
+	
+	public function addGroup(string $name,string $description) : void
+    {
+        $this->database->table('device_groups')->insert(['name' => $name, 'description' => $description]);
+    }
+	
 }
-//maximalni doba vypujcky
+
 //vyucujici si vypujcuje jen z vlastnich atelieru
-//kdyz majitel nezmeni ze si to clovek vyzvedl automaticky pada reservace
+//pridavani zarizeni 
+//edit groups, add groups
+//zakas pujcovani zarizeni
+//delete groups(jenom ty co se nepouzivaji)
+//???upravuje seznam registrovaných uživatelů přiřazených k ateliéru, kteří si mohou půjčovat vybavení
+

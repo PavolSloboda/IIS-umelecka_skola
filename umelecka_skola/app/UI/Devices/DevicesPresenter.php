@@ -30,6 +30,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 			$this->redirect('Login:login');
 		}
 		$this->template->addFunction('isNotDeviceReserve', function (int $id) {return $this->devices->isNotDeviceReserve(intval($id));});
+		$this->template->addFunction('getGroupById', function (int $id) {return $this->devices->getGroupById(intval($id));});
 		$this->devices->ChangeStateReservation();
 		$this->devices->updateLoanStatus();
 	}
@@ -43,12 +44,46 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->template->types = $this->devices->showAllAvailableTypes();
 	}
 
+	public function createComponentAddDeviceForm() : Form
+	{
+		$form = new Form;
+		
+		
+		$form->addText('name', 'Name:')->setRequired();
+		$form->addText('description', 'Description:')->setRequired();
+		$form->addText('max_loan_duration', 'Max loan duration:')->setRequired();
+		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
+		$form->addSubmit('submit', 'Submit changes');
+		
+		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
+
+		$form->onSuccess[] = [$this, 'processAddDeviceForm'];
+		return $form;
+		
+	}
+
+	public function createComponentAddGroupForm() : Form
+	{
+		$form = new Form;
+		
+		
+		$form->addText('name', 'Name:')->setRequired();
+		$form->addText('description', 'Description:')->setRequired();
+		$form->addSubmit('submit', 'Submit changes');
+		
+		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
+
+		$form->onSuccess[] = [$this, 'processAddGroupForm'];
+		return $form;
+		
+	}
 
 	//formular na pujceni zarizeni
 	public function createComponentAddDeviceLoanForm() : Form
 	{
 		$form = new Form;
 
+		$form->addHidden('device_id');
 		// Zadání začátku výpůjčky (datum a čas)
 		$form->addDateTime('loan_start', 'Start Date and Time:')->setFormat('Y-m-d H:i:s')
         ->setRequired('Please enter the start date and time.');
@@ -73,11 +108,30 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 		$form->addHidden('device_id');
 		$form->addText('name', 'Name:')->setRequired();
+		$form->addText('description', 'Description:')->setRequired();
+		$form->addText('max_loan_duration', 'Max loan duration:')->setRequired();
+		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
 		$form->addSubmit('submit', 'Submit changes');
 		
 		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
 
 		$form->onSuccess[] = [$this, 'processDeviceEditForm'];
+		return $form;
+		
+	}
+	public function createComponentEditGroupForm() : Form
+	{
+		$form = new Form;
+		
+		$form->addHidden('group_id');
+		$form->addText('name', 'Name:')->setRequired();
+		$form->addText('description', 'Description:')->setRequired();
+		
+		$form->addSubmit('submit', 'Submit changes');
+		
+		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
+
+		$form->onSuccess[] = [$this, 'processGroupEditForm'];
 		return $form;
 		
 	}
@@ -90,7 +144,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function processDeviceEditForm(Form $form, \stdClass $values): void
 	{
 		try {
-			$this->DevicesService->editDevice(intval($values->device_id), $values->name);
+			$this->DevicesService->editDevice(intval($values->device_id), $values->name, $values->description, intval($values->max_loan_duration), intval($values->group_id));
 			$this->flashMessage('Device has been successfully edited.', 'success');
 			
 			$this->redirect('Devices:devices');
@@ -104,22 +158,45 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	{
 		$device = $this->devices->getDeviceById(intval($deviceId));
 		$form = $this->getComponent('editDeviceForm');
-		$form->setDefaults(['device_id' => $device->device_id, 'name' => $device->name]);
+		$form->setDefaults(['device_id' => $device->device_id, 'name' => $device->name, 'description' => $device->description, 'max_loan_duration' => $device->max_loan_duration, 'group_id' => $device->group_id]);
 	}
 
-	public function actionReserve($name)
+	public function processGroupEditForm(Form $form, \stdClass $values): void
 	{
-		$this->template->deviceName = $name;
+		try {
+			$this->DevicesService->editGroup(intval($values->group_id), $values->name, $values->description);
+			$this->flashMessage('Device has been successfully edited.', 'success');
+			
+			$this->redirect('Devices:devices');
+		}catch(Nette\Security\AuthenticationException $e)
+		{
+			$form->addError('An error occured');
+		}
 	}
 
-	public function validateAddDeviceLoanForm(Form $form): void
+	public function actionEditGroup($groupId)
+	{
+		$group = $this->devices->getGroupById(intval($groupId));
+		$form = $this->getComponent('editGroupForm');
+		$form->setDefaults(['group_id' => $group->group_id, 'name' => $group->name, 'description' => $group->description]);
+	}
+
+	public function actionReserve($deviceId)
+	{
+		$device = $this->devices->getDeviceById(intval($deviceId));
+		$this->template->deviceName = $device->name;
+		$form = $this->getComponent('addDeviceLoanForm');
+		$form->setDefaults(['device_id' => $device->device_id]);
+	}
+
+	public function validateAddDeviceLoanForm(Form $form, \stdClass $values): void
 	{
 		date_default_timezone_set('Europe/Prague');
 		$loanStart = new \DateTime($form->getValues()->loan_start);
 		$loanEnd = new \DateTime($form->getValues()->loan_end);
 
 		$interval = $loanStart->diff($loanEnd);
-		$maxLoanDuration = $this->DevicesService->getDeviceById($form->getValues()->device_id)->max_loan_duration;
+		$maxLoanDuration = $this->DevicesService->getDeviceById(intval($values->device_id))->max_loan_duration;
 
 		if ($interval->days > $maxLoanDuration) {
 			$form->addError('The loan duration cannot exceed ' . $maxLoanDuration . ' days.');
@@ -137,6 +214,32 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 	}
 
+	public function processAddDeviceForm(Form $form, \stdClass $values): void
+	{
+		try {
+			$this->DevicesService->addDevice($values->name, $values->description, intval($values->max_loan_duration), $values->group_id);
+			$this->flashMessage('Device has been successfully edited.', 'success');
+			
+			$this->redirect('Devices:devices');
+		}catch(Nette\Security\AuthenticationException $e)
+		{
+			$form->addError('An error occured');
+		}
+	}
+
+	public function processAddGroupForm(Form $form, \stdClass $values): void
+	{
+		try {
+			$this->DevicesService->addGroup($values->name, $values->description);
+			$this->flashMessage('Device has been successfully edited.', 'success');
+			
+			$this->redirect('Devices:devices');
+		}catch(Nette\Security\AuthenticationException $e)
+		{
+			$form->addError('An error occured');
+		}
+	}
+
 	public function processAddDeviceLoanForm(Form $form, \stdClass $values): void
 	{
 		if ($form->hasErrors()) {
@@ -151,10 +254,10 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$loanEnd = $values->loan_end;
 
 		try {
-			$this->DevicesService->borrowDevice($userId, $deviceId, $loanStart, $loanEnd);
+			$this->DevicesService->borrowDevice($userId, intval($deviceId), $loanStart, $loanEnd);
 			$this->flashMessage('Device has been successfully borrowed.', 'success');
 			
-			$this->redirect('this');
+			$this->redirect('Devices:devices');
 		}catch(Nette\Security\AuthenticationException $e)
 		{
 			$form->addError('An error occured');
