@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\UI\Devices;
 
 use App\Core\DevicesService;
+use App\Core\RolesService;
 use Nette;
 use Nette\Application\UI\Form;
 
@@ -13,13 +14,13 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 {
 	private $devices; 
 	private DevicesService $DevicesService;
-	private $loan;
+	private $roles;
 
-	public function __construct(DevicesService $devices,DevicesService $DevicesService,DevicesService $loan)
+	public function __construct(DevicesService $devices, RolesService $roles, DevicesService $DevicesService,DevicesService $loan)
 	{
 		$this->devices = $devices;
+		$this->roles = $roles;
 		$this->DevicesService = $DevicesService;
-		$this->loan = $loan;
 	}
 
 	protected function startup() : void
@@ -34,6 +35,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->template->addFunction('isGroupEmpty', function (int $id) {return $this->devices->isGroupEmpty(intval($id));});
 
 		$this->template->addFunction('getGroupById', function (int $id) {return $this->devices->getGroupById(intval($id));});
+		$this->template->addFunction('getStatusById', function (int $id) {return $this->devices->getStatusById(intval($id));});
+		$this->template->addFunction('hasCurrUserRole', function (string $role_name) {return $this->roles->userWithIdHasRoleWithId($this->getUser()->getId(), $this->roles->getRoleIdWithName($role_name));});
 		$this->devices->ChangeStateReservation();
 		$this->devices->updateLoanStatus();
 	}
@@ -197,6 +200,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->addText('description', 'Description:')->setRequired();
 		$form->addText('max_loan_duration', 'Max loan duration:')->setRequired();
 		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
+		$form->addCheckbox('loan', 'Device can not be borrowed');
 		$form->addSubmit('submit', 'Submit changes');
 		
 		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
@@ -208,7 +212,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function processDeviceEditForm(Form $form, \stdClass $values): void
 	{
 		try {
-			$this->DevicesService->editDevice(intval($values->device_id), $values->name, $values->description, intval($values->max_loan_duration), intval($values->group_id));
+			$this->DevicesService->editDevice(intval($values->device_id), $values->name, $values->description, intval($values->max_loan_duration), intval($values->group_id), $values->loan);
 			$this->flashMessage('Device has been successfully edited.', 'success');
 			
 			$this->redirect('Devices:devices');
@@ -222,7 +226,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	{
 		$device = $this->devices->getDeviceById(intval($deviceId));
 		$form = $this->getComponent('editDeviceForm');
-		$form->setDefaults(['device_id' => $device->device_id, 'name' => $device->name, 'description' => $device->description, 'max_loan_duration' => $device->max_loan_duration, 'group_id' => $device->group_id]);
+		$form->setDefaults(['device_id' => $device->device_id, 'name' => $device->name, 'description' => $device->description, 'max_loan_duration' => $device->max_loan_duration, 'group_id' => $device->group_id, 'loan' => $device->loan]);
 	}
 
 	public function createComponentEditGroupForm() : Form

@@ -113,12 +113,12 @@ final class DevicesService
         }
     }
 
-	public function editDevice( int $deviceId, string $name, string $description, int $max_loan_duration, int $group_id): void
+	public function editDevice( int $deviceId, string $name, string $description, int $max_loan_duration, int $group_id, bool $loan): void
     {
         $device = $this->database->table('devices')->get($deviceId);
 
         if ($device) {
-            $device->update(['name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id]);
+            $device->update(['name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id, 'loan' => $loan]);
         }
     }
 
@@ -170,6 +170,11 @@ final class DevicesService
     {
         return $this->database->table('device_groups')->get($group_id);
     }
+	
+	public function getStatusById(int $status_id) 
+    {
+        return $this->database->table('loan_status')->get($status_id);
+    }
 
 	public function isNotDeviceReserve(int $device_id) : bool
 	{
@@ -197,10 +202,8 @@ final class DevicesService
 
 	
 }
+//musime omezit schopnosti vyucujiciho jen na atelier kam patri
+//pokud zarizeni patri do jeho atelieru tak se mu zobrazi rezervace//nastavit ze rezervaci muze videt taky vlastnik zarizeni //jde udelat az s palem
 
-//vyucujici si vypujcuje jen z vlastnich atelieru
-//vyucujici zakas pujcovani zarizeni
+//???upravuje seznam registrovaných uživatelů přiřazených k ateliéru, kteří si mohou půjčovat vybavení ///s palem
 
-//???upravuje seznam registrovaných uživatelů přiřazených k ateliéru, kteří si mohou půjčovat vybavení
-//nastavit ze rezervaci muze videt taky vlastnik zarizeni
-//vyucujici vlastni zarizeni a upravuje jestli jde vypujcit

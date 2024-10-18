@@ -2,7 +2,9 @@
 {block content}
 <div  hx-target="this" hx-swap= "outerHTML">
 
-<button hx-get="{link Devices:add}">Add</button>
+{if hasCurrUserRole('teacher')}
+	<button hx-get="{link Devices:add}">Add</button>
+{/if}
 <table>
 	<thead>
 		<tr>
@@ -20,8 +22,10 @@
 			<td> {$item->description} </td>
 			<td> {$item->max_loan_duration} </td>
 			<td> {getGroupById($item->group_id)->name} </td>
-			<td> <button hx-get="{link Devices:edit $item->device_id}" >Edit</button>  </td>
-			<td> <button hx-get="{link deleteDevice! $item->device_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
+			{if hasCurrUserRole('teacher')}
+				<td> <button hx-get="{link Devices:edit $item->device_id}" >Edit</button>  </td>
+				<td> <button hx-get="{link deleteDevice! $item->device_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
+			{/if}
 			{if isNotDeviceReserve($item->device_id)}
 				<td> <button hx-get="{link Devices:reserve $item->device_id}" >Reserve</button>  </td>
 			{/if}
@@ -45,17 +49,21 @@
 			<td> {$item->loan_id} </td>
 			<td> {$item->loan_start} </td>
 			<td> {$item->loan_end} </td>
-			<td> {$item->status} </td>
-			<td> <button hx-get="{link Devices:editreservation $item->loan_id}">Edit</button> </td>
-			{if $item->status == '1'}
-			<td> <button hx-get="{link deleteReservation! $item->loan_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
+			<td> {getStatusById($item->status_id)->name} </td>
+			{if hasCurrUserRole('teacher')}
+				<td> <button hx-get="{link Devices:editreservation $item->loan_id}">Edit</button> </td>
+				{if $item->status == '1'}
+					<td> <button hx-get="{link deleteReservation! $item->loan_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
+				{/if}
 			{/if}
 		</tr>
 	</tbody>
 </table>
 
 <h2>Device groups</h2>
-<button hx-get="{link Devices:addgroup}">Add</button>
+{if hasCurrUserRole('atelier_manager')}
+	<button hx-get="{link Devices:addgroup}">Add</button>
+{/if}
 <table>
 	<thead>
 		<tr>
@@ -69,9 +77,11 @@
 			<td> {$item->group_id} </td>
 			<td> {$item->name} </td>
 			<td> {$item->description} </td>
-			<td> <button hx-get="{link Devices:editgroup $item->group_id}">Edit</button> </td>
-			{if isGroupEmpty($item->group_id)}
-			<td> <button hx-get="{link deleteGroup! $item->group_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
+			{if hasCurrUserRole('atelier_manager')}
+				<td> <button hx-get="{link Devices:editgroup $item->group_id}">Edit</button> </td>
+				{if isGroupEmpty($item->group_id)}
+					<td> <button hx-get="{link deleteGroup! $item->group_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
+				{/if}
 			{/if}
 		</tr>
 	</tbody>
