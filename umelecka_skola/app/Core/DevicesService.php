@@ -25,11 +25,22 @@ final class DevicesService
 		return $result;
 	}
 
-	public function showAllAvailableLoans(int $userId) : array
-	{
-		$result = $this->database->table('loan')->where('user_id',$userId)->where('status IN ?', ['reservation', 'loan'])->fetchAll();
-		return $result;
-	}
+    public function showAllAvailableLoans(): array
+    {
+        
+        $statusIds = [];
+        $statusRows = $this->database->table('loan_status')
+            ->where('name IN ?', ['reservation', 'loan'])
+            ->fetchAll();
+
+        foreach ($statusRows as $status) {
+            $statusIds[] = $status->status_id;
+        }
+
+        return $this->database->table('loan')
+            ->where('status_id IN ?', $statusIds)
+            ->fetchAll();
+    }
 
 	public function showAllAvailableTypes() : array
 	{
@@ -45,23 +56,22 @@ final class DevicesService
 	}
 
 	public function ChangeStateReservation(): void
-    {
-        
-        $currentTime = new \DateTime();
+	{
+		$currentTime = new \DateTime();
 
-        // stav se aktualizuje na zruseno pokud majitel nezmenil stav a tedy si predmet nikdo nevyzvedl
-        $this->database->table('loan')
-            ->where('loan_start < ? AND status = ?', $currentTime->format('Y-m-d H:i:s'), 'reservation')
-            ->update(['status' => 'cancelled']);
-		
-    }
+		$reservationStatusId = $this->database->table('loan_status')->where('name', 'reservation')->fetch()->status_id;
+		$cancelledStatusId = $this->database->table('loan_status')->where('name', 'cancelled')->fetch()->status_id;
+
+		$this->database->table('loan')->where('loan_start < ?', $currentTime->format('Y-m-d H:i:s'))->where('status_id', $reservationStatusId)->update(['status_id' => $cancelledStatusId]);
+	}
+
 
 	public function updateLoanStatus(): void
 	{
-		$deviceIds = $this->database->table('loan')
-			->select('device_id') 
-			->where('status IN ?', ['completed', 'cancelled']) 
-			->fetchAll(); 
+		$completedStatusId = $this->database->table('loan_status')->where('name', 'completed')->fetch()->status_id;
+		$cancelledStatusId = $this->database->table('loan_status')->where('name', 'cancelled')->fetch()->status_id;
+
+		$deviceIds = $this->database->table('loan')->select('device_id')->where('status_id IN ?', [$completedStatusId, $cancelledStatusId])->fetchAll();
 
 		if (!empty($deviceIds)) {
 			
@@ -72,7 +82,11 @@ final class DevicesService
 			}
 		}
 	}
-
+	
+	public function getLoanStatus()
+    {
+        return $this->database->table('loan_status')->fetchPairs('status_id', 'name');
+    }
 	
 	//vypis jmen vsech dostupnych zarizeni
 	public function getAvailableDevices(): array
@@ -91,9 +105,10 @@ final class DevicesService
     public function borrowDevice(int $userId, int $deviceId, string $loanStart, string $loanEnd): void
     {
         $device = $this->database->table('devices')->get($deviceId);
+		$reservationStatusId = $this->database->table('loan_status')->where('name', 'reservation')->fetch()->status_id;
 
         if ($device && !$device->loan) {
-            $this->database->table('loan')->insert(['user_id' => $userId,'device_id' => $deviceId,'loan_start' => $loanStart,'loan_end' => $loanEnd,'status' => 'reservation',]);
+            $this->database->table('loan')->insert(['user_id' => $userId,'device_id' => $deviceId,'loan_start' => $loanStart,'loan_end' => $loanEnd,'status_id' => $reservationStatusId,]);
             $device->update(['loan' => TRUE,]);
         }
     }
@@ -115,10 +130,22 @@ final class DevicesService
             $group->update(['name' => $name, 'description' => $description]);
         }
     }
-
-	public function getDeviceById(int $deviceId)
+	
+	public function editReservation( int $group_id, int $status_id): void
     {
-        return $this->database->table('devices')->get($deviceId);
+        $loan = $this->database->table('loan')->get($group_id);
+
+        $loan->update(['status_id' => $status_id]);
+	}
+
+	public function getDeviceById(int $device_id)
+    {
+        return $this->database->table('devices')->get($device_id);
+    }
+
+	public function getLoanById(int $loan_id)
+    {
+        return $this->database->table('loan')->get($loan_id);
     }
 
 	public function deleteDevice(int $id) : void
@@ -127,6 +154,18 @@ final class DevicesService
 		
 	}
 	
+	public function deleteGroup(int $id) : void
+	{
+		$this->database->table('device_groups')->where('group_id', $id)->delete();
+	}
+	
+	public function deleteReservation(int $id) : void
+	{
+		$device_id = $this->database->table('loan')->get($id)->device_id;
+		$this->database->table('loan')->where('loan_id', $id)->delete();
+		$this->database->table('devices')->where('device_id', $device_id)->update(['loan' => false]);
+	}
+
 	public function getGroupById(int $group_id) 
     {
         return $this->database->table('device_groups')->get($group_id);
@@ -138,6 +177,13 @@ final class DevicesService
 
     	return $device !== null;
 	}
+	
+	public function isGroupEmpty(int $group_id) : bool
+	{
+		$device = $this->database->table('devices')->where('group_id', $group_id)->fetch();
+
+    	return $device == null;
+	}
 
 	public function addDevice(string $name,string $description, int $max_loan_duration,int $group_id) : void
     {
@@ -148,13 +194,13 @@ final class DevicesService
     {
         $this->database->table('device_groups')->insert(['name' => $name, 'description' => $description]);
     }
+
 	
 }
 
 //vyucujici si vypujcuje jen z vlastnich atelieru
-//pridavani zarizeni 
-//edit groups, add groups
-//zakas pujcovani zarizeni
-//delete groups(jenom ty co se nepouzivaji)
-//???upravuje seznam registrovaných uživatelů přiřazených k ateliéru, kteří si mohou půjčovat vybavení
+//vyucujici zakas pujcovani zarizeni
 
+//???upravuje seznam registrovaných uživatelů přiřazených k ateliéru, kteří si mohou půjčovat vybavení
+//nastavit ze rezervaci muze videt taky vlastnik zarizeni
+//vyucujici vlastni zarizeni a upravuje jestli jde vypujcit

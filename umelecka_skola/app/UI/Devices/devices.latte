@@ -20,8 +20,8 @@
 			<td> {$item->description} </td>
 			<td> {$item->max_loan_duration} </td>
 			<td> {getGroupById($item->group_id)->name} </td>
-			<td> <button hx-get="{link delete! $item->device_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
 			<td> <button hx-get="{link Devices:edit $item->device_id}" >Edit</button>  </td>
+			<td> <button hx-get="{link deleteDevice! $item->device_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
 			{if isNotDeviceReserve($item->device_id)}
 				<td> <button hx-get="{link Devices:reserve $item->device_id}" >Reserve</button>  </td>
 			{/if}
@@ -46,7 +46,10 @@
 			<td> {$item->loan_start} </td>
 			<td> {$item->loan_end} </td>
 			<td> {$item->status} </td>
-			<td> <button hx-get="{link Devices:edit $item->loan_id}">Edit</button> </td>
+			<td> <button hx-get="{link Devices:editreservation $item->loan_id}">Edit</button> </td>
+			{if $item->status == '1'}
+			<td> <button hx-get="{link deleteReservation! $item->loan_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
+			{/if}
 		</tr>
 	</tbody>
 </table>
@@ -66,8 +69,10 @@
 			<td> {$item->group_id} </td>
 			<td> {$item->name} </td>
 			<td> {$item->description} </td>
-			{*<td> <button hx-get="{link delete! $item->group_id}"  hx-target="closest tr">Delete</button> </td>*}
 			<td> <button hx-get="{link Devices:editgroup $item->group_id}">Edit</button> </td>
+			{if isGroupEmpty($item->group_id)}
+			<td> <button hx-get="{link deleteGroup! $item->group_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
+			{/if}
 		</tr>
 	</tbody>
 </table>
