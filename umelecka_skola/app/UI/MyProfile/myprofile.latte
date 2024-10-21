@@ -1,0 +1,74 @@
+{layout '../layout.latte'}
+
+{block content}
+
+<block head>
+	<link rel="stylesheet" href="{$basePath}/css/style.css">
+</block>
+
+<!-- Profilová sekce -->
+<h2>Profile Information</h2>
+    <div class="profile-section">
+        <p><strong>Name:</strong> {$profile->password}</p>
+        <p><strong>Email:</strong> {$profile->email}</p>
+    </div>
+
+    <h2>Edit Profile</h2>
+    {control profileForm}
+
+<hr>
+
+<!-- Formulář pro změnu hesla -->
+<div class="password-change-section">
+    <h3>Change Password</h3>
+    {control changePasswordForm}
+</div>
+
+<hr>
+
+<!-- Sekce výpůjček -->
+<div class="loans-section">
+    <h2>Your Loans</h2>
+
+    <!-- Aktuální a budoucí výpůjčky -->
+    <div class="current-loans">
+        <h3>Current and Upcoming Loans</h3>
+
+        {if count($currentLoans)}
+            <ul>
+                {foreach $currentLoans as $loan}
+                    <li>
+                        <strong>Device:</strong> {$loan->device->name}<br>
+                        <strong>Loan Start:</strong> {$loan->loan_start|date:'d-m-Y H:i'}<br>
+                        <strong>Loan End:</strong> {$loan->loan_end|date:'d-m-Y H:i'}<br>
+                        <strong>Status:</strong> {$loan->status}
+                    </li>
+                {/foreach}
+            </ul>
+        {else}
+            <p>No current or upcoming loans.</p>
+        {/if}
+    </div>
+
+    <!-- Minulé výpůjčky -->
+    <div class="past-loans">
+        <h3>Past Loans</h3>
+
+        {if count($pastLoans)}
+            <ul>
+                {foreach $pastLoans as $loan}
+                    <li>
+                        <strong>Device:</strong> {$loan->device->name}<br>
+                        <strong>Loan Start:</strong> {$loan->loan_start|date:'d-m-Y H:i'}<br>
+                        <strong>Loan End:</strong> {$loan->loan_end|date:'d-m-Y H:i'}<br>
+                        <strong>Status:</strong> {$loan->status}
+                    </li>
+                {/foreach}
+            </ul>
+        {else}
+            <p>No past loans.</p>
+        {/if}
+    </div>
+</div>
+
+{/block}

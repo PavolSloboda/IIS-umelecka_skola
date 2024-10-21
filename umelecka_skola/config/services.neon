@@ -5,6 +5,8 @@ services:
 	- App\Core\AtelierService
 	- App\Core\RolesService
 	- App\Core\UsersService
+	- App\Core\MyProfileService
+
 
 
 search:
