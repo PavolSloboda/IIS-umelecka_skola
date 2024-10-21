@@ -30,7 +30,6 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     {
         $userId = $this->getUser()->getId();
         $this->template->profile = $this->profileService->getUserProfile($userId);
-        $this->template->devices = $this->profileService->getAvailableDevices();
         $this->template->loans = $this->profileService->getUserLoans($userId);
          // Získání aktuálních a budoucích výpůjček
          $this->template->currentLoans = $this->profileService->getCurrentAndFutureLoans($userId);
@@ -44,11 +43,12 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     {
         $userId = $this->getUser()->getId();
         $profile = $this->profileService->getUserProfile($userId);
+        bdump($profile);
 
         $form = new Form;
-        $form->addText('name', 'Name:')
-            ->setRequired('Please enter your name.')
-            ->setDefaultValue($profile->name);
+//        $form->addText('name', 'Name:')
+//            ->setRequired('Please enter your name.')
+//            ->setDefaultValue($profile->name);
         $form->addText('email', 'Email:')
             ->setRequired('Please enter your email.')
             ->setDefaultValue($profile->email);
@@ -75,37 +75,6 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         ]);
 
         $this->flashMessage('Profile updated successfully.', 'success');
-        $this->redirect('this');
-    }
-
-    // Formulář pro rezervaci zařízení
-    public function createComponentReserveDeviceForm(): Form
-    {
-        $form = new Form;
-        $form->addSelect('device_id', 'Select Device:', $this->profileService->getAvailableDevices())
-            ->setPrompt('Choose a device')
-            ->setRequired('Please select a device.');
-        $form->addDateTime('loan_start', 'Start Date and Time:')
-            ->setRequired('Please enter the start date and time.');
-        $form->addDateTime('loan_end', 'End Date and Time:')
-            ->setRequired('Please enter the end date and time.');
-        $form->addSubmit('submit', 'Reserve Device');
-        $form->onValidate[] = [$this, 'validateReserveDeviceForm'];
-        $form->onSuccess[] = [$this, 'processReserveDeviceForm'];
-
-        return $form;
-    }
-
-    public function processReserveDeviceForm(Form $form, \stdClass $values): void
-    {
-        if ($form->hasErrors()) {
-            return;
-        }
-
-        $userId = $this->getUser()->getId();
-        $this->profileService->borrowDevice($userId, $values->device_id, $values->loan_start, $values->loan_end);
-
-        $this->flashMessage('Device reserved successfully.', 'success');
         $this->redirect('this');
     }
 

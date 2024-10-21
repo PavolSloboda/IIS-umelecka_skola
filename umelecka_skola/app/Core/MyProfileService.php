@@ -21,19 +21,15 @@ final class MyProfileService
     // Získání údajů o uživateli podle jeho ID
     public function getUserProfile(int $userId): ?\Nette\Database\Table\ActiveRow
     {
-        return $this->database->table('users')->get($userId);
+        $my_user = $this->database->table('users')->get($userId);
+        bdump($my_user);
+        return $my_user;
     }
 
     // Uložení změněných údajů o uživateli
     public function updateUserProfile(int $userId, array $data): void
     {
         $this->database->table('users')->where('id', $userId)->update($data);
-    }
-
-    // Získání všech dostupných zařízení, která si uživatel může vypůjčit
-    public function getAvailableDevices(): array
-    {
-        return $this->database->table('devices')->where('available', false)->fetchAll();
     }
 
     // Získání aktuálních výpůjček uživatele
