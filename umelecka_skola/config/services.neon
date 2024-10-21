@@ -2,7 +2,9 @@ services:
 	- App\Core\RouterFactory::createRouter
 	- App\Core\LoginService
 	- App\Core\DevicesService
+	- App\Core\AtelierService
 	- App\Core\RolesService
+	- App\Core\UsersService
 
 
 search:
