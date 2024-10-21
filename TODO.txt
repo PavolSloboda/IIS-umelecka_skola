@@ -15,3 +15,4 @@ Create a separate table for the restricted items and the users they are restrict
 upravit delete v device u rezervace 
 zprovoznit u device admina
 osetrit všechno co se muze stat
+FIGURE OUT how the fuck I'm supposed to do URL REQUESTS
