@@ -308,19 +308,19 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function handleDeleteDevice(int $id) : void
 	{
 		$this->devices->deleteDevice($id);
-		$this->forward('Devices:devices');
+		$this->redirect('Devices:devices');
 	}
 
 	public function handleDeleteGroup(int $id) : void
 	{
 		$this->devices->deleteGroup($id);
-		$this->forward('Devices:devices');
+		$this->redirect('Devices:devices');
 	}
 
 	public function handleDeleteReservation(int $id) : void
 	{
 		$this->devices->deleteReservation($id);
-		$this->forward('Devices:devices');
+		$this->redirect('Devices:devices');
 	}
 
 }

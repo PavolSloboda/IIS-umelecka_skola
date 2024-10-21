@@ -206,4 +206,6 @@ final class DevicesService
 //pokud zarizeni patri do jeho atelieru tak se mu zobrazi rezervace//nastavit ze rezervaci muze videt taky vlastnik zarizeni //jde udelat az s palem
 
 //???upravuje seznam registrovaných uživatelů přiřazených k ateliéru, kteří si mohou půjčovat vybavení ///s palem
+//device nejde smazat protoze na nej odkazuje loan
 
+//osetrit všechno co se muze stat
