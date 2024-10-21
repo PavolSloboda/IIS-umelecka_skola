@@ -11,3 +11,7 @@ Think about different user logins and authentification i.e.:
 GO over the database and work out kinks
 
 Create a separate table for the restricted items and the users they are restricted to
+
+upravit delete v device u rezervace 
+zprovoznit u device admina
+osetrit všechno co se muze stat
