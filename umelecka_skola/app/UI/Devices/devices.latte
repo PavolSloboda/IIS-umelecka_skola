@@ -22,11 +22,11 @@
 				<td> {$item->description} </td>
 				<td> {$item->max_loan_duration} </td>
 				<td> {getGroupById($item->group_id)->name} </td>
-				{if hasCurrUserRole('teacher') || hasCurrUserRole('admin')}
+				{if (hasCurrUserRole('teacher') && isDeviceInMyAtelier($item->device_id)) || hasCurrUserRole('admin')}
 					<td> <button hx-get="{link Devices:edit $item->device_id}" >Edit</button>  </td>
 					<td> <button hx-get="{link deleteDevice! $item->device_id}" hx-target="body" hx-swap="outerHTML">Delete</button> </td>
 				{/if}
-				{if isNotDeviceReserve($item->device_id)}
+				{if (isNotDeviceReserve($item->device_id) && (isDeviceInMyAtelier($item->device_id) || hasCurrUserRole('admin')))}
 					<td> <button hx-get="{link Devices:reserve $item->device_id}">Reserve</button>  </td>
 				{/if}
 			</tr>

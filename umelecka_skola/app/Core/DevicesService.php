@@ -6,14 +6,17 @@ namespace App\Core;
 
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
+use App\Core\AtelierService;
 
 final class DevicesService
 {
 	private Explorer $database;
+	private AtelierService $ateliers;
 
-	public function __construct(Explorer $database)
+	public function __construct(Explorer $database,AtelierService $ateliers)
 	{
 		$this->database = $database;
+		$this->ateliers = $ateliers;
 	}
 
 	/*
@@ -21,7 +24,7 @@ final class DevicesService
 	*///vypis vsech dostupnych zarizeni
 	public function showAllDevices() : array
 	{
-		$result = $this->database->table('devices')->fetchAll();
+		$result = $this->database->table('devices')->where('deleted', false)->fetchAll();
 		return $result;
 	}
 
@@ -48,10 +51,17 @@ final class DevicesService
 	
 		return $result;
 	}
+
 	public function getDeviceTypes() : array
 	{
 		$result = $this->database->table('device_groups')->fetchPairs('group_id', 'name');
 	
+		return $result;
+	}
+
+	public function getUserAtelier(int $userId) : array
+	{
+		$result = $this->database->table('ateliers')->where('admin_id', $userId)->fetchPairs('atelier_id', 'name');
 		return $result;
 	}
 
@@ -88,19 +98,6 @@ final class DevicesService
         return $this->database->table('loan_status')->fetchPairs('status_id', 'name');
     }
 	
-	//vypis jmen vsech dostupnych zarizeni
-	public function getAvailableDevices(): array
-    {
-        $devices = $this->database->table('devices')->where('loan', FALSE);
-
-		$deviceOptions = [];
-        foreach ($devices as $device) {
-            $deviceOptions[$device->device_id] = $device->name;
-        }
-
-        return $deviceOptions;
-    }
-
 	//pujceni zarizeni, todo maximalni doba vypujcky, zarizeni ktera nejdou vypujcit nebo omezit na atelier, spravovani zarizeni majitelem a spravuje vraceni a pujceni
     public function borrowDevice(int $userId, int $deviceId, string $loanStart, string $loanEnd): void
     {
@@ -113,12 +110,12 @@ final class DevicesService
         }
     }
 
-	public function editDevice( int $deviceId, string $name, string $description, int $max_loan_duration, int $group_id, bool $loan): void
+	public function editDevice( int $deviceId, string $name, string $description, int $max_loan_duration, int $group_id, int $atelier_id, bool $loan): void
     {
         $device = $this->database->table('devices')->get($deviceId);
 
         if ($device) {
-            $device->update(['name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id, 'loan' => $loan]);
+            $device->update(['name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id,'atelier_id' => $atelier_id, 'loan' => $loan]);
         }
     }
 
@@ -150,8 +147,7 @@ final class DevicesService
 
 	public function deleteDevice(int $id) : void
 	{
-		$this->database->table('devices')->where('device_id', $id)->delete();
-		
+		$this->database->table('devices')->where('device_id', $id)->update(['deleted' => true]);
 	}
 	
 	public function deleteGroup(int $id) : void
@@ -189,10 +185,35 @@ final class DevicesService
 
     	return $device == null;
 	}
+	
+	public function isDeviceInMyAtelier(int $user_id, int $device_id) : bool
+	{
+		$userAteliers = $this->database->table('user_atelier')
+		->where('user_id', $user_id)
+		->fetchPairs('atelier_id', 'atelier_id');
+		
+		if (empty($userAteliers)) {
 
-	public function addDevice(string $name,string $description, int $max_loan_duration,int $group_id) : void
+			return false;
+		}
+	
+		$device = $this->database->table('devices')->where('device_id', $device_id)->fetch();
+		foreach ($userAteliers as $userAtelier) 
+		{
+			if ($userAtelier->atelier_id === $device->atelier_id) 
+			{
+				return true;
+			}
+		}
+	
+		return false;
+	}
+
+	
+	public function addDevice(int $user_id, string $name,string $description, int $max_loan_duration,int $group_id) : void
     {
-        $this->database->table('devices')->insert(['name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id]);
+		$atelier_id = $this->database->table('ateliers')->where('admin_id',$user_id)->fetch();
+        $this->database->table('devices')->insert(['name' => $name,'atelier_id' => $atelier_id, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id]);
     }
 	
 	public function addGroup(string $name,string $description) : void
@@ -200,12 +221,10 @@ final class DevicesService
         $this->database->table('device_groups')->insert(['name' => $name, 'description' => $description]);
     }
 
-	
 }
-//musime omezit schopnosti vyucujiciho jen na atelier kam patri
+//musime omezit schopnosti vyucujiciho jen na atelier kam patri ,vyucujici edituje svoje zarizeni, urcuje misto a cas vypujceni, omezi vypujcku veci na konkretni studenty v atelieru
 //pokud zarizeni patri do jeho atelieru tak se mu zobrazi rezervace//nastavit ze rezervaci muze videt taky vlastnik zarizeni //jde udelat az s palem
 
 //???upravuje seznam registrovaných uživatelů přiřazených k ateliéru, kteří si mohou půjčovat vybavení ///s palem
-//device nejde smazat protoze na nej odkazuje loan
 
 //osetrit všechno co se muze stat
