@@ -95,6 +95,7 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		{
 			$form->addError('An error occured while atempting to ad an atelier');
 		}
+		$this->forward('Atelier:atelier');
 	}
 
 	public function handleDelete(int $id) : void
