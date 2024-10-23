@@ -1,7 +1,13 @@
 {layout '../layout.latte'}
 
 {block content}
+
+<block head>
+	<link rel="stylesheet" href="{$basePath}/css/style.css">
+</block>
+
 <div  hx-target="this" hx-swap= "outerHTML">
+<h2>Devices</h2>
 	{if hasCurrUserRole('teacher') || hasCurrUserRole('admin')}
 		<button hx-get="{link Devices:add}">Add</button>
 	{/if}
@@ -32,7 +38,7 @@
 			</tr>
 		</tbody>
 	</table>
-
+<h2>Reservations</h2>
 	<table>
 		<thead>
 			<tr>
