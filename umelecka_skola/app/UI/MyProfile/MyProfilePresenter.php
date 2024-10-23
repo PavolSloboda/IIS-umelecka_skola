@@ -11,6 +11,7 @@ use Nette\Application\UI\Form;
 final class MyProfilePresenter extends Nette\Application\UI\Presenter
 {
     private MyProfileService $profileService;
+    private $profile; // Deklarace proměnné jako vlastnost třídy
 
     public function __construct(MyProfileService $profileService)
     {
@@ -23,13 +24,16 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         if (!$this->getUser()->isLoggedIn()) {
             $this->redirect('Login:login');
         }
+
+        $userId = $this->getUser()->getId();
+        $this->profile = $this->profileService->getUserProfile($userId); // Načtení profilu při startupu
     }
 
     // Zobrazení údajů o profilu
     public function renderMyProfile(): void
     {
         $userId = $this->getUser()->getId();
-        $this->template->profile = $this->profileService->getUserProfile($userId);
+        $this->template->profile = $this->profile; // Použití uloženého profilu
         $this->template->loans = $this->profileService->getUserLoans($userId);
          // Získání aktuálních a budoucích výpůjček
          $this->template->currentLoans = $this->profileService->getCurrentAndFutureLoans($userId);
@@ -41,17 +45,17 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     // Formulář pro úpravu údajů o profilu
     public function createComponentProfileForm(): Form
     {
-        $userId = $this->getUser()->getId();
-        $profile = $this->profileService->getUserProfile($userId);
-        bdump($profile);
+        //$userId = $this->getUser()->getId();
+        $profile_createcomp = $this->profile; // Použití uloženého profilu
+        bdump($profile_createcomp);
 
         $form = new Form;
-//        $form->addText('name', 'Name:')
-//            ->setRequired('Please enter your name.')
-//            ->setDefaultValue($profile->name);
+       $form->addText('name', 'Name:')
+            ->setRequired('Please enter your name.')
+            ->setDefaultValue($profile_createcomp->name);
         $form->addText('email', 'Email:')
             ->setRequired('Please enter your email.')
-            ->setDefaultValue($profile->email);
+            ->setDefaultValue($profile_createcomp->email);
         $form->addSubmit('submit', 'Save Changes');
         $form->onSuccess[] = [$this, 'processProfileForm'];
 
