@@ -195,7 +195,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		}
 	}
 
-	public function actionReserve($deviceId)
+	public function actionReserve($deviceId): void
 	{
 		$device = $this->devices->getDeviceById(intval($deviceId));
 		$this->template->deviceName = $device->name;
@@ -235,7 +235,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		}
 	}
 
-	public function actionEdit($deviceId)
+	public function actionEdit($deviceId): void
 	{
 		$device = $this->devices->getDeviceById(intval($deviceId));
 		$form = $this->getComponent('editDeviceForm');
@@ -273,7 +273,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		}
 	}
 
-	public function actionEditGroup($groupId)
+	public function actionEditGroup($groupId): void
 	{
 		$group = $this->devices->getGroupById(intval($groupId));
 		$form = $this->getComponent('editGroupForm');
@@ -306,7 +306,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		}
 	}
 	
-	public function actionEditReservation($reservationId)
+	public function actionEditReservation($reservationId): void
 	{
 		$device = $this->devices->getLoanById(intval($reservationId));
 		$form = $this->getComponent('editReservationForm');
@@ -339,13 +339,11 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 	public function handleAdd(int $user_id) : void
 	{
-		bdump($user_id);
 		$this->devices->UserWithIdCanBorrowDeviceWithId($user_id, intval($this->curr_edit));
 	}	
 
 	public function handleRemove(int $user_id) : void
 	{
-		bdump($user_id);
 		$this->devices->UserWithIdCanNotBorrowDeviceWithId($user_id, intval($this->curr_edit));
 	}
 

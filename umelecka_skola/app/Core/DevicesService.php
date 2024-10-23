@@ -73,6 +73,10 @@ final class DevicesService
 
 		$reservationStatusId = $this->database->table('loan_status')->where('name', 'reservation')->fetch()->status_id;
 		$cancelledStatusId = $this->database->table('loan_status')->where('name', 'cancelled')->fetch()->status_id;
+		if(!$reservationStatusId || !$cancelledStatusId)
+		{
+			throw new \Exception("Reservation status is not defined");
+		}
 
 		$this->database->table('loan')->where('loan_start < ?', $currentTime->format('Y-m-d H:i:s'))->where('status_id', $reservationStatusId)->update(['status_id' => $cancelledStatusId]);
 	}
@@ -82,6 +86,10 @@ final class DevicesService
 	{
 		$completedStatusId = $this->database->table('loan_status')->where('name', 'completed')->fetch()->status_id;
 		$cancelledStatusId = $this->database->table('loan_status')->where('name', 'cancelled')->fetch()->status_id;
+		if(!$completedStatusId || !$cancelledStatusId)
+		{
+			throw new \Exception("Reservation status is not defined");
+		}
 
 		$deviceIds = $this->database->table('loan')->select('device_id')->where('status_id IN ?', [$completedStatusId, $cancelledStatusId])->fetchAll();
 
@@ -95,7 +103,7 @@ final class DevicesService
 		}
 	}
 	
-	public function getLoanStatus()
+	public function getLoanStatus(): array
     {
         return $this->database->table('loan_status')->fetchPairs('status_id', 'name');
     }
@@ -137,12 +145,12 @@ final class DevicesService
         $loan->update(['status_id' => $status_id]);
 	}
 
-	public function getDeviceById(int $device_id)
+	public function getDeviceById(int $device_id): \Nette\Database\Table\ActiveRow
     {
         return $this->database->table('devices')->get($device_id);
     }
 
-	public function getLoanById(int $loan_id)
+	public function getLoanById(int $loan_id): \Nette\Database\Table\ActiveRow
     {
         return $this->database->table('loan')->get($loan_id);
     }
@@ -164,31 +172,31 @@ final class DevicesService
 		$this->database->table('devices')->where('device_id', $device_id)->update(['loan' => false]);
 	}
 
-	public function getGroupById(int $group_id) 
+	public function getGroupById(int $group_id): \Nette\Database\Table\ActiveRow
     {
         return $this->database->table('device_groups')->get($group_id);
     }
 	
-	public function getStatusById(int $status_id) 
+	public function getStatusById(int $status_id): \Nette\Database\Table\ActiveRow
     {
         return $this->database->table('loan_status')->get($status_id);
     }
 
-	public function isNotDeviceReserve(int $device_id) : bool
+	public function isNotDeviceReserve(int $device_id): bool
 	{
 		$device = $this->database->table('devices')->where('device_id', $device_id)->where('loan', false)->fetch();
 
     	return $device !== null;
 	}
 	
-	public function isGroupEmpty(int $group_id) : bool
+	public function isGroupEmpty(int $group_id): bool
 	{
 		$device = $this->database->table('devices')->where('group_id', $group_id)->fetch();
 
     	return $device == null;
 	}
 	
-	public function isDeviceInMyAtelier(int $user_id, int $device_id) : bool
+	public function isDeviceInMyAtelier(int $user_id, int $device_id): bool
 	{
 		$userAteliers = $this->database->table('user_atelier')
 		->where('user_id', $user_id)
@@ -236,7 +244,8 @@ final class DevicesService
 		$this->database->table('forbidden_user_devices')->insert(['user_id' => $user_id, 'device_id' => $device_id]);
 	}
 
-	public function get_forbidden_users(int $device_id) : array {
+	public function get_forbidden_users(int $device_id): array
+	{
 		$atelier_id = $this->database->table('devices')->where('device_id', $device_id)->fetch()->atelier_id;
 		$users_atelier = $this->users->getUsersBelongingToAtelier(intval($atelier_id));
 		$forbidden_users = [];
@@ -250,7 +259,9 @@ final class DevicesService
 		}
 		return $forbidden_users;
 	}
-	public function get_not_forbidden_users(int $device_id) : array {
+
+	public function get_not_forbidden_users(int $device_id) : array 
+	{
 		$atelier_id = $this->database->table('devices')->where('device_id', $device_id)->fetch()->atelier_id;
 		$users_atelier = $this->users->getUsersBelongingToAtelier(intval($atelier_id));
 		$not_forbidden_users = [];
@@ -266,9 +277,5 @@ final class DevicesService
 	}
 
 }
-//musime omezit schopnosti vyucujiciho jen na atelier kam patri ,vyucujici edituje svoje zarizeni, urcuje misto a cas vypujceni, omezi vypujcku veci na konkretni studenty v atelieru
-
-
-//???upravuje seznam registrovaných uživatelů přiřazených k ateliéru, kteří si mohou půjčovat vybavení ///s palem
 
 //osetrit všechno co se muze stat
