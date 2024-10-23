@@ -63,7 +63,7 @@ final class MyProfileService
     {
         $existingUser = $this->database->table('users')
             ->where('email', $email)
-            ->where('id != ?', $userId) // Zajistí, že nezkontrolujeme aktuálního uživatele
+            ->where('user_id != ?', $userId) // Zajistí, že nezkontrolujeme aktuálního uživatele
             ->fetch();
 
         return $existingUser === null; // Vrací true, pokud uživatel s tímto emailem neexistuje
