@@ -17,7 +17,18 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 		$this->usersService = $usersService;
 	}
 
-	public function renderDefault(): void
+	protected function startup() : void
+	{
+		parent::startup();
+		if(!$this->getUser()->isLoggedIn())
+		{
+			$this->redirect('Login:login');
+		}
+
+		$this->template->addFunction('hasCurrUserRole', function (string $role_name) {return $this->roles->userWithIdHasRoleWithId($this->getUser()->getId(), $this->roles->getRoleIdWithName($role_name));});
+	}
+
+	public function renderUsers(): void
 	{
 		$this->template->users = $this->usersService->getUsers();
 	}

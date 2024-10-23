@@ -20,6 +20,7 @@ final class DevicesService
 		$this->database = $database;
 		$this->users = $users;
 	}
+	
 
 	/*
 	* @return Nette\Database\table\ActiveRow[]
