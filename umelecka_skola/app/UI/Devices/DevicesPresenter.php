@@ -8,6 +8,7 @@ use App\Core\DevicesService;
 use App\Core\RolesService;
 use Nette;
 use Nette\Application\UI\Form;
+use App\Core\UsersService;
 
 
 final class DevicesPresenter extends Nette\Application\UI\Presenter
@@ -15,12 +16,16 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	private $devices; 
 	private DevicesService $DevicesService;
 	private $roles;
+	private $users;
+	private $curr_edit;
 
-	public function __construct(DevicesService $devices, RolesService $roles, DevicesService $DevicesService,DevicesService $loan)
+	public function __construct(DevicesService $devices, RolesService $roles, DevicesService $DevicesService, UsersService $users)
 	{
 		$this->devices = $devices;
 		$this->roles = $roles;
 		$this->DevicesService = $DevicesService;
+		$this->users = $users;
+		$this->curr_edit = null;
 	}
 
 	protected function startup() : void
@@ -48,6 +53,11 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->template->devices = $this->devices->showAllDevices();
 		$this->template->loans = $this->devices->showAllAvailableLoans($this->getUser()->getId());
 		$this->template->types = $this->devices->showAllAvailableTypes();
+	}
+	public function renderEdit() : void
+	{
+		$this->template->forbidden_users = $this->devices->get_forbidden_users(intval($this->curr_edit));
+		$this->template->not_forbidden_users = $this->devices->get_not_forbidden_users(intval($this->curr_edit));
 	}
 
 	public function createComponentAddDeviceForm() : Form
@@ -229,7 +239,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	{
 		$device = $this->devices->getDeviceById(intval($deviceId));
 		$form = $this->getComponent('editDeviceForm');
-		$form->setDefaults(['device_id' => $device->device_id, 'name' => $device->name, 'description' => $device->description, 'max_loan_duration' => $device->max_loan_duration, 'group_id' => $device->group_id, 'loan' => $device->loan]);
+		$form->setDefaults(['device_id' => $device->device_id, 'name' => $device->name, 'description' => $device->description, 'max_loan_duration' => $device->max_loan_duration, 'group_id' => $device->group_id,'atelier_id' => $device->atelier_id, 'loan' => $device->loan]);
+		$this->curr_edit = $deviceId;
 	}
 
 	public function createComponentEditGroupForm() : Form
@@ -324,6 +335,18 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	{
 		$this->devices->deleteReservation($id);
 		$this->redirect('Devices:devices');
+	}
+
+	public function handleAdd(int $user_id) : void
+	{
+		bdump($user_id);
+		$this->devices->UserWithIdCanBorrowDeviceWithId($user_id, intval($this->curr_edit));
+	}	
+
+	public function handleRemove(int $user_id) : void
+	{
+		bdump($user_id);
+		$this->devices->UserWithIdCanNotBorrowDeviceWithId($user_id, intval($this->curr_edit));
 	}
 
 }
