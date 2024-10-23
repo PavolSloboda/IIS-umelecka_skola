@@ -7,14 +7,18 @@ namespace App\UI\Users;
 use App\Core\UsersService;
 use Nette;
 use Nette\Application\UI\Form;
+use App\Core\RolesService;
+
 
 final class UsersPresenter extends Nette\Application\UI\Presenter
 {
 	private UsersService $usersService;
+	private $roles;
 
-	public function __construct(UsersService $usersService)
+	public function __construct(UsersService $usersService, RolesService $roles)
 	{
 		$this->usersService = $usersService;
+		$this->roles = $roles;
 	}
 
 	protected function startup() : void

@@ -3,6 +3,9 @@
 {block content}
 <h1>User Management</h1>
 
+{if hasCurrUserRole('teacher') || hasCurrUserRole('admin')}
+		<button hx-get="{link Devices:add}">Add</button>
+	{/if}
 <table>
 	<thead>
 		<tr>

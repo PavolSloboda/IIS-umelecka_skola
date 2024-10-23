@@ -5,7 +5,6 @@ namespace App\Core;
 
 use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;
-use App\Core\RolesService;
 
 final class UsersService
 {
