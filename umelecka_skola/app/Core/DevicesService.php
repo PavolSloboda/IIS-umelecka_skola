@@ -7,16 +7,18 @@ namespace App\Core;
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 use App\Core\AtelierService;
+use App\Core\UsersService;
 
 final class DevicesService
 {
 	private Explorer $database;
-	private AtelierService $ateliers;
+	private $users;
 
-	public function __construct(Explorer $database,AtelierService $ateliers)
+
+	public function __construct(Explorer $database, UsersService $users)
 	{
 		$this->database = $database;
-		$this->ateliers = $ateliers;
+		$this->users = $users;
 	}
 
 	/*
@@ -221,9 +223,51 @@ final class DevicesService
         $this->database->table('device_groups')->insert(['name' => $name, 'description' => $description]);
     }
 
+	
+	public function UserWithIdCanBorrowDeviceWithId(int $user_id, int $device_id): void //add
+	{
+		bdump($user_id);
+		$this->database->table('forbidden_user_devices')->where('user_id', $user_id)->where('device_id', $device_id)->delete();
+	}
+
+	public function UserWithIdCanNotBorrowDeviceWithId(int $user_id, int $device_id) : void
+	{
+		bdump($device_id);
+		$this->database->table('forbidden_user_devices')->insert(['user_id' => $user_id, 'device_id' => $device_id]);
+	}
+
+	public function get_forbidden_users(int $device_id) : array {
+		$atelier_id = $this->database->table('devices')->where('device_id', $device_id)->fetch()->atelier_id;
+		$users_atelier = $this->users->getUsersBelongingToAtelier(intval($atelier_id));
+		$forbidden_users = [];
+		foreach ($users_atelier as $user_atelier)
+		{
+			$curr_user = $this->database->table('forbidden_user_devices')->where('user_id', $user_atelier->user_id)->fetch();
+			if($curr_user)
+			{
+				$forbidden_users[] = $user_atelier;
+			}
+		}
+		return $forbidden_users;
+	}
+	public function get_not_forbidden_users(int $device_id) : array {
+		$atelier_id = $this->database->table('devices')->where('device_id', $device_id)->fetch()->atelier_id;
+		$users_atelier = $this->users->getUsersBelongingToAtelier(intval($atelier_id));
+		$not_forbidden_users = [];
+		foreach ($users_atelier as $user_atelier)
+		{
+			$curr_user = $this->database->table('forbidden_user_devices')->where('user_id', $user_atelier->user_id)->fetch();
+			if(!$curr_user)
+			{
+				$not_forbidden_users[] = $user_atelier;
+			}
+		}
+		return $not_forbidden_users;
+	}
+
 }
 //musime omezit schopnosti vyucujiciho jen na atelier kam patri ,vyucujici edituje svoje zarizeni, urcuje misto a cas vypujceni, omezi vypujcku veci na konkretni studenty v atelieru
-//pokud zarizeni patri do jeho atelieru tak se mu zobrazi rezervace//nastavit ze rezervaci muze videt taky vlastnik zarizeni //jde udelat az s palem
+
 
 //???upravuje seznam registrovaných uživatelů přiřazených k ateliéru, kteří si mohou půjčovat vybavení ///s palem
 

@@ -1,2 +1,32 @@
 
 {control editDeviceForm}
+<div  hx-target="this" hx-swap= "outerHTML">
+    <h2> Users can borrow this device </h2>
+    <table>
+        <thead>
+            <tr>
+                <th scope = "col">Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr n:foreach="$not_forbidden_users as $user_item">
+                <td> {$user_item->email} </td>
+                <td> <button hx-get="{link remove! $user_item->user_id}" hx-target="body" hx-swap="outerHTML">Deny</button></td>
+            </tr>
+        </tbody>
+    </table>
+    <h2>Users can not borrow this device</h2>
+    <table>
+        <thead>
+            <tr>
+                <th scope = "col">Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr n:foreach="$forbidden_users as $user_item">
+                <td> {$user_item->email} </td>
+                <td> <button hx-get="{link add! $user_item->user_id}"hx-target="body" hx-swap="outerHTML" >Allow</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
