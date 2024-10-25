@@ -7,17 +7,32 @@ namespace App\UI\Users;
 use App\Core\UsersService;
 use Nette;
 use Nette\Application\UI\Form;
+use App\Core\RolesService;
+
 
 final class UsersPresenter extends Nette\Application\UI\Presenter
 {
 	private UsersService $usersService;
+	private $roles;
 
-	public function __construct(UsersService $usersService)
+	public function __construct(UsersService $usersService, RolesService $roles)
 	{
 		$this->usersService = $usersService;
+		$this->roles = $roles;
 	}
 
-	public function renderDefault(): void
+	protected function startup() : void
+	{
+		parent::startup();
+		if(!$this->getUser()->isLoggedIn())
+		{
+			$this->redirect('Login:login');
+		}
+
+		$this->template->addFunction('hasCurrUserRole', function (string $role_name) {return $this->roles->userWithIdHasRoleWithId($this->getUser()->getId(), $this->roles->getRoleIdWithName($role_name));});
+	}
+
+	public function renderUsers(): void
 	{
 		$this->template->users = $this->usersService->getUsers();
 	}

@@ -1,8 +1,11 @@
-{layout 'layout.latte'}
+{layout '../layout.latte'}
 
 {block content}
 <h1>User Management</h1>
 
+{if hasCurrUserRole('teacher') || hasCurrUserRole('admin')}
+		<button hx-get="{link Devices:add}">Add</button>
+	{/if}
 <table>
 	<thead>
 		<tr>
@@ -14,15 +17,14 @@
 		</tr>
 	</thead>
 	<tbody>
-	{foreach $users as $user}
+	{foreach $users as $user_loop}
 		<tr>
-			<td>{$user->id}</td>
-			<td>{$user->name}</td>
-			<td>{$user->email}</td>
-			<td>{$user->role}</td>
+			<td>{$user_loop->user_id}</td>
+			<td>{$user_loop->name}</td>
+			<td>{$user_loop->email}</td>
 			<td>
-				<a href="{link edit, $user->id}">Edit</a> | 
-				<a href="{link delete, $user->id}" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
+				<a href="{link edit, $user_loop->user_id}">Edit</a> | 
+				<a href="{link delete, $user_loop->user_id}" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
 			</td>
 		</tr>
 	{/foreach}
