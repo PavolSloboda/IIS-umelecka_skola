@@ -1,15 +1,13 @@
 html, body {
-    height: 100%;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     font-family: Arial, sans-serif;
-    background: #09090a;
+    background: #dfe8f7;
+    color: #333;
 }
 
 .container {
+    
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,7 +16,6 @@ html, body {
 }
 
 .centered-content {
-    background: #0a0a0a;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -40,18 +37,18 @@ p {
     margin-bottom: 20px;
 }
 
-/* Barvy pro login stránku */
+/* barva boxu loginu*/
 .container.login-page .centered-content {
-    background-color: #fcf7f7; /* Světle modrý nádech */
+    background-color: #ffffff; 
 }
 
-/* Barvy pro signup stránku */
+/* barva boxu signupu */
 .container.signup-page .centered-content {
-    background-color: #a0c02e; /* Světle oranžový nádech */
+    background-color: #ffffff; /* Světle oranžový nádech */
 }
 
 input[type="submit"] {
-    background-color: #007bff;
+    background-color: #4a74a0;
     color: rgb(10, 10, 10);
     border: none;
     padding: 10px 20px;
@@ -59,6 +56,3 @@ input[type="submit"] {
     cursor: pointer;
 }
 
-input[type="submit"]:hover {
-    background-color: #0056b3;
-}
