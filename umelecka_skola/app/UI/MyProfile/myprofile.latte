@@ -3,25 +3,29 @@
 {block content}
 
 <block head>
-	<link rel="stylesheet" href="{$basePath}/css/style.css">
+    <link rel="stylesheet" href="{$basePath}/css/style.css">
 </block>
 
 <!-- Profilová sekce -->
 <h2>Profile Information</h2>
-    <div class="profile-section">
-        <p><strong>Name:</strong> {$profile->name}</p>
-        <p><strong>Email:</strong> {$profile->email}</p>
-    </div>
+<div class="profile-section" hx-get="{$basePath}/profile/info" hx-trigger="load" hx-target=".profile-section">
+    <p><strong>Name:</strong> {$profile->name}</p>
+    <p><strong>Email:</strong> {$profile->email}</p>
+</div>
 
-    <h2>Edit Profile</h2>
+<h2>Edit Profile</h2>
+<div hx-get="{$basePath}/profile/edit" hx-trigger="click" hx-target="this">
     {control profileForm}
+</div>
 
 <hr>
 
 <!-- Formulář pro změnu hesla -->
 <div class="password-change-section">
     <h3>Change Password</h3>
-    {control changePasswordForm}
+    <div hx-get="{$basePath}/profile/password-change" hx-trigger="click" hx-target="this">
+        {control changePasswordForm}
+    </div>
 </div>
 
 <hr>
@@ -31,7 +35,7 @@
     <h2>Your Loans</h2>
 
     <!-- Aktuální a budoucí výpůjčky -->
-    <div class="current-loans">
+    <div class="current-loans" hx-get="{$basePath}/loans/current" hx-trigger="load" hx-target=".current-loans">
         <h3>Current and Upcoming Loans</h3>
 
         {if count($currentLoans)}
@@ -51,7 +55,7 @@
     </div>
 
     <!-- Minulé výpůjčky -->
-    <div class="past-loans">
+    <div class="past-loans" hx-get="{$basePath}/loans/past" hx-trigger="load" hx-target=".past-loans">
         <h3>Past Loans</h3>
 
         {if count($pastLoans)}

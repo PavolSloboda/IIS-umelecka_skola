@@ -1,0 +1,18 @@
+<h2>Profile Information</h2>
+
+<div class="profile-section">
+    <p><strong>Name:</strong> {$profile->name}</p>
+    <p><strong>Email:</strong> {$profile->email}</p>
+</div>
+
+<h2>Edit Profile</h2>
+
+{control profileForm}
+
+<hr>
+
+<!-- Formulář pro změnu hesla -->
+<div class="password-change-section">
+    <h3>Change Password</h3>
+    {control changePasswordForm}
+</div>
