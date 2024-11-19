@@ -1,5 +1,6 @@
 {snippet "nazov"}
 <div id="target_table">
+<h2>Ateliers</h2>
 <table>
 	<thead>
 		<tr>
@@ -20,6 +21,7 @@
 		</tr>
 	</tbody>
 </table>
+<h2>Add Atelier</h2>
 {if hasCurrUserRole('admin') || hasCurrUserRole('atelier_manager')}
 	{control addAtelierForm}
 {/if}
