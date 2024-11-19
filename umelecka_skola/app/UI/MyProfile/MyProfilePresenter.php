@@ -11,7 +11,7 @@ use Nette\Application\UI\Form;
 final class MyProfilePresenter extends Nette\Application\UI\Presenter
 {
     private MyProfileService $profileService;
-    private $profile; // Deklarace proměnné jako vlastnost třídy
+    private $profile;
 
     public function __construct(MyProfileService $profileService)
     {
@@ -24,60 +24,54 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         if (!$this->getUser()->isLoggedIn()) {
             $this->redirect('Login:login');
         }
-
+        
         $userId = $this->getUser()->getId();
-        $this->profile = $this->profileService->getUserProfile($userId); // Načtení profilu při startupu
+        $this->profile = $this->profileService->getUserProfile($userId);
     }
 
-    // Zobrazení údajů o profilu
-    public function renderMyProfile(): void
+    public function actionMyProfile(): void
     {
-        $userId = $this->getUser()->getId();
-        $this->template->profile = $this->profile; // Použití uloženého profilu
-        $this->template->loans = $this->profileService->getUserLoans($userId);
-         // Získání aktuálních a budoucích výpůjček
-         $this->template->currentLoans = $this->profileService->getCurrentAndFutureLoans($userId);
-
-         // Získání minulých výpůjček
-         $this->template->pastLoans = $this->profileService->getPastLoans($userId);
+        $this->template->profile = $this->profile;
+        $this->template->loans = $this->profileService->getUserLoans($this->getUser()->getId());
+        $this->template->currentLoans = $this->profileService->getCurrentAndFutureLoans($this->getUser()->getId());
+        $this->template->pastLoans = $this->profileService->getPastLoans($this->getUser()->getId());
     }
 
-    // Formulář pro úpravu údajů o profilu
-    public function createComponentProfileForm(): Form
+    public function actionEdit(): void
     {
-        //$userId = $this->getUser()->getId();
-        $profile_createcomp = $this->profile; // Použití uloženého profilu
-        bdump($profile_createcomp);
+        $this->template->profile = $this->profile;
+    }
 
+    public function actionPasswordChange(): void
+    {
+        // Tato akce nepotřebuje další data
+    }
+
+    protected function createComponentProfileForm(): Form
+    {
         $form = new Form;
-       $form->addText('name', 'Name:')
-            ->setRequired('Please enter your name.')
-            ->setDefaultValue($profile_createcomp->name);
+        $form->addText('name', 'Name:')
+            ->setRequired()
+            ->setDefaultValue($this->profile->name);
         $form->addText('email', 'Email:')
-            ->setRequired('Please enter your email.')
-            ->setDefaultValue($profile_createcomp->email);
+            ->setRequired()
+            ->setDefaultValue($this->profile->email);
         $form->addSubmit('submit', 'Save Changes');
         $form->onSuccess[] = [$this, 'processProfileForm'];
-
         return $form;
     }
 
     public function processProfileForm(Form $form, \stdClass $values): void
     {
         $userId = $this->getUser()->getId();
-
-        // Kontrola, zda je e-mail unikátní
         if (!$this->profileService->isEmailUnique($values->email, $userId)) {
             $form->addError('The email address is already in use by another account.');
             return;
         }
-
-        // Pokud je e-mail unikátní, pokračujeme s aktualizací profilu
         $this->profileService->updateUserProfileEditForm($userId, [
             'name' => $values->name,
             'email' => $values->email,
         ]);
-
         $this->flashMessage('Profile updated successfully.', 'success');
         $this->redirect('this');
     }
@@ -85,43 +79,28 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     protected function createComponentChangePasswordForm(): Form
     {
         $form = new Form;
-
-        // Původní heslo
         $form->addPassword('old_password', 'Current Password:')
-            ->setRequired('Please enter your current password.');
-
-        // Nové heslo
+            ->setRequired();
         $form->addPassword('new_password', 'New Password:')
-            ->setRequired('Please enter a new password.')
+            ->setRequired()
             ->addRule($form::MIN_LENGTH, 'Password must be at least %d characters long.', 8);
-
-        // Potvrzení nového hesla
         $form->addPassword('confirm_password', 'Confirm New Password:')
-            ->setRequired('Please confirm your new password.')
+            ->setRequired()
             ->addRule($form::EQUAL, 'Passwords do not match.', $form['new_password']);
-
-        // Tlačítko pro změnu hesla
         $form->addSubmit('submit', 'Change Password');
-
         $form->onSuccess[] = [$this, 'processChangePasswordForm'];
-
         return $form;
     }
 
     public function processChangePasswordForm(Form $form, \stdClass $values): void
     {
         $userId = $this->getUser()->getId();
-        $oldPassword = $values->old_password;
-        $newPassword = $values->new_password;
-
         try {
-            // Ověření a změna hesla pomocí služby
-            $this->profileService->changePassword($userId, $oldPassword, $newPassword);
+            $this->profileService->changePassword($userId, $values->old_password, $values->new_password);
             $this->flashMessage('Password successfully changed.', 'success');
             $this->redirect('this');
         } catch (\Exception $e) {
             $form->addError('Failed to change password. ' . $e->getMessage());
         }
     }
-    
 }
