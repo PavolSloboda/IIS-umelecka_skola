@@ -68,7 +68,8 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
             'email' => $values->email,
         ]);
         $this->flashMessage('Profile updated successfully.', 'success');
-        $this->redirect('this');
+        $this->redrawControl('profile-section');
+        $this->redrawControl('edit-profile-section');
     }
 
     protected function createComponentChangePasswordForm(): Form
@@ -90,12 +91,17 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     public function processChangePasswordForm(Form $form, \stdClass $values): void
     {
         $userId = $this->getUser()->getId();
+        $oldPassword = $values->old_password;
+        $newPassword = $values->new_password;
+
         try {
-            $this->profileService->changePassword($userId, $values->old_password, $values->new_password);
+            // Ověření a změna hesla pomocí služby
+            $this->profileService->changePassword($userId, $oldPassword, $newPassword);
             $this->flashMessage('Password successfully changed.', 'success');
-            $this->redirect('this');
+            $this->redrawControl('password-change-container'); // Zajistí obnovu pouze tohoto kontejneru
         } catch (\Exception $e) {
             $form->addError('Failed to change password. ' . $e->getMessage());
+            $this->redrawControl('password-change-container'); // Zajistí obnovu pouze tohoto kontejneru
         }
     }
 
@@ -125,7 +131,6 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
 
     public function renderPasswordChange(): void
     {
-        // Zajistí, že formulář pro změnu hesla je připraven k zobrazení
         $this->template->changePasswordForm = $this['changePasswordForm'];
     }
 }

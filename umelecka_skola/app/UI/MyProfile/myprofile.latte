@@ -5,30 +5,37 @@
     <link rel="stylesheet" href="{$basePath}/css/style.css">
 </block>
 
+
 <!-- Profilová sekce -->
 <h2>Profile Information</h2>
-<div class="profile-section" hx-get="{$presenter->link(':MyProfile:myProfile')}" hx-trigger="load" hx-target=".profile-section">
+<div id="profile-section">
     <p><strong>Name:</strong> {$profile->name}</p>
     <p><strong>Email:</strong> {$profile->email}</p>
 </div>
 
-<hr>
-
 <!-- Sekce pro editaci profilu -->
 <h2>Edit Profile</h2>
-<div class="edit-profile-section" hx-get="{$presenter->link(':MyProfile:edit')}" hx-trigger="click" hx-target=".edit-profile-section">
-    <!-- Zajistíme, že se formulář načte pouze jednou při kliknutí -->
-    {control profileForm}
+<div id="edit-profile-section">
+    <form method="POST"
+      action="{$basePath}/myProfile/editProfile"
+      hx-post="{$basePath}/myProfile/editProfile"
+      hx-target="#profile-section, #edit-profile-section"
+      hx-swap="outerHTML">
+        {control profileForm}
+    </form>
 </div>
 
 <hr>
 
 <!-- Formulář pro změnu hesla -->
 <h3>Change Password</h3>
-<div class="password-change-section" hx-get="{$presenter->link(':MyProfile:passwordChange')}" hx-trigger="click" hx-target=".password-change-section">
-    <!-- Zajistíme, že se formulář načte pouze jednou při kliknutí -->
-    {control changePasswordForm}
+<div id="password-change-container">
+    <form method="POST" action="{$basePath}/myProfile/passwordChange" hx-post="{$basePath}/myProfile/passwordChange" hx-target="#password-change-container" hx-swap="outerHTML">
+        {control changePasswordForm} <!-- Tato metoda vykreslí formulář -->
+    </form>
 </div>
+
+
 
 <hr>
 
@@ -37,7 +44,7 @@
     <h2>Your Loans</h2>
 
     <!-- Aktuální a budoucí výpůjčky -->
-    <div class="current-loans" hx-get="{$presenter->link(':MyProfile:currentLoans')}" hx-trigger="load" hx-target=".current-loans">
+    <div class="current-loans">
         <h3>Current and Upcoming Loans</h3>
         {if count($currentLoans)}
             <ul>
@@ -56,7 +63,7 @@
     </div>
 
     <!-- Minulé výpůjčky -->
-    <div class="past-loans" hx-get="{$presenter->link(':MyProfile:pastLoans')}" hx-trigger="load" hx-target=".past-loans">
+    <div class="past-loans">
         <h3>Past Loans</h3>
         {if count($pastLoans)}
             <ul>
