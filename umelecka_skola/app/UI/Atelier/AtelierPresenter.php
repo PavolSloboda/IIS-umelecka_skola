@@ -35,6 +35,7 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		$this->template->addFunction('getAdminEmailById', function (int $id) {return $this->atelier->getAdminEmailByAtelierId(intval($id));});
 		$this->template->addFunction('isCurrUserAdmin', function (int $id) {return $this->atelier->isCurrUserAdminOfAtelierWithId(intval($id), $this->getUser()->getId());});
 		$this->template->addFunction('hasCurrUserRole', function (string $role_name) {return $this->roles->userWithIdHasRoleWithId($this->getUser()->getId(), $this->roles->getRoleIdWithName($role_name));});
+		$this->template->addFunction('atelier_is_empty', function (int $id) {return $this->atelier->isAtelierEmpty($id);});
 	}
 
 	public function renderAtelier() : void

@@ -18,6 +18,15 @@ final class AtelierService
 		$this->roles = $roles;
 	}
 
+	public function isAtelierEmpty(int $id) : bool
+	{
+		if(!$this->database->table('user_atelier')->where('atelier_id', $id)->fetch())
+		{
+			return True;
+		}
+		return False;
+	}
+
 	public function createAtelier(string $name, string $admin_email) : void
 	{
 		$admin = $this->database->table('users')->where('email', $admin_email)->fetch();
@@ -26,12 +35,6 @@ final class AtelierService
 		{
 			throw new \Exception("User with email: {$admin_email} not found, please make sure you've entered the correct email");
 		}
-		//TODO
-		//add the necessary roles
-	//	if($admin->role != xyz)
-	//	{
-	//		throw new \Exception("User with email: {$admin_email} does not have the required roles to aminister an atelier");
-	//	}
 
 		$this->database->table('ateliers')->insert(['name' => $name, 'admin_id' => $admin->user_id,]);
 	}
