@@ -18,7 +18,7 @@ final class RouterFactory
 		$router->addRoute('<presenter>/<action>[/<id>]', 'MainPage:mainpage');
 
 		$router->addRoute('/myProfile', 'MyProfile:myProfile');    // Zobrazení profilu
-		$router->addRoute('/myProfile/edit', 'MyProfile:edit');     // Úprava profilu
+		$router->addRoute('/myProfile/editProfile', 'MyProfile:editProfile');     // Úprava profilu
 		$router->addRoute('/myProfile/passwordChange', 'MyProfile:passwordChange');  // Změna hesla
 		$router->addRoute('/myProfile/currentLoans', 'MyProfile:currentLoans');  // Aktuální výpůjčky
 		$router->addRoute('/myProfile/pastLoans', 'MyProfile:pastLoans');  // Minulé výpůjčky
