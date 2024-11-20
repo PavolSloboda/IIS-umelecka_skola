@@ -42,11 +42,6 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         $this->template->profile = $this->profile;
     }
 
-    public function actionPasswordChange(): void
-    {
-        // Tato akce nepotřebuje další data
-    }
-
     protected function createComponentProfileForm(): Form
     {
         $form = new Form;
@@ -102,5 +97,35 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         } catch (\Exception $e) {
             $form->addError('Failed to change password. ' . $e->getMessage());
         }
+    }
+
+    public function renderPastLoans(): void
+    {
+        $userId = $this->getUser()->getId();
+        $this->template->pastLoans = $this->profileService->getPastLoans($userId);
+    }
+
+    public function renderCurrentLoans(): void
+    {
+        $userId = $this->getUser()->getId();
+        $this->template->currentLoans = $this->profileService->getCurrentAndFutureLoans($userId);
+    }
+
+    public function renderMyProfile(): void
+    {
+        $this->template->profile = $this->profile;
+        $this->template->currentLoans = $this->profileService->getCurrentAndFutureLoans($this->getUser()->getId());
+        $this->template->pastLoans = $this->profileService->getPastLoans($this->getUser()->getId());
+    }
+
+    public function renderEdit(): void
+    {
+        $this->template->profile = $this->profile;
+    }
+
+    public function renderPasswordChange(): void
+    {
+        // Zajistí, že formulář pro změnu hesla je připraven k zobrazení
+        $this->template->changePasswordForm = $this['changePasswordForm'];
     }
 }
