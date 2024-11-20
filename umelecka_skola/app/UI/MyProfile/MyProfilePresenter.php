@@ -42,8 +42,33 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         $this->template->profile = $this->profile;
     }
 
+    protected function createComponentInfoForm(): Form
+    {
+        //echo '<h2>Profile Information</h2>';
+        $form2 = new Form;
+        $form2->addText('name', 'Name:')
+                ->setHtmlAttribute('readonly', 'readonly')
+            ->setDefaultValue($this->profile->name);
+        $form2->addText('email', 'Email:')
+            ->setHtmlAttribute('readonly', 'readonly')
+            ->setDefaultValue($this->profile->email);
+            return $form2;
+    }
+
+    public function processInfoForm(Form $form, \stdClass $values): void
+    {
+        $userId = $this->getUser()->getId();
+        $this->profileService->updateUserProfileEditForm($userId, [
+            'name' => $values->name,
+            'email' => $values->email,
+        ]);
+        //$this->flashMessage('Profile updated successfully.', 'success');
+        $this->redrawControl('edit-profile-section');
+    }
+
     protected function createComponentProfileForm(): Form
     {
+        //echo '<h2>Edit Profile</h2>';
         $form = new Form;
         $form->addText('name', 'Name:')
             ->setRequired()
@@ -68,7 +93,7 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
             'email' => $values->email,
         ]);
         $this->flashMessage('Profile updated successfully.', 'success');
-        $this->redrawControl('profile-section');
+        //$this->redrawControl('profile-section');
         $this->redrawControl('edit-profile-section');
     }
 

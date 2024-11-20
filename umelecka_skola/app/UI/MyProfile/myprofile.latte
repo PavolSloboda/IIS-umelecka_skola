@@ -5,22 +5,16 @@
     <link rel="stylesheet" href="{$basePath}/css/style.css">
 </block>
 
-
-<!-- Profilová sekce -->
-<h2>Profile Information</h2>
-<div id="profile-section">
-    <p><strong>Name:</strong> {$profile->name}</p>
-    <p><strong>Email:</strong> {$profile->email}</p>
-</div>
-
 <!-- Sekce pro editaci profilu -->
-<h2>Edit Profile</h2>
-<div id="edit-profile-section">
+<div id="edit-profile-section">¨
     <form method="POST"
       action="{$basePath}/myProfile/editProfile"
       hx-post="{$basePath}/myProfile/editProfile"
       hx-target="#edit-profile-section"
       hx-swap="outerHTML">
+      <h2>Profile Information</h2>
+        {control infoForm}
+        <h2>Edit Profile</h2>
         {control profileForm}
     </form>
 </div>
