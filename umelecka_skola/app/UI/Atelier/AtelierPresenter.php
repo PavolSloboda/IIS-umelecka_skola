@@ -80,8 +80,6 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		$form->addSubmit('submit', 'Confirm changes');
 
 		$form->onSuccess[] = [$this, 'processEditAtelierForm'];
-
-		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
 		
 		return $form;
 	}
@@ -117,11 +115,6 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 	public function processEditAtelierForm(Form $form, \stdClass $data) : void
 	{
 		$this->atelier->editAtelier(intval($data->atelier_id), $data->name, $data->admin_email);
-		$this->redirect('Atelier:atelier');
-	}
-
-	public function handleCancelClicked() : void
-	{
 		$this->redirect('Atelier:atelier');
 	}
 
