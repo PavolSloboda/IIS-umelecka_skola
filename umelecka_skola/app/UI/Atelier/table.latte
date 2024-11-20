@@ -4,14 +4,12 @@
 <table>
 	<thead>
 		<tr>
-			<th scope = "col">Atelier ID</th>
 			<th scope = "col">Name</th>
 			<th scope = "col">Admin email</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr n:foreach="$result as $atelier">
-			<td> {$atelier->atelier_id} </td>
 			<td> {$atelier->name} </td>
 			<td> {getAdminEmailById($atelier->atelier_id)} </td>
 			{if isCurrUserAdmin($atelier->atelier_id) || hasCurrUserRole('admin')}

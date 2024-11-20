@@ -1,7 +1,12 @@
 <div id="edit_div">
-	<h2>Atelier editing</h2>
+	<hr>
+	<div id="edit_header">
+		<h2 id="atelier_nadpis">Atelier editing</h2>
+		<button type="button" hx-get="{link Atelier:table}" hx-target="#edit_div" hx-swap="innerHTML">Cancel</button>
+	</div>
 	{control editAtelierForm}
 		<h2>Users belonging to Atelier</h2>
+		{if count($user_items) > 0}
 		<table>
 			<thead>
 				<tr>
@@ -15,7 +20,11 @@
 				</tr>
 			</tbody>
 		</table>
+		{else}
+			<p>No users belong to the atelier</p>
+		{/if}
 		<h2>Users not belonging to Atelier</h2>
+		{if count($user_items_not) > 0}
 		<table>
 			<thead>
 				<tr>
@@ -29,4 +38,7 @@
 				</tr>
 			</tbody>
 		</table>
+		{else}
+			<p>All users belong to the atelier</p>
+		{/if}
 </div>

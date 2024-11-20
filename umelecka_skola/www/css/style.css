@@ -42,11 +42,19 @@ table td, table th {
 }
 
 /* Nadpisy */
-h2 {
+h2:not(#atelier_nadpis) {
     font-size: 1.8em;
     margin-bottom: 20px;
     color: #333;
     border-top: 2px solid #4a74a0;
+    padding-bottom: 10px;
+    text-align: left; /* Zarovnání textu vlevo */
+}
+
+#atelier_nadpis {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    color: #333;
     padding-bottom: 10px;
     text-align: left; /* Zarovnání textu vlevo */
 }
@@ -186,4 +194,12 @@ button:hover {
 }
 .menu a:hover {
     background-color: #7d9ed6;
+}
+#edit_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
