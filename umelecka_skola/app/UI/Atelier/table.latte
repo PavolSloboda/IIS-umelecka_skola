@@ -1,6 +1,7 @@
 {snippet "nazov"}
 <div id="target_table">
 <h2>Ateliers</h2>
+{if count($result) > 0}
 <table>
 	<thead>
 		<tr>
@@ -21,6 +22,9 @@
 		</tr>
 	</tbody>
 </table>
+{else}
+	<p>No Atieliers currently in the system</p>
+{/if}
 <h2>Add Atelier</h2>
 {if hasCurrUserRole('admin') || hasCurrUserRole('atelier_manager')}
 	{control addAtelierForm}

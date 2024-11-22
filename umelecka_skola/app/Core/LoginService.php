@@ -41,13 +41,13 @@ final class LoginService implements Nette\Security\Authenticator
 		return new SimpleIdentity($curr_user->user_id, ['email' => $curr_user->email]);
 	}
 
-	public function signUp(string $email, string $password): void
+	public function signUp(string $email, string $password, string $username): void
 	{
 		$curr_user =  $this->database->table('users')->where('email', $email)->fetch();
 		if($curr_user)
 		{
 			throw new Nette\Security\AuthenticationException('User already exists, please log in instead');
 		}
-		$this->database->table('users')->insert(['email' => $email, 'password' => $this->passwords->hash($password),]);
+		$this->database->table('users')->insert(['email' => $email, 'password' => $this->passwords->hash($password), 'name' => $username,]);
 	}
 }
