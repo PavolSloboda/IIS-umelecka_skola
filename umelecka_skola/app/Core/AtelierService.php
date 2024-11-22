@@ -20,7 +20,9 @@ final class AtelierService
 
 	public function isAtelierEmpty(int $id) : bool
 	{
-		if(!$this->database->table('user_atelier')->where('atelier_id', $id)->fetch())
+		$users = $this->database->table('user_atelier')->where('atelier_id', $id)->fetch();
+		$devices = $this->database->table('devices')->where('atelier_id', $id)->fetch();
+		if(!$users && !$devices)
 		{
 			return True;
 		}
