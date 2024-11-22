@@ -7,6 +7,7 @@
 	{if hasCurrUserRole('teacher') || hasCurrUserRole('admin')}
 		<button hx-get="{link Devices:add}">Add</button>
 	{/if}
+	{if count($devices) > 0}
 	<table>
 		<thead>
 			<tr>
@@ -34,7 +35,11 @@
 			</tr>
 		</tbody>
 	</table>
+	{else}
+		<p>No Devices currently in the system</p>
+	{/if}
 <h2>Reservations</h2>
+	{if count($loans)}
 	<table>
 		<thead>
 			<tr>
@@ -59,11 +64,14 @@
 			</tr>
 		</tbody>
 	</table>
-
+	{else}
+		<p>No Loans currently in the system</p>
+	{/if}
 	<h2>Device groups</h2>
 	{if hasCurrUserRole('atelier_manager') || hasCurrUserRole('admin')}
 		<button hx-get="{link Devices:addgroup}">Add</button>
 	{/if}
+	{if count($types) > 0}
 	<table>
 		<thead>
 			<tr>
@@ -84,6 +92,9 @@
 			</tr>
 		</tbody>
 	</table>
+	{else}
+		<p>No Device groups currently in the system</p>
+	{/if}
 	</div>
 	</div>
 {/block}
