@@ -123,12 +123,13 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         try {
             // Ověření a změna hesla pomocí služby
             $this->profileService->changePassword($userId, $oldPassword, $newPassword);
+            $this->redrawControl('edit-profile-section'); // Zajistí obnovu pouze tohoto kontejneru
             $this->flashMessage('Password successfully changed.', 'success');
-            $this->redrawControl('password-change-section'); // Zajistí obnovu pouze tohoto kontejneru
             //$this->redirect('MyProfile:myProfile');
         } catch (\Exception $e) {
             $form->addError('Failed to change password. ' . $e->getMessage());
-            $this->redrawControl('password-change-section'); // Zajistí obnovu pouze tohoto kontejneru
+            //$this->redrawControl('password-change-section'); // Zajistí obnovu pouze tohoto kontejneru
+            $this->redrawControl('edit-profile-section');
         }
     }
 
