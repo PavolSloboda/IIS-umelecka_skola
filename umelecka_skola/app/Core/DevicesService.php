@@ -346,6 +346,25 @@ final class DevicesService
 		return $not_forbidden_users;
 	}
 
+	//request
+	public function getDeviceRequests(): array
+    {
+        // Fetch pending device requests from the database
+        return $this->database->table('device_requests')->where('status', 'pending')->fetchAll();
+    }
+
+    public function getRequestById(int $requestId)
+    {
+        // Retrieve a specific device request by ID
+        return $this->database->table('device_requests')->get($requestId);
+    }
+
+    public function deleteRequest(int $requestId): void
+    {
+        // Delete a device request by ID
+        $this->database->table('device_requests')->where('id', $requestId)->delete();
+    }
+
 }
 
 //osetrit všechno co se muze stat

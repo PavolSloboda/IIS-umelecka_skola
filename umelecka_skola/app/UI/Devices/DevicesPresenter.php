@@ -374,4 +374,31 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->devices->UserWithIdCanNotBorrowDeviceWithId($user_id, intval($this->curr_edit));
 	}
 
+	//request
+	public function renderRequests(): void
+    {
+        // Fetch all pending device requests for the teacher
+        $this->template->deviceRequests = $this->devicesService->getDeviceRequests();
+    }
+
+    public function actionFulfillRequest(int $requestId): void
+    {
+        $request = $this->devicesService->getRequestById($requestId);
+        if ($request) {
+            // Redirect to the add-device form with pre-filled data
+            $this->redirect('addDevice', ['name' => $request->name, 'description' => $request->description]);
+        } else {
+            $this->flashMessage("Device request not found.", "error");
+            $this->redirect('requests');
+        }
+    }
+
+    public function handleDeleteRequest(int $requestId): void
+    {
+        $this->devicesService->deleteRequest($requestId);
+        $this->flashMessage("Request deleted successfully.", "success");
+        $this->redirect('requests');
+    }
+
+
 }
