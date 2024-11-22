@@ -1,6 +1,7 @@
 {layout '../layout.latte'}
 {block content}
 <div id="form-container">
+<div hx-target="this" hx-swap= "outerHTML">
 <h2>User Management</h2>
 
 <table>
@@ -17,16 +18,18 @@
             <td>{$user_loop->user_id}</td>
             <td>{$user_loop->name}</td>
             <td>{$user_loop->email}</td>
+			{if hasCurrUserRole('admin')}
             <td>
                 <!-- Edit button now loads form below table -->
-                <button hx-get="{link edit, $user_loop->user_id}" hx-target="#form-container" hx-swap="innerHTML">Edit</button> | 
+                <button hx-get="{link edit, $user_loop->user_id}" >Edit</button> | 
                 <!-- Delete button -->
                 <button hx-delete="{link delete, $user_loop->user_id}" hx-target="#form-container" hx-select="#form-container" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
             </td>
+			{/if}
         </tr>
     {/foreach}
     </tbody>
 </table>
-
+</div>
 </div>
 {/block}
