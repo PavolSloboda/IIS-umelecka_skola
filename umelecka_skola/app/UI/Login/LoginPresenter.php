@@ -61,9 +61,9 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		$form = new Form;
 
 		$form->addEmail('email', 'Email:')->setRequired('Plase enter an email');
+		$form->addText('username', 'Username:')->setRequired('Please enter a username');
 		$form->addPassword('password', 'Password:')->setRequired('Plase enter your password');
 		$form->addSubmit('signup', 'Sign up');
-		//$form->addButton('login', 'Log in')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('loginClicked!').'"');
 		
 		$form->onSuccess[] = [$this, 'validateSignUp']; 
 		return $form;
@@ -73,7 +73,7 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 	{
 		try
 		{
-			$this->loginService->signUp($data->email, $data->password);
+			$this->loginService->signUp($data->email, $data->password, $data->username);
 			$this->redirect('Login:login');
 		}
 		catch(Nette\Security\AuthenticationException $e)
