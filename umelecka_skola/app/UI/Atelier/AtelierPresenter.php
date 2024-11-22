@@ -60,7 +60,7 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 
 		$form->addHidden('atelier_id');
 		$form->addText('name', 'Name:')->setRequired();  
-		$form->addText('admin_email', 'Email of atelier admin:')->setRequired();
+		$form->addEmail('admin_email', 'Email of atelier admin:')->setRequired();
 
 		$form->addSubmit('submit', 'Add atelier');
 
@@ -75,7 +75,7 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 
 		$form->addHidden('atelier_id');
 		$form->addText('name', 'Name:')->setRequired();  
-		$form->addText('admin_email', 'Email of atelier admin:')->setRequired();
+		$form->addEmail('admin_email', 'Email of atelier admin:')->setRequired();
 
 		$form->addSubmit('submit', 'Confirm changes');
 
