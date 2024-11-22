@@ -3,7 +3,27 @@
             <h2 id="cancel_nadpis">hu</h2>
             <button type="button" hx-get="{link Devices:devices}" hx-target="#uwu" hx-select="#uwu">Cancel</button>
     </div>
-{if isset($deviceName)}
-    <p>Your device is: {$deviceName}</p>
+{if isset($device)}
+    <p>Your device is: {$device->name}</p>
 {/if}
 {control addDeviceLoanForm}
+
+<h2>Reservations</h2>
+	<table>
+		<thead>
+			<tr>
+				<th scope = "col">Device</th>
+				<th scope = "col">Start</th>
+				<th scope = "col">End</th>
+				<th scope = "col">Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr n:foreach="getDeviceLoans($device->device_id) as $item">
+				<td> {getDeviceById($item->device_id)->name} </td>
+				<td> {$item->loan_start} </td>
+				<td> {$item->loan_end} </td>
+				<td> {getStatusById($item->status_id)->name} </td>
+			</tr>
+		</tbody>
+	</table>
