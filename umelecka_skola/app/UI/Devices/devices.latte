@@ -1,10 +1,8 @@
 {layout '../layout.latte'}
 
 {block content}
-
-
-
-<div  hx-target="this" hx-swap= "outerHTML">
+<div id="uwu" >
+<div hx-target="this" hx-swap= "outerHTML">
 <h2>Devices</h2>
 	{if hasCurrUserRole('teacher') || hasCurrUserRole('admin')}
 		<button hx-get="{link Devices:add}">Add</button>
@@ -12,25 +10,25 @@
 	<table>
 		<thead>
 			<tr>
-				<th scope = "col">Device ID</th>
 				<th scope = "col">Name</th>
 				<th scope = "col">Description</th>
 				<th scope = "col">Max loan period</th>
 				<th scope = "col">Group</th>
+				<th scope = "col">Atelier</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr n:foreach="$devices as $item">
-				<td> {$item->device_id} </td>
 				<td> {$item->name} </td>
 				<td> {$item->description} </td>
 				<td> {$item->max_loan_duration} </td>
 				<td> {getGroupById($item->group_id)->name} </td>
+				<td> {getAtelierById($item->atelier_id)->name} </td>
 				{if (hasCurrUserRole('teacher') && isDeviceInMyAtelier($item->device_id)) || hasCurrUserRole('admin')}
 					<td> <button hx-get="{link Devices:edit $item->device_id}" >Edit</button>  </td>
-					<td> <button hx-get="{link deleteDevice! $item->device_id}" hx-target="body" hx-swap="outerHTML">Delete</button> </td>
+					<td> <button hx-get="{link deleteDevice! $item->device_id}" hx-target="#uwu" hx-select="#uwu">Delete</button> </td>
 				{/if}
-				{if (isNotDeviceReserve($item->device_id) && (isDeviceInMyAtelier($item->device_id) || hasCurrUserRole('admin')))}
+				{if (isDeviceInMyAtelier($item->device_id) || hasCurrUserRole('admin'))}
 					<td> <button hx-get="{link Devices:reserve $item->device_id}">Reserve</button>  </td>
 				{/if}
 			</tr>
@@ -40,7 +38,7 @@
 	<table>
 		<thead>
 			<tr>
-				<th scope = "col">Reservation ID</th>
+				<th scope = "col">Device</th>
 				<th scope = "col">Start</th>
 				<th scope = "col">End</th>
 				<th scope = "col">Status</th>
@@ -48,14 +46,14 @@
 		</thead>
 		<tbody>
 			<tr n:foreach="$loans as $item">
-				<td> {$item->loan_id} </td>
+				<td> {getDeviceById($item->device_id)->name} </td>
 				<td> {$item->loan_start} </td>
 				<td> {$item->loan_end} </td>
 				<td> {getStatusById($item->status_id)->name} </td>
-				{if hasCurrUserRole('teacher') || hasCurrUserRole('admin')}
+				{if hasCurrUserRole('teacher') || hasCurrUserRole('admin') || (getCurrUser() == $item->user_id)}
 					<td> <button hx-get="{link Devices:editreservation $item->loan_id}">Edit</button> </td>
 					{if $item->status == '1'}
-						<td> <button hx-get="{link deleteReservation! $item->loan_id}"  hx-target="body" hx-swap="outerHTML">Delete</button> </td>
+						<td> <button hx-get="{link deleteReservation! $item->loan_id}" hx-target="#uwu" hx-select="#uwu">Delete</button> </td>
 					{/if}
 				{/if}
 			</tr>
@@ -69,14 +67,12 @@
 	<table>
 		<thead>
 			<tr>
-				<th scope = "col">Group ID</th>
 				<th scope = "col">Name</th>
 				<th scope = "col">Description</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr n:foreach="$types as $item">
-				<td> {$item->group_id} </td>
 				<td> {$item->name} </td>
 				<td> {$item->description} </td>
 				{if hasCurrUserRole('atelier_manager') || hasCurrUserRole('admin')}
@@ -88,5 +84,6 @@
 			</tr>
 		</tbody>
 	</table>
+	</div>
 	</div>
 {/block}

@@ -38,9 +38,11 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->template->addFunction('isNotDeviceReserve', function (int $id) {return $this->devices->isNotDeviceReserve(intval($id));});
 		$this->template->addFunction('isDeviceInMyAtelier', function (int $id) {return $this->devices->isDeviceInMyAtelier($this->getUser()->getId(),intval($id));});
 		$this->template->addFunction('isGroupEmpty', function (int $id) {return $this->devices->isGroupEmpty(intval($id));});
-
+		$this->template->addFunction('getCurrUser',  function () {return $this->getUser()->getId();});
 		$this->template->addFunction('getGroupById', function (int $id) {return $this->devices->getGroupById(intval($id));});
 		$this->template->addFunction('getStatusById', function (int $id) {return $this->devices->getStatusById(intval($id));});
+		$this->template->addFunction('getAtelierById', function (int $id) {return $this->devices->getAtelierById(intval($id));});
+		$this->template->addFunction('getDeviceById', function (int $id) {return $this->devices->getDeviceById(intval($id));});
 		$this->template->addFunction('hasCurrUserRole', function (string $role_name) {return $this->roles->userWithIdHasRoleWithId($this->getUser()->getId(), $this->roles->getRoleIdWithName($role_name));});
 		$this->devices->ChangeStateReservation();
 		$this->devices->updateLoanStatus();
@@ -51,7 +53,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	{
 		//$this->devices->ChangeStateReservation();
 		$this->template->devices = $this->devices->showAllDevices();
-		$this->template->loans = $this->devices->showAllAvailableLoans($this->getUser()->getId());
+		$this->template->loans = $this->devices->showAllAvailableLoans();
 		$this->template->types = $this->devices->showAllAvailableTypes();
 	}
 	public function renderEdit() : void
@@ -72,7 +74,6 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->addSelect('atelier_id', 'Atelier:', $this->devices->getUserAtelier($this->getUser()->getId()))->setRequired();
 		$form->addSubmit('submit', 'Submit changes');
 		
-		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
 
 		$form->onSuccess[] = [$this, 'processAddDeviceForm'];
 		return $form;
@@ -102,8 +103,6 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->addText('description', 'Description:')->setRequired();
 		$form->addSubmit('submit', 'Submit changes');
 		
-		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
-
 		$form->onSuccess[] = [$this, 'processAddGroupForm'];
 		return $form;
 		
@@ -121,6 +120,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 			$form->addError('An error occured');
 		}
 	}
+	
+
 
 	//formular na pujceni zarizeni
 	public function createComponentAddDeviceLoanForm() : Form
@@ -136,7 +137,6 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
         ->setRequired('Please enter the end date and time.');
 		
 		$form->addSubmit('submit', 'Borrow Device');
-		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
 
 		$form->onValidate[] = [$this, 'validateAddDeviceLoanForm'];
 
@@ -215,8 +215,6 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->addSelect('atelier_id', 'Atelier:', $this->devices->getUserAtelier($this->getUser()->getId()))->setRequired();
 		$form->addCheckbox('loan', 'Device can not be borrowed');
 		$form->addSubmit('submit', 'Submit changes');
-		
-		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
 
 		$form->onSuccess[] = [$this, 'processDeviceEditForm'];
 		return $form;
@@ -253,8 +251,6 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 		$form->addSubmit('submit', 'Submit changes');
 		
-		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
-
 		$form->onSuccess[] = [$this, 'processGroupEditForm'];
 		return $form;
 		
@@ -286,10 +282,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 		$form->addHidden('loan_id');
 		$form->addSelect('status', 'Status:', $this->devices->getLoanStatus())->setRequired();
-		$form->addSubmit('submit', 'Submit changes');
-		
-		$form->addButton('cancel', 'Cancel')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('cancelClicked!').'"');
-	
+		$form->addSubmit('submit', 'Submit changes');	
 		$form->onSuccess[] = [$this, 'processReservationEditForm'];
 		return $form;
 	}
@@ -311,13 +304,70 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$device = $this->devices->getLoanById(intval($reservationId));
 		$form = $this->getComponent('editReservationForm');
 		$form->setDefaults(['loan_id' => $device->loan_id, 'status' => $device->status_id]);
+		$this->template->loan = $device;
+		$form = $this->getComponent('editLoanEndDateForm');
+		$form->setDefaults(['loan_id' => $device->loan_id, 'loan_end' => $device->loan_end]);
 	}
 	
-
-	public function handleCancelClicked() : void
+	public function createComponentEditLoanEndDateForm() : Form
 	{
-		$this->redirect('Devices:devices');
+		$form = new Form;
+
+		$form->addHidden('loan_id');
+		$form->addHidden('loan_start');
+		
+		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')
+        ->setRequired('Please enter new end date and time.');
+		
+		$form->addSubmit('submit', 'Change end date');
+
+
+		$form->onValidate[] = [$this, 'validateAddDeviceLoanForm'];
+		$form->onSuccess[] = [$this, 'processAddDeviceLoanForm'];
+		
+
+		return $form;
+		
 	}
+
+	public function processEditLoanEndDateForm(Form $form, \stdClass $values): void
+	{
+		try {
+			$this->DevicesService->EditLoanEndDate(intval($values->loan_id), $values->loan_end);
+			$this->flashMessage('End date has been successfully changed.', 'success');
+			
+			$this->redirect('Devices:devices');
+		}catch(Nette\Security\AuthenticationException $e)
+		{
+			$form->addError('An error occured');
+		}
+	}
+
+	public function validateEditLoanEndDateForm(Form $form, \stdClass $values): void
+	{
+		date_default_timezone_set('Europe/Prague');
+		$loanStart = new \DateTime($form->getValues()->loan_start);
+		$loanEnd = new \DateTime($form->getValues()->loan_end);
+
+		$interval = $loanStart->diff($loanEnd);
+		$maxLoanDuration = $this->DevicesService->getDeviceById(intval($values->device_id))->max_loan_duration;
+
+		if ($interval->days > $maxLoanDuration) {
+			$form->addError('The loan duration cannot exceed ' . $maxLoanDuration . ' days.');
+		}
+
+		if ($loanEnd < $loanStart) {
+			$form->addError('The end date must be after the start date.');
+		}
+
+		$today = new \DateTime();
+		$formattoday = $today->format('d-m-Y H:i');
+		if ($today > $loanStart) {
+			$form->addError('The earliest possible reservation start date is ' . $formattoday . '.');
+		}
+		
+	}
+
 
 	public function handleDeleteDevice(int $id) : void
 	{
