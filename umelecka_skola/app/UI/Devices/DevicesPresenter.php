@@ -44,18 +44,18 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->template->addFunction('getAtelierById', function (int $id) {return $this->devices->getAtelierById(intval($id));});
 		$this->template->addFunction('getDeviceById', function (int $id) {return $this->devices->getDeviceById(intval($id));});
 		$this->template->addFunction('hasCurrUserRole', function (string $role_name) {return $this->roles->userWithIdHasRoleWithId($this->getUser()->getId(), $this->roles->getRoleIdWithName($role_name));});
-		$this->devices->ChangeStateReservation();
-		$this->devices->updateLoanStatus();
+		$this->template->addFunction('getDeviceLoans', function (int $id) {return $this->devices->showDeviceLoans(intval($id));});
+		$this->devices->changeStateReservation();
 	}
 
 	//vypis vsech dostupnych zarizeni
 	public function renderDevices() : void
 	{
-		//$this->devices->ChangeStateReservation();
 		$this->template->devices = $this->devices->showAllDevices();
 		$this->template->loans = $this->devices->showAllAvailableLoans();
 		$this->template->types = $this->devices->showAllAvailableTypes();
 	}
+
 	public function renderEdit() : void
 	{
 		$this->template->forbidden_users = $this->devices->get_forbidden_users(intval($this->curr_edit));
@@ -84,7 +84,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	{
 		try {
 			$userId = $this->getUser()->getId();
-			$this->DevicesService->addDevice($userId, $values->name, $values->description, intval($values->max_loan_duration), $values->group_id);
+			$this->DevicesService->addDevice($userId, $values->name, $values->description, intval($values->max_loan_duration), $values->group_id, $values->atelier_id);
 			$this->flashMessage('Device has been successfully edited.', 'success');
 			
 			$this->redirect('Devices:devices');
@@ -152,21 +152,10 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$loanStart = new \DateTime($form->getValues()->loan_start);
 		$loanEnd = new \DateTime($form->getValues()->loan_end);
 
-		$interval = $loanStart->diff($loanEnd);
-		$maxLoanDuration = $this->DevicesService->getDeviceById(intval($values->device_id))->max_loan_duration;
-
-		if ($interval->days > $maxLoanDuration) {
-			$form->addError('The loan duration cannot exceed ' . $maxLoanDuration . ' days.');
-		}
-
-		if ($loanEnd < $loanStart) {
-			$form->addError('The end date must be after the start date.');
-		}
-
-		$today = new \DateTime();
-		$formattoday = $today->format('d-m-Y H:i');
-		if ($today > $loanStart) {
-			$form->addError('The earliest possible reservation start date is ' . $formattoday . '.');
+		$retval = $this->DevicesService->validateDate($loanStart,$loanEnd,intval($values->device_id));
+		if($retval !== null)
+		{
+			$form->addError($retval);
 		}
 		
 	}
@@ -198,7 +187,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function actionReserve($deviceId): void
 	{
 		$device = $this->devices->getDeviceById(intval($deviceId));
-		$this->template->deviceName = $device->name;
+		$this->template->device = $device;
 		$form = $this->getComponent('addDeviceLoanForm');
 		$form->setDefaults(['device_id' => $device->device_id]);
 	}
@@ -321,11 +310,9 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 		$form->addSubmit('submit', 'Change end date');
 
-
 		$form->onValidate[] = [$this, 'validateAddDeviceLoanForm'];
 		$form->onSuccess[] = [$this, 'processAddDeviceLoanForm'];
 		
-
 		return $form;
 		
 	}
@@ -342,32 +329,6 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 			$form->addError('An error occured');
 		}
 	}
-
-	public function validateEditLoanEndDateForm(Form $form, \stdClass $values): void
-	{
-		date_default_timezone_set('Europe/Prague');
-		$loanStart = new \DateTime($form->getValues()->loan_start);
-		$loanEnd = new \DateTime($form->getValues()->loan_end);
-
-		$interval = $loanStart->diff($loanEnd);
-		$maxLoanDuration = $this->DevicesService->getDeviceById(intval($values->device_id))->max_loan_duration;
-
-		if ($interval->days > $maxLoanDuration) {
-			$form->addError('The loan duration cannot exceed ' . $maxLoanDuration . ' days.');
-		}
-
-		if ($loanEnd < $loanStart) {
-			$form->addError('The end date must be after the start date.');
-		}
-
-		$today = new \DateTime();
-		$formattoday = $today->format('d-m-Y H:i');
-		if ($today > $loanStart) {
-			$form->addError('The earliest possible reservation start date is ' . $formattoday . '.');
-		}
-		
-	}
-
 
 	public function handleDeleteDevice(int $id) : void
 	{
