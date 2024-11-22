@@ -5,6 +5,34 @@
     <link rel="stylesheet" href="{$basePath}/css/style.css">
 </block>
 
+<!-- Profilová sekce -->
+<h2>Profile Information</h2>
+<div id="profile-section">
+    <p><strong>Name:</strong> {$profile->name}</p>
+    <p><strong>Email:</strong> {$profile->email}</p>
+</div>
+<h3>Assigned Roles</h3>
+    {if $roles}
+        <ul>
+            {foreach $roles as $role}
+                <li>{$role}</li> <!-- Zobrazení názvu každé role -->
+            {/foreach}
+        </ul>
+    {else}
+        <p>You have no roles assigned.</p>
+    {/if}
+<h3>Booked Ateliers</h3>
+{if $ateliers}
+<ul>
+    {foreach $ateliers as $atelier}
+        <li>{$atelier}</li>
+    {/foreach}
+</ul>
+{else}
+        <p>You have no ateliers assigned.</p>
+{/if}
+
+
 <!-- Sekce pro editaci profilu -->
 <div id="edit-profile-section">
     <form method="POST"
@@ -14,8 +42,6 @@
       hx-swap="outerHTML">
         <h2>Edit Profile</h2>
         {control profileForm}
-        <h2>Profile Information</h2>
-        {control infoForm}
         <h3>Change Password</h3>
         {control changePasswordForm}
     </form>

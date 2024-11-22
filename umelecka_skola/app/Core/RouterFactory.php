@@ -23,8 +23,6 @@ final class RouterFactory
 		$router->addRoute('/myProfile/currentLoans', 'MyProfile:currentLoans');  // Aktuální výpůjčky
 		$router->addRoute('/myProfile/pastLoans', 'MyProfile:pastLoans');  // Minulé výpůjčky
 
-		bdump($router); // Tento řádek vypíše nastavení routeru do debuggeru Tracy.
-
 		return $router;
 	}
 }
