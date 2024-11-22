@@ -263,9 +263,9 @@ final class DevicesService
 	}
 
 	
-	public function addDevice(int $user_id, string $name,string $description, int $max_loan_duration,int $group_id, int $atelier_id) : void
+	public function addDevice(int $user_id, string $name,string $description, int $max_loan_duration,int $group_id, int $atelier_id,  bool $loan) : void
     {
-        $this->database->table('devices')->insert(['name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id, 'atelier_id' => $atelier_id]);
+        $this->database->table('devices')->insert(['name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id, 'atelier_id' => $atelier_id, 'loan' => $loan]);
     }
 	
 	public function addGroup(string $name,string $description) : void
@@ -276,13 +276,11 @@ final class DevicesService
 	
 	public function UserWithIdCanBorrowDeviceWithId(int $user_id, int $device_id): void //add
 	{
-		bdump($user_id);
 		$this->database->table('forbidden_user_devices')->where('user_id', $user_id)->where('device_id', $device_id)->delete();
 	}
 
 	public function UserWithIdCanNotBorrowDeviceWithId(int $user_id, int $device_id) : void
 	{
-		bdump($device_id);
 		$this->database->table('forbidden_user_devices')->insert(['user_id' => $user_id, 'device_id' => $device_id]);
 	}
 
