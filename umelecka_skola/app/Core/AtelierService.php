@@ -63,9 +63,9 @@ final class AtelierService
 			throw new \Exception("User with email: {$admin_email} not found, please make sure you've entered the correct email");
 		}
 
-		if(!$this->roles->userWithEmailHasRoleWithName($admin_email, 'teacher'))
+		if(!$this->roles->userWithEmailHasRoleWithName($admin_email, 'atelier_manager'))
 		{
-			throw new \Exception("User with email: {$admin_email} is not a teacher and can't be assigned an atelier");
+			throw new \Exception("User with email: {$admin_email} is not a atelier manager and can't be assigned an atelier");
 		}
 
 		$this->database->table('ateliers')->where('atelier_id', $id)->update(['name' => $name, 'admin_id' => $admin->user_id]);
