@@ -48,6 +48,55 @@ final class DevicesService
             ->fetchAll();
     }
 
+	public function showDeviceLoans(int $deviceId): array
+    {
+        
+        $statusIds = [];
+        $statusRows = $this->database->table('loan_status')
+            ->where('name IN ?', ['reservation', 'loan'])
+            ->fetchAll();
+
+        foreach ($statusRows as $status) {
+            $statusIds[] = $status->status_id;
+        }
+
+        return $this->database->table('loan')
+            ->where('status_id IN ?', $statusIds)->where('device_id IN ?', $deviceId)
+            ->fetchAll();
+    }
+
+	public function validateDate(\DateTime $loanStart, \DateTime $loanEnd, int $deviceId): ?string
+    {
+		$interval = $loanStart->diff($loanEnd);
+		$deviceLoans = $this->showDeviceLoans($deviceId);
+		date_default_timezone_set('Europe/Prague');
+
+		$maxLoanDuration = $this->getDeviceById($deviceId)->max_loan_duration;
+
+		foreach($deviceLoans as $loan)
+		{
+			if(!(($loan->loan_start > $loanStart && $loan->loan_start > $loanEnd) || ($loan->loan_end < $loanStart && $loan->loan_end < $loanEnd)))
+			{
+				return 'The device is already loaned at this time';
+			}
+		}
+
+		if ($interval->days > $maxLoanDuration) {
+			return 'The loan duration cannot exceed ' . $maxLoanDuration . ' days.';
+		}
+
+		if ($loanEnd < $loanStart) {
+			return 'The end date must be after the start date.';
+		}
+
+		$today = new \DateTime();
+		$formatToday = $today->format('d-m-Y H:i');
+		if ($today > $loanStart) {
+			return 'The earliest possible reservation start date is ' . $formatToday . '.';
+		}
+		return null;
+	}
+
 	public function showAllAvailableTypes() : array
 	{
 		$result = $this->database->table('device_groups')->fetchAll();
@@ -68,41 +117,23 @@ final class DevicesService
 		return $result;
 	}
 
-	public function ChangeStateReservation(): void
+	public function changeStateReservation(): void
 	{
+		date_default_timezone_set('Europe/Prague');
 		$currentTime = new \DateTime();
 
 		$reservationStatusId = $this->database->table('loan_status')->where('name', 'reservation')->fetch()->status_id;
-		$cancelledStatusId = $this->database->table('loan_status')->where('name', 'cancelled')->fetch()->status_id;
-		if(!$reservationStatusId || !$cancelledStatusId)
-		{
-			throw new \Exception("Reservation status is not defined");
-		}
-
-		$this->database->table('loan')->where('loan_start < ?', $currentTime->format('Y-m-d H:i:s'))->where('status_id', $reservationStatusId)->update(['status_id' => $cancelledStatusId]);
-	}
-
-
-	public function updateLoanStatus(): void
-	{
+		$loanStatusId = $this->database->table('loan_status')->where('name', 'loan')->fetch()->status_id;
 		$completedStatusId = $this->database->table('loan_status')->where('name', 'completed')->fetch()->status_id;
-		$cancelledStatusId = $this->database->table('loan_status')->where('name', 'cancelled')->fetch()->status_id;
-		if(!$completedStatusId || !$cancelledStatusId)
+
+		if(!$reservationStatusId || !$completedStatusId || !$loanStatusId)
 		{
 			throw new \Exception("Reservation status is not defined");
 		}
-
-		$deviceIds = $this->database->table('loan')->select('device_id')->where('status_id IN ?', [$completedStatusId, $cancelledStatusId])->fetchAll();
-
-		if (!empty($deviceIds)) {
-			
-			foreach ($deviceIds as $device) {
-				$this->database->table('devices')
-				->where('device_id IN ?', $device->device_id)
-				->update(['loan' => false]);
-			}
-		}
+		$this->database->table('loan')->where('loan_start < ?', $currentTime->format('Y-m-d H:i:s'))->where('status_id', $reservationStatusId)->update(['status_id' => $loanStatusId]);
+		$this->database->table('loan')->where('loan_end < ?', $currentTime->format('Y-m-d H:i:s'))->where('status_id', $reservationStatusId)->update(['status_id' => $completedStatusId]);
 	}
+
 	
 	public function getLoanStatus(): array
     {
@@ -232,10 +263,9 @@ final class DevicesService
 	}
 
 	
-	public function addDevice(int $user_id, string $name,string $description, int $max_loan_duration,int $group_id) : void
+	public function addDevice(int $user_id, string $name,string $description, int $max_loan_duration,int $group_id, int $atelier_id) : void
     {
-		$atelier_id = $this->database->table('ateliers')->where('admin_id',$user_id)->fetch();
-        $this->database->table('devices')->insert(['name' => $name,'atelier_id' => $atelier_id, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id]);
+        $this->database->table('devices')->insert(['name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id, 'atelier_id' => $atelier_id]);
     }
 	
 	public function addGroup(string $name,string $description) : void
