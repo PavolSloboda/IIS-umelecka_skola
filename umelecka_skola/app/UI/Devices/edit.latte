@@ -16,7 +16,7 @@
         <tbody>
             <tr n:foreach="$not_forbidden_users as $user_item">
                 <td> {$user_item->email} </td>
-                <td> <button hx-get="{link remove! $user_item->user_id}" hx-target="body" hx-swap="outerHTML">Deny</button></td>
+                <td> <button hx-get="{link remove! $user_item->user_id}" >Deny</button></td>
             </tr>
         </tbody>
     </table>
@@ -34,7 +34,7 @@
         <tbody>
             <tr n:foreach="$forbidden_users as $user_item">
                 <td> {$user_item->email} </td>
-                <td> <button hx-get="{link add! $user_item->user_id}"hx-target="body" hx-swap="outerHTML" >Allow</button></td>
+                <td> <button hx-get="{link add! $user_item->user_id}" >Allow</button></td>
             </tr>
         </tbody>
     </table>

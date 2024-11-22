@@ -92,7 +92,8 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		}
 		catch (\Exception $e)
 		{
-			$form->addError('An error occured while atempting to ad an atelier');
+			$this->error("uwu");
+			bdump("tuto");
 		}
 		$this->forward('Atelier:atelier');
 	}
