@@ -1,7 +1,7 @@
 {layout '../layout.latte'}
 
 {block content}
-<div id="uwu" >
+<div id="device_body" >
 <div hx-target="this" hx-swap= "outerHTML">
 <h2>Devices</h2>
 	{if hasCurrUserRole('teacher') || hasCurrUserRole('admin')}
@@ -27,7 +27,7 @@
 				<td> {getAtelierById($item->atelier_id)->name} </td>
 				{if (hasCurrUserRole('teacher') && isDeviceInMyAtelier($item->device_id)) || hasCurrUserRole('admin')}
 					<td> <button hx-get="{link Devices:edit $item->device_id}" >Edit</button>  </td>
-					<td> <button hx-get="{link deleteDevice! $item->device_id}" hx-target="#uwu" hx-select="#uwu">Delete</button> </td>
+					<td> <button hx-get="{link deleteDevice! $item->device_id}" hx-target="#device_body" hx-select="#device_body">Delete</button> </td>
 				{/if}
 				{if (isDeviceInMyAtelier($item->device_id) || hasCurrUserRole('admin'))}
 					<td> <button hx-get="{link Devices:reserve $item->device_id}">Reserve</button>  </td>
@@ -58,7 +58,7 @@
 				{if hasCurrUserRole('teacher') || hasCurrUserRole('admin') || (getCurrUser() == $item->user_id)}
 					<td> <button hx-get="{link Devices:editreservation $item->loan_id}">Edit</button> </td>
 					{if $item->status == '1'}
-						<td> <button hx-get="{link deleteReservation! $item->loan_id}" hx-target="#uwu" hx-select="#uwu">Delete</button> </td>
+						<td> <button hx-get="{link deleteReservation! $item->loan_id}" hx-target="#device_body" hx-select="#device_body">Delete</button> </td>
 					{/if}
 				{/if}
 			</tr>
