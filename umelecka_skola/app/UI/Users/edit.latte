@@ -1,0 +1,13 @@
+
+{block content}
+<div id="edit_div">
+<hr>
+
+<div id="cancel_header">
+	<h2 id="cancel_nadpis">User editing</h2>
+	<button type="button" hx-get="{link Users:users}" hx-target="#edit_div" hx-swap="innerHTML">Cancel</button>
+</div>
+{control editUserForm}
+
+</div>
+{/block}
