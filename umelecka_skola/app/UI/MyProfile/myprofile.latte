@@ -6,13 +6,13 @@
 </block>
 
 <!-- Sekce pro editaci profilu -->
-<div id="edit-profile-section">¨
+<div id="edit-profile-section">
     <form method="POST"
       action="{$basePath}/myProfile/editProfile"
       hx-post="{$basePath}/myProfile/editProfile"
       hx-target="#edit-profile-section"
       hx-swap="outerHTML">
-      <h2>Profile Information</h2>
+        <h2>Profile Information</h2>
         {control infoForm}
         <h2>Edit Profile</h2>
         {control profileForm}
@@ -22,9 +22,13 @@
 <hr>
 
 <!-- Formulář pro změnu hesla -->
-<h3>Change Password</h3>
-<div id="password-change-container">
-    <form method="POST" action="{$basePath}/myProfile/passwordChange" hx-post="{$basePath}/myProfile/passwordChange" hx-target="#password-change-container" hx-swap="outerHTML">
+<div id="password-change-section">
+    <form method="POST" 
+    action="{$basePath}/myProfile/passwordChange"
+     hx-post="{$basePath}/myProfile/passwordChange" 
+     hx-target="#password-change-section" 
+     hx-swap="outerHTML">
+        <h3>Change Password</h3>
         {control changePasswordForm} <!-- Tato metoda vykreslí formulář -->
     </form>
 </div>
