@@ -7,15 +7,19 @@ namespace App\UI\MyProfile;
 use App\Core\MyProfileService;
 use Nette;
 use Nette\Application\UI\Form;
+use App\Core\RolesService;
+
 
 final class MyProfilePresenter extends Nette\Application\UI\Presenter
 {
     private MyProfileService $profileService;
     private $profile;
+    private $roles;
 
-    public function __construct(MyProfileService $profileService)
+    public function __construct(MyProfileService $profileService, RolesService $roles)
     {
         $this->profileService = $profileService;
+        $this->roles = $roles;
     }
 
     protected function startup(): void
@@ -136,6 +140,13 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
 
     public function renderMyProfile(): void
     {
+        $userId = $this->getUser()->getId();
+        // Získání všech rolí uživatele
+        $roles = $this->profileService->getMyProfileRoles($userId);
+
+        // Předání rolí do šablony
+        $this->template->ateliers = $this->profileService->getUserAteliers($userId);
+        $this->template->roles = $roles;
         $this->template->profile = $this->profile;
         $this->template->currentLoans = $this->profileService->getCurrentAndFutureLoans($this->getUser()->getId());
         $this->template->pastLoans = $this->profileService->getPastLoans($this->getUser()->getId());
@@ -150,4 +161,5 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     {
         $this->template->changePasswordForm = $this['changePasswordForm'];
     }
+
 }

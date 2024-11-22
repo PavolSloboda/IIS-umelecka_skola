@@ -92,4 +92,28 @@ final class MyProfileService
         $newPasswordHash = $this->passwords->hash($newPassword);
         $user->update(['password' => $newPasswordHash]);
     }
+
+    public function getMyProfileRoles(int $userId): array
+    {
+    // Načteme všechny role uživatele z tabulky 'user_role' a vrátíme je
+    $roles = $this->database->table('user_role')
+        ->where('user_id', $userId)
+        ->fetchAll(); // Načte všechny záznamy přiřazené uživateli
+
+    // Pokud existují nějaké role, vrátíme seznam názvů rolí
+    $roleNames = [];
+    foreach ($roles as $role) {
+        $roleNames[] = $this->database->table('roles')->get($role->role_id)->name; // Přiřadíme název role podle role_id
+    }
+
+    return $roleNames;
+    }
+
+    public function getUserAteliers(int $userId): array
+    {
+    return $this->database->table('user_atelier')
+        ->where('user_id', $userId)
+        ->select('atelier.name')
+        ->fetchPairs('id', 'atelier.name');
+    }
 }
