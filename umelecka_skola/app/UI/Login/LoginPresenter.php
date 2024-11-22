@@ -63,6 +63,7 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		$form->addEmail('email', 'Email:')->setRequired('Plase enter an email');
 		$form->addText('username', 'Username:')->setRequired('Please enter a username');
 		$form->addPassword('password', 'Password:')->setRequired('Plase enter your password');
+		$form->addRule($form::MIN_LENGTH, 'Password must be at least %d characters long.', 8);
 		$form->addSubmit('signup', 'Sign up');
 		
 		$form->onSuccess[] = [$this, 'validateSignUp']; 

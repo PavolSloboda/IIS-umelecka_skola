@@ -46,7 +46,6 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
 
     protected function createComponentInfoForm(): Form
     {
-        //echo '<h2>Profile Information</h2>';
         $form2 = new Form;
         $form2->addText('name', 'Name:')
                 ->setHtmlAttribute('readonly', 'readonly')
@@ -54,21 +53,12 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         $form2->addText('email', 'Email:')
             ->setHtmlAttribute('readonly', 'readonly')
             ->setDefaultValue($this->profile->email);
+        //$form2->onSuccess[] = [$this, 'processInfoForm'];
             return $form2;
-    }
-
-    public function processInfoForm(Form $form, \stdClass $values): void
-    {
-        $userId = $this->getUser()->getId();
-        $this->profileService->updateUserProfileEditForm($userId, [
-            'name' => $values->name,
-            'email' => $values->email,
-        ]);
     }
 
     protected function createComponentProfileForm(): Form
     {
-        //echo '<h2>Edit Profile</h2>';
         $form = new Form;
         $form->addText('name', 'Name:')
             ->setRequired()
@@ -93,7 +83,6 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
             'email' => $values->email,
         ]);
         $this->flashMessage('Profile updated successfully.', 'success');
-        //$this->redrawControl('profile-section');
         $this->redrawControl('edit-profile-section');
         
     }
@@ -123,8 +112,8 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         try {
             // Ověření a změna hesla pomocí služby
             $this->profileService->changePassword($userId, $oldPassword, $newPassword);
-            $this->redrawControl('edit-profile-section'); // Zajistí obnovu pouze tohoto kontejneru
             $this->flashMessage('Password successfully changed.', 'success');
+            $this->redrawControl('edit-profile-section'); // Zajistí obnovu pouze tohoto kontejneru
             //$this->redirect('MyProfile:myProfile');
         } catch (\Exception $e) {
             $form->addError('Failed to change password. ' . $e->getMessage());
