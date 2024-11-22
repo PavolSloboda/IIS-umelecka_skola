@@ -40,61 +40,64 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 	// Formulář pro editaci uživatele
 	protected function createComponentEditUserForm(): Form
 	{
-		$form = new Form;
-		$form->addText('name', 'Name:')
-			->setRequired('Please enter the user\'s name.');
+    $form = new Form;
+    $form->addText('name', 'Name:')
+        ->setRequired('Please enter the user\'s name.');
 
-		$form->addText('email', 'Email:')
-			->setRequired('Please enter the user\'s email.')
-			->addRule($form::EMAIL, 'Please enter a valid email address.');
+    $form->addText('email', 'Email:')
+        ->setRequired('Please enter the user\'s email.')
+        ->addRule($form::EMAIL, 'Please enter a valid email address.');
 
-		$form->addSelect('role', 'Role:', [
-			'user' => 'User',
-			'admin' => 'Admin',
-		])->setRequired('Please select a role.');
+    // Načtení seznamu rolí z RolesService
+    $roles = $this->roles->getRoles();
+    $form->addSelect('role', 'Role:', $roles)
+        ->setRequired('Please select a role.');
 
-		$form->addSubmit('submit', 'Save');
-		$form->onSuccess[] = [$this, 'processEditUserForm'];
+    $form->addSubmit('submit', 'Save');
+    $form->onSuccess[] = [$this, 'processEditUserForm'];
 
-		return $form;
+    return $form;
 	}
 
 	public function processEditUserForm(Form $form, \stdClass $values): void
 	{
-		//$userId = $this->getParameter('userId');
 		$userId = $this->getUser()->getId();
 
-		// Ověření unikátnosti emailu
-		if (!$this->usersService->isEmailUnique($values->email, $userId)) {
-			$form->addError('The email address is already in use.');
-			return;
-		}
+    // Ověření unikátnosti emailu
+    if ($this->usersService->isEmailUnique($values->email, $userId)) {
+        $form->addError('The email address is already in use.');
+        return;
+    }
 
-		$this->usersService->updateUser($userId, [
-			'name' => $values->name,
-			'email' => $values->email,
-			//'role' => $values->role,
-		]);
-		
-		$this->usersService->updateUserRole($userId, $values->role);
+    // Aktualizace údajů o uživateli
+    $this->usersService->updateUser($userId, [
+        'name' => $values->name,
+        'email' => $values->email,
+    ]);
 
-		$this->flashMessage('User information updated successfully.', 'success');
-		$this->redirect('users');
+    // Aktualizace role
+    $roleId = $values->role;
+	bdump($roleId);
+    $this->usersService->updateUserRole($userId, $roleId);
+
+    $this->flashMessage('User information updated successfully.', 'success');
+    $this->redirect('users');
 	}
 
 	public function actionEdit(int $userId): void
 	{
-		$user = $this->usersService->getUserById($userId);
+    $user = $this->usersService->getUserById($userId);
+    $roleId = $this->usersService->getUserRoleId($userId); // Získejte aktuální `role_id`
 
-		if (!$user) {
-			$this->error('User not found');
-		}
+    if (!$user) {
+        $this->error('User not found');
+    }
 
-		$this['editUserForm']->setDefaults([
-			'name' => $user->name,
-			'email' => $user->email,
-			//'role' => $user->role,
-		]);
+    $this['editUserForm']->setDefaults([
+        'name' => $user->name,
+        'email' => $user->email,
+        'role' => $roleId, // Nastavení aktuální role
+    ]);
 	}
 
 	public function actionDelete(int $userId): void

@@ -47,4 +47,10 @@ final class RolesService
 
 		return $this->database->table('roles')->where('role_id', $user_roles->select('role_id'));
 	}
+
+	// V RolesService
+	public function getRoles(): array
+	{
+    	return $this->database->table('roles')->fetchPairs('role_id', 'name');
+	}
 }

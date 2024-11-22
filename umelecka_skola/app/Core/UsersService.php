@@ -39,7 +39,7 @@ final class UsersService
 	// Smazání uživatele
 	public function deleteUser(int $userId): void
 	{
-		$this->database->table('users')->where('id', $userId)->delete();
+		$this->database->table('users')->where('user_id', $userId)->delete();
 	}
 
 	// Přidání nového uživatele
@@ -82,6 +82,12 @@ final class UsersService
         'user_id' => $userId,
         'role_id' => $roleId,
     ]);
+	}
+
+	public function getUserRoleId(int $userId): ?int
+	{
+    $userRole = $this->database->table('user_role')->where('user_id', $userId)->fetch();
+    return $userRole ? $userRole->role_id : null;
 	}
 
 }
