@@ -9,6 +9,7 @@
 {control addDeviceLoanForm}
 
 <h2>Reservations</h2>
+	{if count(getDeviceLoans($device->device_id)}
 	<table>
 		<thead>
 			<tr>
@@ -27,3 +28,6 @@
 			</tr>
 		</tbody>
 	</table>
+	{else}
+	<p>No ongoing reservations for the device</p>
+	{/if}
