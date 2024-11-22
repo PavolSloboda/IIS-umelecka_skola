@@ -97,6 +97,35 @@ final class DevicesService
 		return null;
 	}
 
+	public function validateEditDate(int $loan_id, \DateTime $loanStart, \DateTime $loanEnd, int $deviceId): ?string
+    {
+		$interval = $loanStart->diff($loanEnd);
+		$deviceLoans = $this->showDeviceLoans($deviceId);
+		date_default_timezone_set('Europe/Prague');
+
+		$maxLoanDuration = $this->getDeviceById($deviceId)->max_loan_duration;
+
+		foreach($deviceLoans as $loan)
+		{
+			if($loan_id != $loan->loan_id)
+			{
+				if(!(($loan->loan_start > $loanStart && $loan->loan_start > $loanEnd) || ($loan->loan_end < $loanStart && $loan->loan_end < $loanEnd)))
+				{
+					return 'The device is already loaned at this time';
+				}
+			}
+		}
+
+		if ($interval->days > $maxLoanDuration) {
+			return 'The loan duration cannot exceed ' . $maxLoanDuration . ' days.';
+		}
+
+		if ($loanEnd < $loanStart) {
+			return 'The end date must be after the start date.';
+		}
+		return null;
+	}
+
 	public function showAllAvailableTypes() : array
 	{
 		$result = $this->database->table('device_groups')->fetchAll();
@@ -125,13 +154,14 @@ final class DevicesService
 		$reservationStatusId = $this->database->table('loan_status')->where('name', 'reservation')->fetch()->status_id;
 		$loanStatusId = $this->database->table('loan_status')->where('name', 'loan')->fetch()->status_id;
 		$completedStatusId = $this->database->table('loan_status')->where('name', 'completed')->fetch()->status_id;
+		bdump($completedStatusId);
 
 		if(!$reservationStatusId || !$completedStatusId || !$loanStatusId)
 		{
 			throw new \Exception("Reservation status is not defined");
 		}
 		$this->database->table('loan')->where('loan_start < ?', $currentTime->format('Y-m-d H:i:s'))->where('status_id', $reservationStatusId)->update(['status_id' => $loanStatusId]);
-		$this->database->table('loan')->where('loan_end < ?', $currentTime->format('Y-m-d H:i:s'))->where('status_id', $reservationStatusId)->update(['status_id' => $completedStatusId]);
+		$this->database->table('loan')->where('loan_end < ?', $currentTime->format('Y-m-d H:i:s'))->where('status_id', $loanStatusId)->update(['status_id' => $completedStatusId]);
 	}
 
 	
@@ -177,7 +207,7 @@ final class DevicesService
         $loan->update(['status_id' => $status_id]);
 	}
 	
-	public function editLoanEndDate( int $loan_id, int $loan_end): void
+	public function editLoanEndDate( int $loan_id, string $loan_end): void
     {
 		$loan = $this->database->table('loan')->get($loan_id);
         $loan->update(['loan_end' => $loan_end]);

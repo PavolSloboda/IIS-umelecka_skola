@@ -29,9 +29,11 @@
 					<td> <button hx-get="{link Devices:edit $item->device_id}" >Edit</button>  </td>
 					<td> <button hx-get="{link deleteDevice! $item->device_id}" hx-target="#device_body" hx-select="#device_body">Delete</button> </td>
 				{/if}
-				{if (isDeviceInMyAtelier($item->device_id) || hasCurrUserRole('admin'))}
-					<td> <button hx-get="{link Devices:reserve $item->device_id}">Reserve</button>  </td>
-				{/if}
+				{if ($item->loan == 0)}
+					{if (isDeviceInMyAtelier($item->device_id) || hasCurrUserRole('admin'))}
+						<td> <button hx-get="{link Devices:reserve $item->device_id}">Reserve</button>  </td>
+					{/if}
+				{/if}	
 			</tr>
 		</tbody>
 	</table>

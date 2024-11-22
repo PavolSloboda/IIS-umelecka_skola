@@ -296,7 +296,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->setDefaults(['loan_id' => $device->loan_id, 'status' => $device->status_id]);
 		$this->template->loan = $device;
 		$form = $this->getComponent('editLoanEndDateForm');
-		$form->setDefaults(['loan_id' => $device->loan_id, 'loan_end' => $device->loan_end]);
+		$form->setDefaults(['loan_id' => $device->loan_id, 'loan_end' => $device->loan_end, 'device_id' => $device->device_id,]);
 	}
 	
 	public function createComponentEditLoanEndDateForm() : Form
@@ -305,16 +305,31 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 		$form->addHidden('loan_id');
 		$form->addHidden('loan_start');
+		$form->addHidden('device_id');
 		
 		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')
         ->setRequired('Please enter new end date and time.');
 		
 		$form->addSubmit('submit', 'Change end date');
 
-		$form->onValidate[] = [$this, 'validateAddDeviceLoanForm'];
-		$form->onSuccess[] = [$this, 'processAddDeviceLoanForm'];
+		$form->onValidate[] = [$this, 'validateEditLoanEndDateForm'];
+		$form->onSuccess[] = [$this, 'processEditLoanEndDateForm'];
 		
 		return $form;
+		
+	}
+
+	public function validateEditLoanEndDateForm(Form $form, \stdClass $values): void
+	{
+		date_default_timezone_set('Europe/Prague');
+		$loanStart = new \DateTime($form->getValues()->loan_start);
+		$loanEnd = new \DateTime($form->getValues()->loan_end);
+
+		$retval = $this->DevicesService->validateEditDate(intval($values->loan_id),$loanStart,$loanEnd,intval($values->device_id));
+		if($retval !== null)
+		{
+			$form->addError($retval);
+		}
 		
 	}
 
