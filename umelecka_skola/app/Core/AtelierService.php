@@ -38,6 +38,11 @@ final class AtelierService
 			throw new \Exception("User with email: {$admin_email} not found, please make sure you've entered the correct email");
 		}
 
+		if(!$this->roles->userWithEmailHasRoleWithName($admin->email, 'atelier_manager') && !$this->roles->userWithEmailHasRoleWithName($admin->email, 'admin'))
+		{
+			throw new \Exception("User must be atelier manageror admin to administrate an atelier");
+		}
+
 		$this->database->table('ateliers')->insert(['name' => $name, 'admin_id' => $admin->user_id,]);
 	}
 
