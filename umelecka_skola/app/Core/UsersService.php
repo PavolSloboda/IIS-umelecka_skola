@@ -36,11 +36,32 @@ final class UsersService
 		}
 	}
 
-	// Smazání uživatele
 	public function deleteUser(int $userId): void
 	{
-		$this->database->table('users')->where('user_id', $userId)->delete();
+    // Kontrola, zda má uživatel přiřazené role
+    $rolesAssigned = $this->database->table('user_atelier')
+        ->where('user_id', $userId)
+        ->count(); // Počet přiřazených rolí pro tohoto uživatele
+	$currentDate = new \DateTime();
+	$rolesAssigned += $this->database->table('loan')
+	->where('user_id', $userId)
+	->where(
+		'loan_start >= ? OR loan_end >= ?', 
+		$currentDate->format('Y-m-d'), 
+		$currentDate->format('Y-m-d')
+	) // Nadcházející nebo probíhající výpůjčky
+	->count(); // Počet probíhajících nebo nadcházejících výpůjček
+
+    // Pokud uživatel nemá žádnou roli, pokračujeme ve smazání
+    if ($rolesAssigned === 0) {        
+        // Smazání uživatele, pokud není přiřazen k žádné jiné tabulce
+        $this->database->table('users')->where('user_id', $userId)->delete();
+    } else {
+        // Pokud má uživatel nějaké přiřazené role, neprovádíme smazání
+        throw new \Exception('User cannot be deleted because they have assigned roles.');
+    }
 	}
+
 
 	// Přidání nového uživatele
 	public function createUser(array $data): void
@@ -72,11 +93,25 @@ final class UsersService
         return $existingUser === null; // Vrací true, pokud uživatel s tímto emailem neexistuje
     }
 
+	public function updateUserRoletwo(int $userId, int $roleId, int $secrolId): void
+	{
+		// Vymazání všech existujících rolí pro uživatele, pokud má mít pouze jednu
+	$this->database->table('user_role')->where('user_id', $userId)->delete();
+    // Přiřazení nové role
+    $this->database->table('user_role')->insert([
+        'user_id' => $userId,
+        'role_id' => $roleId,
+    ]);
+	$this->database->table('user_role')->insert([
+        'user_id' => $userId,
+        'role_id' => $secrolId,
+    ]);
+	}
+
 	public function updateUserRole(int $userId, int $roleId): void
 	{
-    // Vymazání všech existujících rolí pro uživatele, pokud má mít pouze jednu
-    $this->database->table('user_role')->where('user_id', $userId)->delete();
-
+		// Vymazání všech existujících rolí pro uživatele, pokud má mít pouze jednu
+	$this->database->table('user_role')->where('user_id', $userId)->delete();
     // Přiřazení nové role
     $this->database->table('user_role')->insert([
         'user_id' => $userId,
@@ -88,6 +123,14 @@ final class UsersService
 	{
     $userRole = $this->database->table('user_role')->where('user_id', $userId)->fetch();
     return $userRole ? $userRole->role_id : null;
+	}
+
+	public function removeUserRole(int $userId): void
+	{
+    // Odstranění všech přiřazených rolí pro uživatele
+    $this->database->table('user_role')
+        ->where('user_id', $userId)
+        ->delete();
 	}
 
 }

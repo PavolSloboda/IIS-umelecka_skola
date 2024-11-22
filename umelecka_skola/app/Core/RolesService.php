@@ -51,6 +51,16 @@ final class RolesService
 	// V RolesService
 	public function getRoles(): array
 	{
-    	return $this->database->table('roles')->fetchPairs('role_id', 'name');
+    // Získání všech rolí z tabulky 'roles'
+    $roles = $this->database->table('roles')->fetchPairs('role_id', 'name');
+
+    // Přidání "Registrovaný uživatel" (role bez role)
+    $roles[0] = 'Registrovaný uživatel';  // Můžete použít '0' jako ID pro tuto roli
+
+    // Seřazení rolí podle ID (nebo jiným způsobem, pokud je to potřeba)
+    ksort($roles);
+
+    return $roles;
 	}
+
 }
