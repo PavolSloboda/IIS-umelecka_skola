@@ -276,13 +276,11 @@ final class DevicesService
 	
 	public function UserWithIdCanBorrowDeviceWithId(int $user_id, int $device_id): void //add
 	{
-		bdump($user_id);
 		$this->database->table('forbidden_user_devices')->where('user_id', $user_id)->where('device_id', $device_id)->delete();
 	}
 
 	public function UserWithIdCanNotBorrowDeviceWithId(int $user_id, int $device_id) : void
 	{
-		bdump($device_id);
 		$this->database->table('forbidden_user_devices')->insert(['user_id' => $user_id, 'device_id' => $device_id]);
 	}
 
