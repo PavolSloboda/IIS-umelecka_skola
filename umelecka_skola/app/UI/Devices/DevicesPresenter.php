@@ -69,9 +69,10 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 		$form->addText('name', 'Name:')->setRequired();
 		$form->addText('description', 'Description:')->setRequired();
-		$form->addText('max_loan_duration', 'Max loan duration:')->setRequired();
+		$form->addInteger('max_loan_duration', 'Max loan duration:')->addRule($form::Range, 'Loan duration must be between %d and %d.', [1, 90])->setRequired();
 		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
 		$form->addSelect('atelier_id', 'Atelier:', $this->devices->getUserAtelier($this->getUser()->getId()))->setRequired();
+		$form->addCheckbox('loan', 'Device can not be borrowed');
 		$form->addSubmit('submit', 'Submit changes');
 		
 
@@ -84,7 +85,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	{
 		try {
 			$userId = $this->getUser()->getId();
-			$this->DevicesService->addDevice($userId, $values->name, $values->description, intval($values->max_loan_duration), $values->group_id, $values->atelier_id);
+			$this->DevicesService->addDevice($userId, $values->name, $values->description, intval($values->max_loan_duration), $values->group_id, $values->atelier_id, $values->loan);
 			$this->flashMessage('Device has been successfully edited.', 'success');
 			
 			$this->redirect('Devices:devices');
@@ -199,7 +200,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->addHidden('device_id');
 		$form->addText('name', 'Name:')->setRequired();
 		$form->addText('description', 'Description:')->setRequired();
-		$form->addText('max_loan_duration', 'Max loan duration:')->setRequired();
+		$form->addInteger('max_loan_duration', 'Max loan duration:')->addRule($form::Range, 'Loan duration must be between %d and %d.', [1, 90])->setRequired();
 		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
 		$form->addSelect('atelier_id', 'Atelier:', $this->devices->getUserAtelier($this->getUser()->getId()))->setRequired();
 		$form->addCheckbox('loan', 'Device can not be borrowed');
