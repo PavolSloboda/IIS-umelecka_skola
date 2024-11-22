@@ -64,7 +64,7 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 		$userId = $this->getUser()->getId();
 
     // Ověření unikátnosti emailu
-    if ($this->usersService->isEmailUnique($values->email, $userId)) {
+    if (!$this->usersService->isEmailUnique($values->email, $userId)) {
         $form->addError('The email address is already in use.');
         return;
     }
@@ -77,9 +77,12 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 
     // Aktualizace role
     $roleId = $values->role;
+    if ($roleId == 0) {  // "0" znamená "Registrovaný uživatel" (žádná role)
+        $this->usersService->removeUserRole($userId);
+    }else{
 	bdump($roleId);
     $this->usersService->updateUserRole($userId, $roleId);
-
+    }
     $this->flashMessage('User information updated successfully.', 'success');
     $this->redirect('users');
 	}
@@ -104,6 +107,7 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 	public function actionDelete(int $userId): void
 	{
 		$this->usersService->deleteUser($userId);
+        $this->usersService->removeUserRole($userId);
 		$this->flashMessage('User deleted successfully.', 'success');
 		$this->redirect('users');
 	}

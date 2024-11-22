@@ -90,4 +90,12 @@ final class UsersService
     return $userRole ? $userRole->role_id : null;
 	}
 
+	public function removeUserRole(int $userId): void
+	{
+    // Odstranění všech přiřazených rolí pro uživatele
+    $this->database->table('user_role')
+        ->where('user_id', $userId)
+        ->delete();
+	}
+
 }
