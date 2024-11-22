@@ -42,7 +42,7 @@ table td, table th {
 }
 
 /* Nadpisy */
-h2:not(#atelier_nadpis) {
+h2:not(#cancel_nadpis) {
     font-size: 1.8em;
     margin-bottom: 20px;
     color: #333;
@@ -51,7 +51,7 @@ h2:not(#atelier_nadpis) {
     text-align: left; /* Zarovnání textu vlevo */
 }
 
-#atelier_nadpis {
+#cancel_nadpis {
     font-size: 1.8em;
     margin-bottom: 20px;
     color: #333;
@@ -195,7 +195,7 @@ button:hover {
 .menu a:hover {
     background-color: #7d9ed6;
 }
-#edit_header {
+#cancel_header {
     display: flex;
     justify-content: space-between;
     align-items: center;

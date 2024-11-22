@@ -145,6 +145,12 @@ final class DevicesService
 
         $loan->update(['status_id' => $status_id]);
 	}
+	
+	public function editLoanEndDate( int $loan_id, int $loan_end): void
+    {
+		$loan = $this->database->table('loan')->get($loan_id);
+        $loan->update(['loan_end' => $loan_end]);
+	}
 
 	public function getDeviceById(int $device_id): \Nette\Database\Table\ActiveRow
     {
@@ -181,6 +187,11 @@ final class DevicesService
 	public function getStatusById(int $status_id): \Nette\Database\Table\ActiveRow
     {
         return $this->database->table('loan_status')->get($status_id);
+    }
+
+	public function getAtelierById(int $atelier_id): \Nette\Database\Table\ActiveRow
+    {
+        return $this->database->table('ateliers')->get($atelier_id);
     }
 
 	public function isNotDeviceReserve(int $device_id): bool
