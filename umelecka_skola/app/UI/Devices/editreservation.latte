@@ -1,1 +1,14 @@
-{control editReservationForm}
+<div>
+<hr>
+    <div id="cancel_header">
+            <h2 id="cancel_nadpis">hu</h2>
+            <button type="button" hx-get="{link Devices:devices}" hx-target="#uwu" hx-select="#uwu">Cancel</button>
+    </div>
+    {if hasCurrUserRole('teacher') || hasCurrUserRole('admin')}
+        {control editReservationForm}
+    {/if}
+    {if $loan->status == '2'}
+        <p>Reservation start date: {$loan->loan_start}</p>
+        {control editLoanEndDateForm}
+    {/if}
+</div>
