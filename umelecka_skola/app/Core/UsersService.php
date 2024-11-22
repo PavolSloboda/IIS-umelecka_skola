@@ -61,4 +61,27 @@ final class UsersService
 		$ateliers = $this->database->table('user_atelier')->where('atelier_id', $id);
 		return $this->database->table('users')->where('user_id NOT', $ateliers->select('user_id'));
 	}
+
+	public function isEmailUnique(string $email, int $userId): bool
+    {
+        $existingUser = $this->database->table('users')
+            ->where('email', $email)
+            ->where('user_id != ?', $userId) // Zajistí, že nezkontrolujeme aktuálního uživatele
+            ->fetch();
+
+        return $existingUser === null; // Vrací true, pokud uživatel s tímto emailem neexistuje
+    }
+
+	public function updateUserRole(int $userId, int $roleId): void
+	{
+    // Vymazání všech existujících rolí pro uživatele, pokud má mít pouze jednu
+    $this->database->table('user_role')->where('user_id', $userId)->delete();
+
+    // Přiřazení nové role
+    $this->database->table('user_role')->insert([
+        'user_id' => $userId,
+        'role_id' => $roleId,
+    ]);
+	}
+
 }

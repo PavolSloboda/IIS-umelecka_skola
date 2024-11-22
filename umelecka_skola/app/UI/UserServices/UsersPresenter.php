@@ -61,7 +61,8 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 
 	public function processEditUserForm(Form $form, \stdClass $values): void
 	{
-		$userId = $this->getParameter('userId');
+		//$userId = $this->getParameter('userId');
+		$userId = $this->getUser()->getId();
 
 		// Ověření unikátnosti emailu
 		if (!$this->usersService->isEmailUnique($values->email, $userId)) {
@@ -72,11 +73,13 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 		$this->usersService->updateUser($userId, [
 			'name' => $values->name,
 			'email' => $values->email,
-			'role' => $values->role,
+			//'role' => $values->role,
 		]);
+		
+		$this->usersService->updateUserRole($userId, $values->role);
 
 		$this->flashMessage('User information updated successfully.', 'success');
-		$this->redirect('default');
+		$this->redirect('users');
 	}
 
 	public function actionEdit(int $userId): void
@@ -90,7 +93,7 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 		$this['editUserForm']->setDefaults([
 			'name' => $user->name,
 			'email' => $user->email,
-			'role' => $user->role,
+			//'role' => $user->role,
 		]);
 	}
 
@@ -98,6 +101,6 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 	{
 		$this->usersService->deleteUser($userId);
 		$this->flashMessage('User deleted successfully.', 'success');
-		$this->redirect('default');
+		$this->redirect('users');
 	}
 }
