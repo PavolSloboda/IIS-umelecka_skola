@@ -97,10 +97,14 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function createComponentAddDeviceForm() : Form
 	{
 		$form = new Form;
+
+		// Získání předvyplněných hodnot z parametrů
+		$name = $this->getParameter('name');
+		$description = $this->getParameter('description');
 		
 		
-		$form->addText('name', 'Name:')->setRequired();
-		$form->addText('description', 'Description:')->setRequired();
+		$form->addText('name', 'Name:')->setRequired()->setDefaultValue($name);;
+		$form->addText('description', 'Description:')->setRequired()->setDefaultValue($description);;
 		$form->addInteger('max_loan_duration', 'Max loan duration:')->addRule($form::Range, 'Loan duration must be between %d and %d.', [1, 90])->setRequired();
 		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
 		$form->addSelect('atelier_id', 'Atelier:', $this->devices->getUserAtelier($this->getUser()->getId()))->setRequired();
@@ -410,23 +414,26 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 
     public function actionFulfillRequest(int $requestId): void
-    {
-        $request = $this->devices->getRequestById($requestId);
-        if ($request) {
-            // Redirect to the add-device form with pre-filled data
-			bdump($requestId);
-            $this->redirect('add', ['name' => $request->name, 'description' => $request->description]);
-        } else {
-            $this->flashMessage("Device request not found.", "error");
-            $this->redirect('requests');
-        }
+{
+    $request = $this->devices->getRequestById($requestId);
+    if ($request) {
+        // Předání hodnot pro předvyplnění formuláře
+        $this->redirect('add', [
+            'name' => $request->name,
+            'description' => $request->description
+        ]);
+    } else {
+        $this->flashMessage("Device request not found.", "error");
+        $this->redirect('requests');
     }
+}
 
     public function handleDeleteRequest(int $requestId): void
     {
+		bdump($requestId);
         $this->devices->deleteRequest($requestId);
-        $this->flashMessage("Request deleted successfully.", "success");
-        $this->redirect('requests');
+        //$this->flashMessage("Request deleted successfully.", "success");
+        $this->redirect('Devices:devices');
     }
 
 
