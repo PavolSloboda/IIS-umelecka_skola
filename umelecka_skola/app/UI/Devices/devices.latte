@@ -25,6 +25,7 @@
 				<td> {$item->max_loan_duration} </td>
 				<td> {getGroupById($item->group_id)->name} </td>
 				<td> {getAtelierById($item->atelier_id)->name} </td>
+				<td> <button hx-get="{link Devices:stats $item->device_id}" >Show stats</button>  </td>
 				{if (hasCurrUserRole('teacher') && isDeviceInMyAtelier($item->device_id)) || hasCurrUserRole('admin')}
 					<td> <button hx-get="{link Devices:edit $item->device_id}" >Edit</button>  </td>
 					<td> <button hx-get="{link deleteDevice! $item->device_id}" hx-target="#device_body" hx-select="#device_body">Delete</button> </td>
