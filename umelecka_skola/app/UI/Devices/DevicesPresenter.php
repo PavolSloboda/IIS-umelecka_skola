@@ -393,7 +393,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
         $request = $this->devices->getRequestById($requestId);
         if ($request) {
             // Redirect to the add-device form with pre-filled data
-            $this->redirect('addDevice', ['name' => $request->name, 'description' => $request->description]);
+			bdump($requestId);
+            $this->redirect('add', ['name' => $request->name, 'description' => $request->description]);
         } else {
             $this->flashMessage("Device request not found.", "error");
             $this->redirect('requests');
