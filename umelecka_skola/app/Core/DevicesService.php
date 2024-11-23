@@ -365,6 +365,104 @@ final class DevicesService
         $this->database->table('wanted_devices')->where('id', $requestId)->delete();
     }
 
+	public function get_loyal_customer(int $device_id): array
+	{
+		// Nejprve zjistíme maximální počet výpůjček
+		$maxLoans = $this->database->table('loan')
+			->where('device_id', $device_id)
+			->group('user_id')
+			->select('COUNT(*) AS loan_count')
+			->order('loan_count DESC')
+			->limit(1)
+			->fetch();
+	
+		// Pokud není žádná výpůjčka pro dané zařízení, vrátí prázdné pole
+		if (!$maxLoans) {
+			return [];
+		}
+	
+		// Získáme ID uživatelů s maximálním počtem výpůjček
+		$userIds = $this->database->table('loan')
+			->where('device_id', $device_id)
+			->group('loan.user_id') // Skupina podle user_id
+			->select('loan.user_id, COUNT(*) AS loan_count')
+			->having('loan_count = ?', $maxLoans->loan_count)
+			->fetchAll();
+	
+		// Nyní získáme emaily těchto uživatelů podle jejich ID
+		$users = [];
+		foreach ($userIds as $user) {
+			$userEmail = $this->database->table('users') // Tabulka uživatelů
+				->select('email')
+				->where('user_id', $user->user_id) // Najdeme email podle user_id
+				->fetch();
+	
+			// Pokud existuje email pro uživatele, přidáme ho do pole
+			if ($userEmail) {
+				$users[$userEmail->email] = $user->loan_count;
+			}
+		}
+	
+		return $users;
+	}
+	
+	public function get_number_of_device_loans(int $device_id): int
+	{
+		$count = $this->database->table('loan')->where('device_id', $device_id)->count('*');
+	
+		// Pokud není žádná výpůjčka, vrátí 0
+		return $count;
+	}
+	
+	public function get_number_of_loans(): int
+	{
+		$count = $this->database->table('loan')->count('*');
+	
+		// Pokud není žádná výpůjčka, vrátí 0
+		return $count;
+	}
+	
+	public function get_avg_loan_time(int $device_id): ?float
+	{
+		$avg = $this->database->table('loan')->where('device_id', $device_id)->where('loan_end IS NOT NULL')->aggregation('AVG(DATEDIFF(loan_end, loan_start))');
+		if($avg)
+		{
+			return $avg;
+		}
+		return 0;
+	}
+	
+	public function get_longest_loan_time(int $device_id): float
+	{
+		$loan = $this->database->table('loan')
+			->where('device_id', $device_id)
+			->where('loan_end IS NOT NULL')
+			->order('DATEDIFF(loan_end, loan_start) DESC') 
+			->fetch();
+	
+		if ($loan) {
+			$duration = $loan->loan_start->diff($loan->loan_end)->days; 
+			return $duration;
+		}
+	
+		return 0;	
+	}
+	
+	public function get_shortest_loan_time(int $device_id): float
+	{
+		$loan = $this->database->table('loan')
+			->where('device_id', $device_id)
+			->where('loan_end IS NOT NULL')
+			->order('DATEDIFF(loan_end, loan_start) ASC') 
+			->fetch();
+	
+		if ($loan) {
+			$duration = $loan->loan_start->diff($loan->loan_end)->days; 
+			return $duration;
+		}
+	
+		return 0;
+	}	
 }
 
 //osetrit všechno co se muze stat

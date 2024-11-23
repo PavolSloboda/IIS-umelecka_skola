@@ -18,6 +18,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	private $roles;
 	private $users;
 	private $curr_edit;
+	private $curr_stat;
 	private $wanted_devices;
 
 	public function __construct(DevicesService $devices, RolesService $roles, DevicesService $DevicesService, UsersService $users)
@@ -75,21 +76,19 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 	public function renderStats() : void
 	{
+		//nejcasteji vypujceno od
 		$this->template->loyal_customer = $this->devices->get_loyal_customer(intval($this->curr_stat));
-		$this->template->last_loan = $this->devices->get_last_loan(intval($this->curr_stat));
+		//datum posledni vypujcky
 		$this->template->number_of_device_loans = $this->devices->get_number_of_device_loans(intval($this->curr_stat));
-		$this->template->number_of_loans = $this->devices->get_number_of_loans(intval($this->curr_stat));
+		//celkovy pocet vypujcek
+		$this->template->number_of_loans = $this->devices->get_number_of_loans();
+		//prumerna doba vypujcky
 		$this->template->avg_loan_time = $this->devices->get_avg_loan_time(intval($this->curr_stat));
+		//nejdelsi vypujcka
 		$this->template->longest_loan_time = $this->devices->get_longest_loan_time(intval($this->curr_stat));
+		//nejkratsi vypujcka
 		$this->template->shortest_loan_time = $this->devices->get_shortest_loan_time(intval($this->curr_stat));
 	}
-//datum posledni vypujcky
-//celkovy pocet vypujcek
-//a taky jake procento to tvori ze vsech vypujcek
-//prumerna doba vypujcky
-//nejdelsi vypujcka
-//nejkratsi vypujcka
-//nejcasteji vypujceno od
 	public function actionStats($deviceId): void
 	{
 		$this->curr_stat = $deviceId;
