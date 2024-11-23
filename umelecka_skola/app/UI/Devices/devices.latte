@@ -41,7 +41,47 @@
 		<p>No Devices currently in the system</p>
 	{/if}
 
-<h2>Device Requests</h2>
+<!-- Devices Template - devices.latte -->
+
+<h2>Requested Devices</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Loop through each requested device in wanted_devices -->
+        {foreach $wanted_devices as $device}
+            <td>{$device->ID}</td>
+            <td>{$device->name}</td>
+            <td>{$device->description}</td>
+            <td>
+                <!-- Delete Button -->
+                <button hx-delete="{link deleteRequest!, $device->ID}"
+                        hx-target="#request-{$device->ID}"
+                        hx-swap="outerHTML"
+                        hx-confirm="Are you sure you want to delete this request?">
+                    Delete
+                </button>
+
+                <!-- Fulfill Button -->
+                <button hx-get="{link Devices:edit, name => $device->name, description => $device->description}"
+                        hx-target="#deviceFormContainer"
+                        hx-swap="innerHTML">
+                    Add
+                </button>
+            </td>
+        {/foreach}
+    </tbody>
+</table>
+
+<!-- Container for the Add Device Form (dynamically loaded by HTMX) -->
+<div id="deviceFormContainer"></div>
 
 <h2>Reservations</h2>
 	{if count($loans)}

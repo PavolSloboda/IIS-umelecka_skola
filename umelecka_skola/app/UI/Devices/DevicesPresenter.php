@@ -18,6 +18,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	private $roles;
 	private $users;
 	private $curr_edit;
+	private $wanted_devices;
 
 	public function __construct(DevicesService $devices, RolesService $roles, DevicesService $DevicesService, UsersService $users)
 	{
@@ -26,6 +27,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->DevicesService = $DevicesService;
 		$this->users = $users;
 		$this->curr_edit = null;
+		//$this->wanted_devices = $wanted_devices;
 	}
 
 	protected function startup() : void
@@ -54,12 +56,21 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->template->devices = $this->devices->showAllDevices();
 		$this->template->loans = $this->devices->showAllAvailableLoans();
 		$this->template->types = $this->devices->showAllAvailableTypes();
+
+		$this->template->wanted_devices = $this->devices->getDeviceRequests();
 	}
 
 	public function renderEdit() : void
 	{
 		$this->template->forbidden_users = $this->devices->get_forbidden_users(intval($this->curr_edit));
 		$this->template->not_forbidden_users = $this->devices->get_not_forbidden_users(intval($this->curr_edit));
+	}
+
+	public function renderRequests(): void
+	{
+    // Fetch all pending device requests for the teacher
+    $this->template->wanted_devices = $this->devices->getDeviceRequests();
+	bdump($this->devicesService->getDeviceRequests());
 	}
 
 	public function createComponentAddDeviceForm() : Form
@@ -375,15 +386,11 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	}
 
 	//request
-	public function renderRequests(): void
-    {
-        // Fetch all pending device requests for the teacher
-        $this->template->deviceRequests = $this->devicesService->getDeviceRequests();
-    }
+
 
     public function actionFulfillRequest(int $requestId): void
     {
-        $request = $this->devicesService->getRequestById($requestId);
+        $request = $this->devices->getRequestById($requestId);
         if ($request) {
             // Redirect to the add-device form with pre-filled data
             $this->redirect('addDevice', ['name' => $request->name, 'description' => $request->description]);
@@ -395,7 +402,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
     public function handleDeleteRequest(int $requestId): void
     {
-        $this->devicesService->deleteRequest($requestId);
+        $this->devices->deleteRequest($requestId);
         $this->flashMessage("Request deleted successfully.", "success");
         $this->redirect('requests');
     }
