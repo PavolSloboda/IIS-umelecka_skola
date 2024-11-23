@@ -116,4 +116,6 @@ final class MyProfileService
         ->select('atelier.name')
         ->fetchPairs('id', 'atelier.name');
     }
+    
+    
 }

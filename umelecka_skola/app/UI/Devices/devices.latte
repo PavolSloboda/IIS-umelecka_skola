@@ -71,7 +71,7 @@
                 </button>
 
                 <!-- Fulfill Button -->
-                <button hx-get="{link Devices:add, name => $device->name, description => $device->description}"
+                <button hx-get="{link Devices:FulfillRequest $device->ID}"
                         hx-target="#deviceFormContainer"
                         hx-swap="innerHTML">
                     Add
