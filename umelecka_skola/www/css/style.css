@@ -32,7 +32,8 @@ table td, table th {
   table tr:nth-child(even){background-color: #f2f2f2;}
   
   table tbody tr:hover {background-color: #ddd;}
-.container {
+
+.container:not(.signup-page,.login-page) {
     max-width: 100%; /* Plná šířka */
     margin: 0;
     padding: 20px;
@@ -94,6 +95,7 @@ form input[type="button"],
 form input[type="text"],
 form input[type="email"],
 form input[type="datetime-local"],
+form input[type="password"],
 form select {
 
     padding: 10px;
@@ -213,4 +215,27 @@ button:hover {
 .menu a:hover {
     background-color: #7d9ed6;
 }
+
+.container.login-page,.container.signup-page  {
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* barva boxu loginu*/
+.container.login-page .centered-content,.container.signup-page .centered-content { 
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+
 
