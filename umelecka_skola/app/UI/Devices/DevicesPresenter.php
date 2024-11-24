@@ -385,19 +385,16 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function handleDeleteDevice(int $id) : void
 	{
 		$this->devices->deleteDevice($id);
-		$this->redirect('Devices:devices');
 	}
 
 	public function handleDeleteGroup(int $id) : void
 	{
 		$this->devices->deleteGroup($id);
-		$this->redirect('Devices:devices');
 	}
 
 	public function handleDeleteReservation(int $id) : void
 	{
 		$this->devices->deleteReservation($id);
-		$this->redirect('Devices:devices');
 	}
 
 	public function handleAdd(int $user_id) : void
@@ -425,7 +422,6 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
     public function handleDeleteRequest(int $requestId): void
     {
-		bdump($requestId);
         $this->devices->deleteRequest($requestId);
         //$this->flashMessage("Request deleted successfully.", "success");
         $this->redirect('Devices:devices');

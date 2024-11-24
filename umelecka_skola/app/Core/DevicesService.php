@@ -36,7 +36,7 @@ final class DevicesService
         
         $statusIds = [];
         $statusRows = $this->database->table('loan_status')
-            ->where('name IN ?', ['reservation', 'loan'])
+            ->where('name IN ?', ['reserved', 'loaned'])
             ->fetchAll();
 
         foreach ($statusRows as $status) {
@@ -53,7 +53,7 @@ final class DevicesService
         
         $statusIds = [];
         $statusRows = $this->database->table('loan_status')
-            ->where('name IN ?', ['reservation', 'loan'])
+            ->where('name IN ?', ['reserved', 'loaned'])
             ->fetchAll();
 
         foreach ($statusRows as $status) {
@@ -151,10 +151,9 @@ final class DevicesService
 		date_default_timezone_set('Europe/Prague');
 		$currentTime = new \DateTime();
 
-		$reservationStatusId = $this->database->table('loan_status')->where('name', 'reservation')->fetch()->status_id;
-		$loanStatusId = $this->database->table('loan_status')->where('name', 'loan')->fetch()->status_id;
+		$reservationStatusId = $this->database->table('loan_status')->where('name', 'reserved')->fetch()->status_id;
+		$loanStatusId = $this->database->table('loan_status')->where('name', 'loaned')->fetch()->status_id;
 		$completedStatusId = $this->database->table('loan_status')->where('name', 'completed')->fetch()->status_id;
-		bdump($completedStatusId);
 
 		if(!$reservationStatusId || !$completedStatusId || !$loanStatusId)
 		{
@@ -174,11 +173,11 @@ final class DevicesService
     public function borrowDevice(int $userId, int $deviceId, string $loanStart, string $loanEnd): void
     {
         $device = $this->database->table('devices')->get($deviceId);
-		$reservationStatusId = $this->database->table('loan_status')->where('name', 'reservation')->fetch()->status_id;
+		$reservationStatusId = $this->database->table('loan_status')->where('name', 'reserved')->fetch()->status_id;
 
         if ($device && !$device->loan) {
             $this->database->table('loan')->insert(['user_id' => $userId,'device_id' => $deviceId,'loan_start' => $loanStart,'loan_end' => $loanEnd,'status_id' => $reservationStatusId,]);
-            $device->update(['loan' => TRUE,]);
+            $device->update(['loaned' => TRUE,]);
         }
     }
 
@@ -225,7 +224,7 @@ final class DevicesService
 
 	public function deleteDevice(int $id) : void
 	{
-		$this->database->table('devices')->where('device_id', $id)->update(['deleted' => true]);
+		$this->database->table('devices')->where('device_id', $id)->update(['deleted' => true,'group_id' => null]);
 	}
 	
 	public function deleteGroup(int $id) : void
@@ -237,7 +236,7 @@ final class DevicesService
 	{
 		$device_id = $this->database->table('loan')->get($id)->device_id;
 		$this->database->table('loan')->where('loan_id', $id)->delete();
-		$this->database->table('devices')->where('device_id', $device_id)->update(['loan' => false]);
+		$this->database->table('devices')->where('device_id', $device_id)->update(['loaned' => false]);
 	}
 
 	public function getGroupById(int $group_id): \Nette\Database\Table\ActiveRow
@@ -257,7 +256,7 @@ final class DevicesService
 
 	public function isNotDeviceReserve(int $device_id): bool
 	{
-		$device = $this->database->table('devices')->where('device_id', $device_id)->where('loan', false)->fetch();
+		$device = $this->database->table('devices')->where('device_id', $device_id)->where('loaned', false)->fetch();
 
     	return $device !== null;
 	}
