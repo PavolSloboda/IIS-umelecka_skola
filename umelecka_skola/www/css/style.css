@@ -42,6 +42,13 @@ table td, table th {
     text-align: left; /* Zarovnání textu vlevo */
 }
 
+th .required::after {
+    content: " *"; /* Hvězdička */
+    color: #dc3545; /* Červená barva hvězdičky */
+    font-weight: normal; /* Volitelně odlišný styl hvězdičky */
+}
+
+
 /* Nadpisy */
 h2:not(#cancel_nadpis) {
     font-size: 1.8em;
