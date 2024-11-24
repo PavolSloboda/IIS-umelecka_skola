@@ -67,7 +67,7 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
             $userId = $this->getUser()->getId();
 
         // Ověření unikátnosti emailu
-        if (!$this->usersService->isEmailUnique($values->email, $userId)) {
+        if ($this->usersService->isEmailUnique($values->email, $userId)) {
             $form->addError('The email address is already in use.');
             return;
         }
