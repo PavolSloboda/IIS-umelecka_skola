@@ -29,7 +29,7 @@ final class MyProfileService
     // Uložení změněných údajů o uživateli
     public function updateUserProfile(int $userId, array $data): void
     {
-        $this->database->table('users')->where('id', $userId)->update($data);
+        $this->database->table('users')->where('user_id', $userId)->update($data);
     }
 
     // Získání aktuálních výpůjček uživatele
@@ -114,7 +114,7 @@ final class MyProfileService
     return $this->database->table('user_atelier')
         ->where('user_id', $userId)
         ->select('atelier.name')
-        ->fetchPairs('id', 'atelier.name');
+        ->fetchPairs('atelier_id', 'atelier.name');
     }
 
     //request
