@@ -21,7 +21,7 @@
 			{if hasCurrUserRole('admin')}
             <td>
                 <!-- Edit button now loads form below table -->
-                <button hx-get="{link edit, $user_loop->user_id}" >Edit</button> | 
+                <button hx-get="{link edit, $user_loop->user_id}" >Edit</button> 
                 <!-- Delete button -->
                 <button hx-delete="{link delete, $user_loop->user_id}" hx-target="#form-container" hx-select="#form-container" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
             </td>

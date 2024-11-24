@@ -43,6 +43,14 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         $form = new Form;
         $form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();
 
+        //$Users = $this->users->getUsers();
+        //$usersEmails = array();
+
+        //foreach($Users as $a) {
+        //    if(!$this->roles->userWithEmailHasRoleWithName($a['email'], 'admin')) continue;
+        //    $usersEmails[] = $a['email'];
+        //}
+
         $form->addEmail('email', 'Email:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();
 
         // Načtení seznamu rolí z RolesService
@@ -64,10 +72,11 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 
         public function processEditUserForm(Form $form, \stdClass $values): void
         {
-            $userId = $this->getUser()->getId();
+            //$userId = $this->getUser()->getId();
+            $userId = $this->template->userToEdit->user_id;
 
         // Ověření unikátnosti emailu
-        if (!$this->usersService->isEmailUnique($values->email, $userId)) {
+        if ($this->usersService->isEmailUnique($values->email, $userId)) {
             $form->addError('The email address is already in use.');
             return;
         }
@@ -97,9 +106,8 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         }else{
             $this->usersService->updateUserRole($userId, $roleId2);
         }
-        $this->flashMessage('User information updated successfully.', 'success');
         $this->redirect('users');
-	}
+	    }
 
 	public function actionEdit(int $userId): void
 	{
