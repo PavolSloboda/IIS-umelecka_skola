@@ -47,6 +47,7 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		try
 		{
 			$this->getUser()->setAuthenticator($this->loginService)->login($data->email, $data->password);
+			$this->getUser()->setExpiration('10 minutes');
 			$this->redirect('MainPage:mainpage');
 		}
 		catch (Nette\Security\AuthenticationException $e)
@@ -84,12 +85,12 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 
 	public function renderLogin(): void
 	{
-    	$this->template->pageClass = 'login-page'; // Pro přihlášení
+		$this->template->pageClass = 'login-page'; // Pro přihlášení
 	}
 
 	public function renderSignup(): void
 	{
-    	$this->template->pageClass = 'signup-page'; // Pro registraci
+		$this->template->pageClass = 'signup-page'; // Pro registraci
 	}
 
 	public function actionOut(): void
