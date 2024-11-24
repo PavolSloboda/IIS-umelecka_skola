@@ -58,11 +58,11 @@
 <form n:name="deviceRequestForm">
     <div>
         <label>Device name:</label>
-        <input n:name="name">
+        <input type="text" id="name" n:name="name" required>
     </div>
     <div>
         <label>Device description:</label>
-        <textarea n:name="description"></textarea>
+        <input type="text" id="description" n:name="description" required>
     </div>
     <button type="submit">Submit request</button>
 </form>
