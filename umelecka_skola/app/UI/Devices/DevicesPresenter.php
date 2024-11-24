@@ -105,7 +105,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$description = $this->getParameter('description');
 		
 		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired()->setDefaultValue($name);
-		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50)->setRequired()->setDefaultValue($description);
+		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50)->setDefaultValue($description);
 		$form->addInteger('max_loan_duration', 'Max loan duration:')->addRule($form::Range, 'Loan duration must be between %d and %d.', [1, 90])->setRequired();
 		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
 		$form->addSelect('atelier_id', 'Atelier:', $this->devices->getUserAtelier($this->getUser()->getId()))->setRequired();
@@ -136,7 +136,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 		
 		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();
-		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50)->setRequired();
+		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50);
 		$form->addSubmit('submit', 'Submit changes');
 		
 		$form->onSuccess[] = [$this, 'processAddGroupForm'];
