@@ -76,17 +76,11 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 	{
 		$form = new Form;
 
-		$adminUsers = $this->users->getUsers();
-		$adminEmails = array();
-
-		foreach($adminUsers as $a) {
-		    if(!$this->roles->userWithEmailHasRoleWithName($a['email'], 'admin')) continue;
-		    $adminEmails[] = $a['email'];
-		}
+		$adminAtelierEmails = $this->atelier->getAdminAtelierEmails();
 
 		$form->addHidden('atelier_id');
 		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();  
-		$form->addEmail('admin_email', 'Email of atelier admin:')->addRule($form::IsIn, "User is not admin", $adminEmails)->setRequired();
+		$form->addEmail('admin_email', 'Email of atelier admin:')->addRule($form::IsIn, "User is not admin", $adminAtelierEmails)->setRequired();
 
 		$form->addSubmit('submit', 'Add atelier');
 
