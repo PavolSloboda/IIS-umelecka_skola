@@ -135,9 +135,13 @@ final class UsersService
 
 	public function getAllEmails(int $user_id): array
     {
-        // Výběr všech emailů z tabulky users
-        return $this->database
-            ->table('users')->where('NOT user_id', $user_id)->select('email')->fetchPairs('email', null); // Vrátí pole pouze s hodnotami sloupce email
+		bdump($user_id);
+    // Výběr všech emailů z tabulky users kromě zadaného user_id
+    return $this->database
+        ->table('users')
+        ->where('NOT user_id', $user_id)
+        ->select('email')
+        ->fetchPairs('email', 'email'); // Vrátí pole, kde klíče i hodnoty jsou emaily
     }
 
 }
