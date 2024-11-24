@@ -54,26 +54,27 @@
 <hr>
 
 <div class="device_requests">
-    <h2>Vytvořit žádost o zařízení</h2>
+    <h2>Create device request</h2>
 <form n:name="deviceRequestForm">
     <div>
-        <label>Název zařízení:</label>
+        <label>Device name:</label>
         <input n:name="name">
     </div>
     <div>
-        <label>Popis zařízení:</label>
+        <label>Device description:</label>
         <textarea n:name="description"></textarea>
     </div>
-    <button type="submit">Odeslat žádost</button>
+    <button type="submit">Submit request</button>
 </form>
 
-<h3>Moje žádosti o zařízení</h3>
+<h3>My device requests</h3>
 <table>
+    {if count($userRequests) > 0}
     <thead>
         <tr>
-            <th>Název</th>
-            <th>Popis</th>
-            <th>Akce</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -90,6 +91,9 @@
             </tr>
         {/foreach}
     </tbody>
+    {else}
+    <p>No devices currently requested</p> 
+    {/if}
 </table>
 
 </div>

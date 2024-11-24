@@ -59,12 +59,12 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		$form = new Form;
 
 		$adminUsers = $this->users->getUsers();
-        $adminEmails = array();
+		$adminEmails = array();
 
-        foreach($adminUsers as $a) {
-            if(!$this->roles->userWithEmailHasRoleWithName($a['email'], 'admin')) continue;
-            $adminEmails[] = $a['email'];
-        }
+		foreach($adminUsers as $a) {
+		    if(!$this->roles->userWithEmailHasRoleWithName($a['email'], 'admin')) continue;
+		    $adminEmails[] = $a['email'];
+		}
 
 		$form->addHidden('atelier_id');
 		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();  
@@ -82,12 +82,12 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		$form = new Form;
 
 		$adminUsers = $this->users->getUsers();
-        $adminEmails = array();
+		$adminEmails = array();
 
-        foreach($adminUsers as $a) {
-            if(!$this->roles->userWithEmailHasRoleWithName($a['email'], 'admin')) continue;
-            $adminEmails[] = $a['email'];
-        }
+		foreach($adminUsers as $a) {
+		    if(!$this->roles->userWithEmailHasRoleWithName($a['email'], 'admin')) continue;
+		    $adminEmails[] = $a['email'];
+		}
 
 		$form->addHidden('atelier_id');
 		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();  
