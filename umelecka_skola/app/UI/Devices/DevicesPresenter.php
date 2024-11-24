@@ -430,4 +430,11 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 }
 
+///zobrazit ktere pole jsou povinne
+///zobrazit datumy aktualni
+//. Automatické odhlášení po určité době nečinnosti.
+//zeptat se chalanu zda jsou  ok s tim souborem
+//v prohlížečích Chrome a Firefox 
+//otrstuj ty emaily a prekopiruj atelier
+
 

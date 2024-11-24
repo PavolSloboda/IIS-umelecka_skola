@@ -47,21 +47,6 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         $this->template->profile = $this->profile;
     }
 
-    
-
-    protected function createComponentInfoForm(): Form
-    {
-        $form2 = new Form;
-        $form2->addText('name', 'Name:')
-                ->setHtmlAttribute('readonly', 'readonly')
-            ->setDefaultValue($this->profile->name);
-        $form2->addText('email', 'Email:')
-            ->setHtmlAttribute('readonly', 'readonly')
-            ->setDefaultValue($this->profile->email);
-        //$form2->onSuccess[] = [$this, 'processInfoForm'];
-            return $form2;
-    }
-
     protected function createComponentProfileForm(): Form
     {
         $form = new Form;
@@ -80,16 +65,13 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     {
         $userId = $this->getUser()->getId();
         if (!$this->profileService->isEmailUnique($values->email, $userId)) {
-            $form->addError('The email address is already in use by another account.');
+            $form->addError('The email address is already in use by another account.'); //----------kontrola mailu
             return;
         }
         $this->profileService->updateUserProfileEditForm($userId, [
             'name' => $values->name,
             'email' => $values->email,
         ]);
-        $this->flashMessage('Profile updated successfully.', 'success');
-        $this->redrawControl('edit-profile-section');
-        
     }
 
     protected function createComponentChangePasswordForm(): Form
@@ -113,18 +95,7 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         $userId = $this->getUser()->getId();
         $oldPassword = $values->old_password;
         $newPassword = $values->new_password;
-
-        try {
-            // Ověření a změna hesla pomocí služby
-            $this->profileService->changePassword($userId, $oldPassword, $newPassword);
-            $this->flashMessage('Password successfully changed.', 'success');
-            $this->redrawControl('edit-profile-section'); // Zajistí obnovu pouze tohoto kontejneru
-            //$this->redirect('MyProfile:myProfile');
-        } catch (\Exception $e) {
-            $form->addError('Failed to change password. ' . $e->getMessage());
-            //$this->redrawControl('password-change-section'); // Zajistí obnovu pouze tohoto kontejneru
-            $this->redrawControl('edit-profile-section');
-        }
+        $this->profileService->changePassword($userId, $oldPassword, $newPassword);
     }
 
     public function renderPastLoans(): void
@@ -182,13 +153,8 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     $userId = $this->getUser()->getId();
     $name = $this->getHttpRequest()->getPost('name');
     $description = $this->getHttpRequest()->getPost('description');
-
-    if ($name && $description) {
-        $this->profileService->createRequest($userId, $name, $description);
-        $this->flashMessage('Žádost byla úspěšně vytvořena.', 'success');
-    } else {
-        $this->flashMessage('Všechny údaje musí být vyplněny.', 'error');
-    }
+    
+    $this->profileService->createRequest($userId, $name, $description);
 
     $this->redirect('myprofile-section');
     }
@@ -212,7 +178,6 @@ public function processDeviceRequestForm(Form $form, \stdClass $values): void
     {
     $userId = $this->getUser()->getId();
     $this->profileService->createDeviceRequest($userId, $values->name, $values->description);
-    $this->flashMessage('Žádost o zařízení byla odeslána.', 'success');
     $this->redirect('this');
     }
 

@@ -76,7 +76,7 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
             $userId = $this->template->userToEdit->user_id;
 
         // Ověření unikátnosti emailu
-        if ($this->usersService->isEmailUnique($values->email, $userId)) {
+        if (!$this->usersService->isEmailUnique($values->email, $userId)) {
             $form->addError('The email address is already in use.');
             return;
         }
@@ -92,12 +92,10 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         $roleId2 = $values->role2;
         if(($roleId == 2 && $roleId2 == 3) || ($roleId == 3 && $roleId2 == 2)){
             $this->usersService->updateUserRoletwo($userId, $roleId, $roleId2);
-        } else if(($roleId == 0 && $roleId2 != '') || ($roleId == 4 && $roleId2 != '') || ($roleId == 2 && ($roleId2 != 3 || $roleId2 != '')) || ($roleId == 3 && ($roleId2 != 2 || $roleId2 != ''))){
-            $form->addError('Wrong role input.');
-            return;
+        } else if(($roleId == 0 && $roleId2 != '') || ($roleId == 4 && $roleId2 != '') || ($roleId == 2 && ($roleId2 != 3 || $roleId2 != '')) || ($roleId == 3 && ($roleId2 != 2 || $roleId2 != ''))|| ($roleId == '' && $roleId2 == '')){
+            $this->redirect('users');
         }else if(($roleId2 == 0 && $roleId != '') || ($roleId2 == 4 && $roleId != '') || ($roleId2 == 2 && ($roleId != 3 || $roleId != '')) || ($roleId2 == 3 && ($roleId != 2 || $roleId != ''))){
-            $form->addError('Wrong role input.');
-            return;
+            $this->redirect('users');
         }
         else if ($roleId == 0 || $roleId2 == 0) {  // "0" znamená "Registrovaný uživatel" (žádná role)
             $this->usersService->removeUserRole($userId);

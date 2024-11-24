@@ -6,16 +6,19 @@ namespace App\Core;
 
 use Nette\Database\Explorer;
 use App\Core\RolesService;
+use App\Core\UsersService;
 
 final class AtelierService
 {
 	private Explorer $database;
 	private RolesService $roles;
+	private $users;
 
-	public function __construct(Explorer $database, RolesService $roles)
+	public function __construct(Explorer $database, RolesService $roles, UsersService $users)
 	{
 		$this->database = $database;
 		$this->roles = $roles;
+		$this->users = $users;
 	}
 
 	public function isAtelierEmpty(int $id) : bool
@@ -100,5 +103,17 @@ final class AtelierService
 	public function removeUserWithIdFromAtelierWithId(int $user_id, int $atelier_id) : void
 	{
 		$this->database->table('user_atelier')->where('user_id', $user_id)->where('atelier_id', $atelier_id)->delete();
+	}
+
+	public function getAdminAtelierEmails() : array
+	{
+		$adminUsers = $this->users->getUsers();
+		$adminAtelierEmails = array();
+
+		foreach($adminUsers as $a) {
+		    if(!$this->roles->userWithEmailHasRoleWithName($a['email'], 'atelier_manager')) continue;
+		    $adminAtelierEmails[] = $a['email'];
+		}
+		return $adminAtelierEmails;
 	}
 }
