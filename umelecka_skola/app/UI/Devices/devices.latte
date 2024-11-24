@@ -25,7 +25,6 @@
 				<td> {$item->max_loan_duration} </td>
 				<td> {getGroupById($item->group_id)->name} </td>
 				<td> {getAtelierById($item->atelier_id)->name} </td>
-				<td> <button hx-get="{link Devices:stats $item->device_id}" >Show stats</button>  </td>
 				{if (hasCurrUserRole('teacher') && isDeviceInMyAtelier($item->device_id)) || hasCurrUserRole('admin')}
 					<td> <button hx-get="{link Devices:edit $item->device_id}" >Edit</button>  </td>
 					<td> <button hx-get="{link deleteDevice! $item->device_id}" hx-target="#device_body" hx-select="#device_body">Delete</button> </td>
@@ -57,27 +56,28 @@
     </thead>
     <tbody>
         <!-- Loop through each requested device in wanted_devices -->
+		{if $wanted_devices}
         {foreach $wanted_devices as $device}
             <td>{$device->ID}</td>
             <td>{$device->name}</td>
             <td>{$device->description}</td>
+			{if (hasCurrUserRole('teacher') || hasCurrUserRole('admin'))}
             <td>
                 <!-- Delete Button -->
-                <button hx-delete="{link deleteRequest!, $device->ID}"
-                        hx-target="#request-{$device->ID}"
-                        hx-swap="outerHTML"
-                        hx-confirm="Are you sure you want to delete this request?">
+                <button hx-delete="{link deleteRequest!, $device->ID}" hx-target="#device_body" hx-select="#device_body" hx-confirm="Are you sure you want to delete this request?">
                     Delete
                 </button>
 
                 <!-- Fulfill Button -->
-                <button hx-get="{link Devices:FulfillRequest $device->ID}"
-                        hx-target="#deviceFormContainer"
-                        hx-swap="innerHTML">
+                <button hx-get="{link Devices:FulfillRequest $device->ID}">
                     Add
                 </button>
             </td>
-        {/foreach}
+			{/if}
+		{/foreach}
+		{else}
+        <p>You have no wanted devices assigned.</p>
+		{/if}
     </tbody>
 </table>
 

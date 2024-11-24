@@ -362,7 +362,7 @@ final class DevicesService
     public function deleteRequest(int $requestId): void
     {
         // Delete a device request by ID
-        $this->database->table('wanted_devices')->where('id', $requestId)->delete();
+        $this->database->table('wanted_devices')->where('ID', $requestId)->delete();
     }
 
 	public function get_loyal_customer(int $device_id): array

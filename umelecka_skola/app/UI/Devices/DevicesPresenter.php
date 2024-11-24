@@ -99,9 +99,13 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function createComponentAddDeviceForm() : Form
 	{
 		$form = new Form;
+
+		// Získání předvyplněných hodnot z parametrů
+		$name = $this->getParameter('name');
+		$description = $this->getParameter('description');
 		
-		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();
-		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50)->setRequired();
+		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired()->setDefaultValue($name);
+		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50)->setRequired()->setDefaultValue($description);
 		$form->addInteger('max_loan_duration', 'Max loan duration:')->addRule($form::Range, 'Loan duration must be between %d and %d.', [1, 90])->setRequired();
 		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
 		$form->addSelect('atelier_id', 'Atelier:', $this->devices->getUserAtelier($this->getUser()->getId()))->setRequired();
@@ -409,19 +413,22 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
     public function actionFulfillRequest(int $requestId): void
     {
         $request = $this->devices->getRequestById($requestId);
-        if ($request) {
+        if ($request) 
+		{
             $this->redirect('add', ['name' => $request->name, 'description' => $request->description]);
-        } else {
+        } else 
+		{
             $this->flashMessage("Device request not found.", "error");
             $this->redirect('requests');
         }
-    }
+	}
 
     public function handleDeleteRequest(int $requestId): void
     {
+		bdump($requestId);
         $this->devices->deleteRequest($requestId);
-        $this->flashMessage("Request deleted successfully.", "success");
-        $this->redirect('requests');
+        //$this->flashMessage("Request deleted successfully.", "success");
+        $this->redirect('Devices:devices');
     }
 
 
