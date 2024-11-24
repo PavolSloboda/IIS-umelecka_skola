@@ -109,12 +109,24 @@ final class MyProfileService
     return $roleNames;
     }
 
-    public function getUserAteliers(int $userId): array
+    public function getUserAteliers_bak(int $userId): array
     {
     return $this->database->table('user_atelier')
         ->where('user_id', $userId)
         ->select('atelier.name')
         ->fetchPairs('atelier_id', 'atelier.name');
+    }
+
+    public function getUserAteliers(int $userId): array
+    {
+        $sql = "
+            SELECT a.atelier_id, a.name, a.admin_id
+            FROM Ateliers a
+            JOIN user_atelier ua ON a.atelier_id = ua.atelier_ID
+            WHERE ua.user_id = ?
+        ";
+
+        return $this->database->query($sql, $userId)->fetchAll();
     }
 
     //request

@@ -25,8 +25,8 @@
 {if $ateliers}
 <ul>
     {foreach $ateliers as $atelier}
-        <li>{$atelier}</li>
-    {/foreach}
+    <li>{$atelier->name} (ID: {$atelier->atelier_id}, Admin ID: {$atelier->admin_id})</li>
+{/foreach}
 </ul>
 {else}
         <p>You have no ateliers assigned.</p>
