@@ -116,6 +116,25 @@ final class MyProfileService
         ->select('atelier.name')
         ->fetchPairs('id', 'atelier.name');
     }
+
+    //request
+    public function getUserAtelierRequests(int $userId): array
+    {
+        // Načtení všech žádostí uživatele o ateliér
+        return $this->database->table('user_atelier')
+            ->where('user_id', $userId)
+            ->fetchAll();
+    }
+
+    public function createAtelierRequest(int $userId, string $atelierName): void
+    {
+        // Vytvoření žádosti o nový ateliér
+        $this->database->table('user_atelier')->insert([
+            'user_id' => $userId,
+            'atelier_ID' => null,  // Až bude schváleno, přiřadí se ID skutečného ateliéru
+            'name' => $atelierName
+        ]);
+    }
     
     
 }
