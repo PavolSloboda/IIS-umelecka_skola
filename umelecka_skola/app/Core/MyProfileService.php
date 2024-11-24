@@ -125,8 +125,16 @@ final class MyProfileService
             JOIN user_atelier ua ON a.atelier_id = ua.atelier_ID
             WHERE ua.user_id = ?
         ";
+        $ateliers = $this->database->table('user_atelier')->where('user_id', $userId)->fetchAll();
 
-        return $this->database->query($sql, $userId)->fetchAll();
+        $out_ateliers = [];
+
+        foreach ($ateliers as $atelier)
+        {
+            array_push($out_ateliers, $this->database->table('atelier')->where('atelier_id', $atelier->atelier_id)->fetch());
+        }
+
+        return $out_ateliers;//$this->database->query($sql, $userId)->fetchAll();
     }
 
     //request
