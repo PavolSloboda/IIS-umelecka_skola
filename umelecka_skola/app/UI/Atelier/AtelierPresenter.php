@@ -102,6 +102,19 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		$this->forward('Atelier:atelier');
 	}
 
+	public function processEditAtelierForm(Form $form, \stdClass $data) : void
+	{
+		try
+		{
+			$this->atelier->editAtelier(intval($data->atelier_id), $data->name, $data->admin_email);
+		}
+		catch (\Exception $e)
+		{
+
+		}
+		$this->redirect('Atelier:atelier');
+	}
+
 	public function handleDelete(int $id) : void
 	{
 		$this->atelier->deleteAtelier($id);
@@ -117,11 +130,7 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		//$form->onSuccess[] = [$this, 'editFormSucceeded'];
 	}
 
-	public function processEditAtelierForm(Form $form, \stdClass $data) : void
-	{
-		$this->atelier->editAtelier(intval($data->atelier_id), $data->name, $data->admin_email);
-		$this->redirect('Atelier:atelier');
-	}
+
 
 	public function handleAdd(int $user_id) : void
 	{

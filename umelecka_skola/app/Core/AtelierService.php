@@ -111,7 +111,7 @@ final class AtelierService
 		$adminAtelierEmails = array();
 
 		foreach($adminUsers as $a) {
-		    if(!$this->roles->userWithEmailHasRoleWithName($a['email'], 'atelier_manager')) continue;
+		    if(!$this->roles->userWithEmailHasRoleWithName($a['email'], 'atelier_manager') && !$this->roles->userWithEmailHasRoleWithName($a['email'], 'admin')) continue;
 		    $adminAtelierEmails[] = $a['email'];
 		}
 		return $adminAtelierEmails;

@@ -166,18 +166,51 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 		$form->addHidden('device_id');
 		// Zadání začátku výpůjčky (datum a čas)
-		$form->addDateTime('loan_start', 'Start Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter the start date and time.');
+		$form->addDateTime('loan_start', 'Start Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter the start date and time.')
+		->addRule([$this, 'validateLoanStartDate'],'The earliest possible reservation start date is today.' );
 	
-		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter the end date and time.');
+		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter the end date and time.')
+		->addRule([$this, 'validateLoanEndDate'], 'The end date must be after the start date.' )
+		->addRule([$this, 'validateLoanDuration'], 'The loan duration cannot exceed the maximum allowed days.');
 		
 		$form->addSubmit('submit', 'Borrow Device');
 
-		$form->onValidate[] = [$this, 'validateAddDeviceLoanForm'];
+		//$form->onValidate[] = [$this, 'validateAddDeviceLoanForm'];
 
 		$form->onSuccess[] = [$this, 'processAddDeviceLoanForm'];
 
 		return $form;
 		
+	}
+
+	public function validateLoanStartDate($item,$value): bool
+	{
+		$today = new \DateTime();
+		$formatToday = $today->format('Y-m-d H:i:s');
+		$loanStart = $item->value;
+	
+		return $loanStart >= $formatToday;
+	}
+	
+	public function validateLoanEndDate($item): bool
+	{
+		$loanStart = new \DateTime($item->getForm()->getUntrustedValues()->loan_start);
+		$formatLoanStart = $loanStart->format('Y-m-d H:i:s');
+		$loanEnd = $item->value;
+	
+		return $loanEnd > $formatLoanStart;
+	}
+	
+	public function validateLoanDuration($item): bool
+	{
+		$loanStart = new \DateTime($item->getForm()->getUntrustedValues()->loan_start);
+		$formatLoanStart = new \DateTime($loanStart->format('Y-m-d H:i:s'));
+		$loanEnd = new \DateTime($item->value);
+		$interval = $formatLoanStart->diff($loanEnd);
+		$deviceId = intval($item->getForm()->getUntrustedValues()->device_id);
+		
+		$maxLoanDuration = $this->devices->getDeviceById($deviceId)->max_loan_duration;
+		return $interval->days <= $maxLoanDuration;
 	}
 
 	public function validateAddDeviceLoanForm(Form $form, \stdClass $values): void
@@ -196,10 +229,6 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 	public function processAddDeviceLoanForm(Form $form, \stdClass $values): void
 	{
-		if ($form->hasErrors()) {
-			return; 
-		}
-
 		$userId = $this->getUser()->getId();
 		$deviceId = $values->device_id;
 
@@ -207,15 +236,11 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$loanStart = $values->loan_start;
 		$loanEnd = $values->loan_end;
 
-		try {
-			$this->DevicesService->borrowDevice($userId, intval($deviceId), $loanStart, $loanEnd);
-			$this->flashMessage('Device has been successfully borrowed.', 'success');
-			
-			$this->redirect('Devices:devices');
-		}catch(Nette\Security\AuthenticationException $e)
-		{
-			$form->addError('An error occured');
-		}
+		$this->DevicesService->borrowDevice($userId, intval($deviceId), $loanStart, $loanEnd);
+		$this->flashMessage('Device has been successfully borrowed.', 'success');
+		
+		$this->redirect('Devices:devices');
+		
 	}
 
 	public function actionReserve($deviceId): void
@@ -428,8 +453,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 }
 
-//spravit cekovani datumu
 //v prohlížečích Chrome a Firefox 
+
 
 
 
