@@ -137,7 +137,7 @@ final class UsersService
     {
         // Výběr všech emailů z tabulky users
         return $this->database
-            ->table('users')->where('NOT user_id', $user_id)->select('email')->fetchPairs('email', null); // Vrátí pole pouze s hodnotami sloupce email
+            ->table('users')->where('user_id !=', $user_id)->select('email')->fetchPairs('email', null); // Vrátí pole pouze s hodnotami sloupce email
     }
 
 }
