@@ -57,10 +57,10 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         // Přidání možnosti "Žádná role"
         $roles[''] = 'No role'; // Případ pro "Žádnou roli" (prázdný klíč bude znamenat žádnou roli)
 
-        $form->addSelect('role', 'Role:', $roles)
-            ->setRequired('Please select a role.');
-        $form->addSelect('role2', 'Role:', $roles)
-            ->setRequired('Please select a role.');
+        $form->addSelect('role', 'Role:', $roles);
+            //->setRequired('Please select a role.');
+        $form->addSelect('role2', 'Role:', $roles);
+            //->setRequired('Please select a role.');
 
         $form->addSubmit('submit', 'Save');
         $form->onSuccess[] = [$this, 'processEditUserForm'];
