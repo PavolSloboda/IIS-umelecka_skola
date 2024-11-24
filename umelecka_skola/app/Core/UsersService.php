@@ -133,4 +133,13 @@ final class UsersService
         ->delete();
 	}
 
+	public function getAllEmails(): array
+    {
+        // Výběr všech emailů z tabulky users
+        return $this->database
+            ->table('users')
+            ->select('email')
+            ->fetchPairs(null, 'email'); // Vrátí pole pouze s hodnotami sloupce email
+    }
+
 }
