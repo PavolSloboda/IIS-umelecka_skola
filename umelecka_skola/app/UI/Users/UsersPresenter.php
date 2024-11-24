@@ -47,7 +47,7 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 
         $usersEmails = array();
 
-        $usersEmails = $this->usersService->getAllEmails($this->user_id);
+        $usersEmails = $this->usersService->getAllEmails(intval($form->getUntrustedValues()->user_id));
 
         $form->addEmail('email', 'Email:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->addRule($form::IsNotIn, "Email already exist", $usersEmails)->setRequired();
 
