@@ -61,7 +61,7 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         $form->addText('email', 'Email:')
             ->setRequired()
             ->setDefaultValue($this->profile->email)
-            ->addRule($form::IsIn, "Email already exist", $usersEmails);
+            ->addRule($form::IsNotIn, "Email already exist", $usersEmails);
         $form->addSubmit('submit', 'Save Changes');
         $form->onSuccess[] = [$this, 'processProfileForm'];
         return $form;

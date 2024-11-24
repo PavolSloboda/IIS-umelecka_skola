@@ -47,7 +47,7 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 
         $usersEmails = getAllEmails();
 
-        $form->addEmail('email', 'Email:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->addRule($form::IsIn, "Email already exist", $usersEmails)->setRequired();
+        $form->addEmail('email', 'Email:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->addRule($form::IsNotIn, "Email already exist", $usersEmails)->setRequired();
 
         // Načtení seznamu rolí z RolesService
         $roles = $this->roles->getRoles();
@@ -116,12 +116,8 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 
 	public function actionDelete(int $userId): void
 	{
-        try{
 		$this->usersService->deleteUser($userId);
-        }
-        catch(Exception $e) {
-            echo 'Message: ' .$e->getMessage();
-        }
+
         $this->usersService->removeUserRole($userId);
 		$this->redirect('users');
 	}
