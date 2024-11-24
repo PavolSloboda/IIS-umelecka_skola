@@ -166,11 +166,9 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 		$form->addHidden('device_id');
 		// Zadání začátku výpůjčky (datum a čas)
-		$form->addDateTime('loan_start', 'Start Date and Time:')->setFormat('Y-m-d H:i:s')
-        ->setRequired('Please enter the start date and time.');
+		$form->addDateTime('loan_start', 'Start Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter the start date and time.');
 	
-		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')
-        ->setRequired('Please enter the end date and time.');
+		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter the end date and time.');
 		
 		$form->addSubmit('submit', 'Borrow Device');
 
@@ -343,7 +341,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->addHidden('loan_start');
 		$form->addHidden('device_id');
 		
-		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')
+		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))
         ->setRequired('Please enter new end date and time.');
 		
 		$form->addSubmit('submit', 'Change end date');
@@ -430,11 +428,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 }
 
-///zobrazit ktere pole jsou povinne
-///zobrazit datumy aktualni
-//. Automatické odhlášení po určité době nečinnosti.
-//zeptat se chalanu zda jsou  ok s tim souborem
+//spravit cekovani datumu
 //v prohlížečích Chrome a Firefox 
-//otrstuj ty emaily a prekopiruj atelier
+
 
 
