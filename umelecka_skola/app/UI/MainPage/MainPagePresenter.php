@@ -18,24 +18,4 @@ final class MainPagePresenter extends Nette\Application\UI\Presenter
 			$this->redirect('Login:login');
 		}
 	}
-
-	public function createComponentMainPageForm() : Form
-	{
-		$form = new Form;
-		$form->addButton('devicemanagement', 'Device management')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('DevicesClicked!').'"');
-		$form->addButton('logout', 'Log out')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('loginClicked!').'"');
-		return $form;
-
-	}
-
-	public function handleLoginClicked() : void
-	{
-		$this->getUser()->logout();
-		$this->redirect('Login:login');
-	}
-
-	public function handleDevicesClicked() : void
-	{
-		$this->redirect('Devices:devices');
-	}
 }
