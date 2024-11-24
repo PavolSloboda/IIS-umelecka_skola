@@ -5,6 +5,7 @@
 <div hx-target="this" hx-swap= "outerHTML">
 
 <!-- Profilová sekce -->
+<div id="profile_information">
 <h2>Profile Information</h2>
 <div id="profile-section">
     <p><strong>Name:</strong> {$profile->name}</p>
@@ -30,24 +31,29 @@
 {else}
         <p>You have no ateliers assigned.</p>
 {/if}
+</div>
 
 <!-- Sekce pro editaci profilu -->
+<div id="edit_profile">
 <h2>Edit Profile</h2>
 <div>
     {control profileForm}
+</div>
 </div>
 
 <hr>
 
 <!-- Formulář pro změnu hesla -->
+<div id="change_password">
 <h3>Change Password</h3>
 <div>
     {control changePasswordForm}
 </div>
+</div>
 
 <hr>
 
-<div class="atelier-requests">
+<div class="device_requests">
     <h2>Vytvořit žádost o zařízení</h2>
 <form n:name="deviceRequestForm">
     <div>

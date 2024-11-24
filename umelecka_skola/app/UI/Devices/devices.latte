@@ -61,7 +61,7 @@
             <td>{$device->ID}</td>
             <td>{$device->name}</td>
             <td>{$device->description}</td>
-			{if (hasCurrUserRole('teacher') || hasCurrUserRole('admin'))}
+			{if (hasCurrUserRole('teacher'))}
             <td>
                 <!-- Delete Button -->
                 <button hx-delete="{link deleteRequest!, $device->ID}" hx-target="#device_body" hx-select="#device_body" hx-confirm="Are you sure you want to delete this request?">
