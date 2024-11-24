@@ -1,8 +1,7 @@
-<hr>
-    <div id="cancel_header">
-            <h2 id="cancel_nadpis">Create reservation</h2>
-            <button type="button" hx-get="{link Devices:devices}" hx-target="#device_body" hx-select="#device_body">Cancel</button>
-    </div>
+<div id="cancel_header">
+		<h2 id="cancel_nadpis">Create reservation</h2>
+		<button type="button" hx-get="{link Devices:devices}" hx-target="#device_body" hx-select="#device_body">Cancel</button>
+</div>
 {if isset($device)}
     <p>Your device is: {$device->name}</p>
 {/if}

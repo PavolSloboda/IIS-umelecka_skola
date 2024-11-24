@@ -91,6 +91,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	}
 	public function actionStats($deviceId): void
 	{
+		$device = $this->devices->getDeviceById(intval($deviceId));
+		$this->template->device = $device;
 		$this->curr_stat = $deviceId;
 	}
 
@@ -102,15 +104,13 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$name = $this->getParameter('name');
 		$description = $this->getParameter('description');
 		
-		
-		$form->addText('name', 'Name:')->setRequired()->setDefaultValue($name);;
-		$form->addText('description', 'Description:')->setRequired()->setDefaultValue($description);;
+		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired()->setDefaultValue($name);
+		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50)->setRequired()->setDefaultValue($description);
 		$form->addInteger('max_loan_duration', 'Max loan duration:')->addRule($form::Range, 'Loan duration must be between %d and %d.', [1, 90])->setRequired();
 		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
 		$form->addSelect('atelier_id', 'Atelier:', $this->devices->getUserAtelier($this->getUser()->getId()))->setRequired();
 		$form->addCheckbox('loan', 'Device can not be borrowed');
 		$form->addSubmit('submit', 'Submit changes');
-		
 
 		$form->onSuccess[] = [$this, 'processAddDeviceForm'];
 		return $form;
@@ -123,7 +123,6 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 			$userId = $this->getUser()->getId();
 			$this->DevicesService->addDevice($userId, $values->name, $values->description, intval($values->max_loan_duration), $values->group_id, $values->atelier_id, $values->loan);
 			$this->flashMessage('Device has been successfully edited.', 'success');
-			
 			$this->redirect('Devices:devices');
 		}catch(Nette\Security\AuthenticationException $e)
 		{
@@ -136,8 +135,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form = new Form;
 		
 		
-		$form->addText('name', 'Name:')->setRequired();
-		$form->addText('description', 'Description:')->setRequired();
+		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();
+		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50)->setRequired();
 		$form->addSubmit('submit', 'Submit changes');
 		
 		$form->onSuccess[] = [$this, 'processAddGroupForm'];
@@ -234,8 +233,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form = new Form;
 		
 		$form->addHidden('device_id');
-		$form->addText('name', 'Name:')->setRequired();
-		$form->addText('description', 'Description:')->setRequired();
+		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();
+		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50)->setRequired();
 		$form->addInteger('max_loan_duration', 'Max loan duration:')->addRule($form::Range, 'Loan duration must be between %d and %d.', [1, 90])->setRequired();
 		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
 		$form->addSelect('atelier_id', 'Atelier:', $this->devices->getUserAtelier($this->getUser()->getId()))->setRequired();
@@ -262,6 +261,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function actionEdit($deviceId): void
 	{
 		$device = $this->devices->getDeviceById(intval($deviceId));
+		$this->template->device = $device;
 		$form = $this->getComponent('editDeviceForm');
 		$form->setDefaults(['device_id' => $device->device_id, 'name' => $device->name, 'description' => $device->description, 'max_loan_duration' => $device->max_loan_duration, 'group_id' => $device->group_id,'atelier_id' => $device->atelier_id, 'loan' => $device->loan]);
 		$this->curr_edit = $deviceId;
@@ -272,8 +272,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form = new Form;
 		
 		$form->addHidden('group_id');
-		$form->addText('name', 'Name:')->setRequired();
-		$form->addText('description', 'Description:')->setRequired();
+		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();
+		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50)->setRequired();
 		
 		$form->addSubmit('submit', 'Submit changes');
 		
@@ -385,19 +385,16 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function handleDeleteDevice(int $id) : void
 	{
 		$this->devices->deleteDevice($id);
-		$this->redirect('Devices:devices');
 	}
 
 	public function handleDeleteGroup(int $id) : void
 	{
 		$this->devices->deleteGroup($id);
-		$this->redirect('Devices:devices');
 	}
 
 	public function handleDeleteReservation(int $id) : void
 	{
 		$this->devices->deleteReservation($id);
-		$this->redirect('Devices:devices');
 	}
 
 	public function handleAdd(int $user_id) : void
@@ -410,27 +407,21 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->devices->UserWithIdCanNotBorrowDeviceWithId($user_id, intval($this->curr_edit));
 	}
 
-	//request
-
-
     public function actionFulfillRequest(int $requestId): void
-{
-    $request = $this->devices->getRequestById($requestId);
-    if ($request) {
-        // Předání hodnot pro předvyplnění formuláře
-        $this->redirect('add', [
-            'name' => $request->name,
-            'description' => $request->description
-        ]);
-    } else {
-        $this->flashMessage("Device request not found.", "error");
-        $this->redirect('requests');
-    }
-}
+    {
+        $request = $this->devices->getRequestById($requestId);
+        if ($request) 
+		{
+            $this->redirect('add', ['name' => $request->name, 'description' => $request->description]);
+        } else 
+		{
+            $this->flashMessage("Device request not found.", "error");
+            $this->redirect('requests');
+        }
+	}
 
     public function handleDeleteRequest(int $requestId): void
     {
-		bdump($requestId);
         $this->devices->deleteRequest($requestId);
         //$this->flashMessage("Request deleted successfully.", "success");
         $this->redirect('Devices:devices');

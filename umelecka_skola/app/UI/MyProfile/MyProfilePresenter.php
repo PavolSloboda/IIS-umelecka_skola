@@ -98,10 +98,10 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
             ->setRequired();
         $form->addPassword('new_password', 'New Password:')
             ->setRequired()
-            ->addRule($form::MIN_LENGTH, 'Password must be at least %d characters long.', 8);
+            ->addRule($form::MinLength, 'Password must be at least %d characters long.', 8);
         $form->addPassword('confirm_password', 'Confirm New Password:')
             ->setRequired()
-            ->addRule($form::EQUAL, 'Passwords do not match.', $form['new_password']);
+            ->addRule($form::Equal, 'Passwords do not match.', $form['new_password']);
         $form->addSubmit('submit', 'Change Password');
         $form->onSuccess[] = [$this, 'processChangePasswordForm'];
         return $form;

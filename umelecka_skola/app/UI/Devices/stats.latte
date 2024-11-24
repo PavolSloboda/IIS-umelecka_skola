@@ -1,20 +1,17 @@
 <div  hx-target="this" hx-swap= "outerHTML">
-<hr>
     <div id="cancel_header">
             <h2 id="cancel_nadpis">Statistics of device loans</h2>
             <button type="button" hx-get="{link Devices:devices}" hx-target="#device_body" hx-select="#device_body">Cancel</button>
     </div>
-
+{if isset($device)}
+    <p>Your device is: {$device->name}</p>
+{/if}
 <table class="table table-bordered">
     <thead>
-        <tr>
-            <th>Ukazatel</th>
-            <th>Hodnota</th>
-        </tr>
     </thead>
     <tbody>
         <tr>
-            <td>Top borrower</td>
+            <td>Most items borrowed by</td>
             <td>
                 {if count($loyal_customer) > 0}
                     {foreach $loyal_customer as $userEmail => $loanCount}
@@ -27,9 +24,16 @@
         </tr>
 
         <tr>
-            <td>Number of loans</td>
+            <td>Total number of loans</td>
             <td>
                 {$number_of_loans}
+            </td>
+        </tr>
+
+        <tr>
+            <td>Number of device loans</td>
+            <td>
+                {$number_of_device_loans} loans represent {round($number_of_device_loans/$number_of_loans,2)}% of the total number of loans
             </td>
         </tr>
 
@@ -46,7 +50,7 @@
                 {if $longest_loan_time != NULL}
                     Duration: {$longest_loan_time} days
                 {else}
-                    Žádná výpůjčka
+                    no loans
                 {/if}
             </td>
         </tr>
@@ -57,7 +61,7 @@
                 {if $shortest_loan_time != NULL}
                     Duration: {$shortest_loan_time} days
                 {else}
-                    Žádná výpůjčka
+                    no loans
                 {/if}
             </td>
         </tr>

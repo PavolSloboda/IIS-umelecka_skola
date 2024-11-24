@@ -54,32 +54,48 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		$this->template->user_items_not = $this->users->getUsersNotBelongingToAtelier(intval($this->curr_edit));
 	}
 
-	protected function createComponentAddAtelierForm(): Form
-	{
-		$form = new Form;
-
-		$form->addHidden('atelier_id');
-		$form->addText('name', 'Name:')->setRequired();  
-		$form->addEmail('admin_email', 'Email of atelier admin:')->setRequired();
-
-		$form->addSubmit('submit', 'Add atelier');
-
-		$form->onSuccess[] = [$this, 'processAddAtelierForm'];
-		
-		return $form;
-	}
-
 	protected function createComponentEditAtelierForm(): Form
 	{
 		$form = new Form;
 
+		$adminUsers = $this->users->getUsers();
+        $adminEmails = array();
+
+        foreach($adminUsers as $a) {
+            if(!$this->roles->userWithEmailHasRoleWithName($a['email'], 'admin')) continue;
+            $adminEmails[] = $a['email'];
+        }
+
 		$form->addHidden('atelier_id');
-		$form->addText('name', 'Name:')->setRequired();  
-		$form->addEmail('admin_email', 'Email of atelier admin:')->setRequired();
+		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();  
+		$form->addEmail('admin_email', 'Email of atelier admin:')->addRule($form::IsIn, "User is not admin", $adminEmails)->setRequired();
 
 		$form->addSubmit('submit', 'Confirm changes');
 
 		$form->onSuccess[] = [$this, 'processEditAtelierForm'];
+		
+		return $form;
+	}
+
+	protected function createComponentAddAtelierForm(): Form
+	{
+		$form = new Form;
+
+		$adminUsers = $this->users->getUsers();
+        $adminEmails = array();
+
+        foreach($adminUsers as $a) {
+            if(!$this->roles->userWithEmailHasRoleWithName($a['email'], 'admin')) continue;
+            $adminEmails[] = $a['email'];
+        }
+
+		$form->addHidden('atelier_id');
+		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();  
+		$form->addEmail('admin_email', 'Email of atelier admin:')->addRule($form::IsIn, "User is not admin", $adminEmails)->setRequired();
+
+		$form->addSubmit('submit', 'Add atelier');
+
+		$form->onSuccess[] = [$this, 'processAddAtelierForm'];
 		
 		return $form;
 	}
@@ -92,8 +108,7 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		}
 		catch (\Exception $e)
 		{
-			$this->error("uwu");
-			bdump("tuto");
+
 		}
 		$this->forward('Atelier:atelier');
 	}
