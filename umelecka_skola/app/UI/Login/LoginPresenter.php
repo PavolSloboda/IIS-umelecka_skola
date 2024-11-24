@@ -23,8 +23,8 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 	{
 		$form = new Form;
 
-		$form->addEmail('email', 'Email:')->setRequired('Plase enter an email');
-		$form->addPassword('password', 'Password:')->setRequired('Plase enter your password');
+		$form->addEmail('email', 'Email:')->addRule($form::MaxLength, 'Email is limited to a maximum of 50 characters.', 50)->setRequired('Plase enter an email');
+		$form->addPassword('password', 'Password:')->addRule($form::MaxLength, 'Password is limited to a maximum of 50 characters.', 50)->setRequired('Plase enter your password');
 		$form->addSubmit('login', 'Log in');
 		//$form->addButton('signup', 'Sign up')->setHtmlAttribute('onclick', 'window.location.href="'.$this->link('signupClicked!').'"');
 		
@@ -60,9 +60,9 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		
 		$form = new Form;
 
-		$form->addEmail('email', 'Email:')->setRequired('Plase enter an email');
-		$form->addText('username', 'Username:')->setRequired('Please enter a username');
-		$form->addPassword('password', 'Password:')->setRequired('Plase enter your password')->addRule($form::MIN_LENGTH, 'Password must be at least %d characters long.', 8);
+		$form->addEmail('email', 'Email:')->addRule($form::MaxLength, 'Email is limited to a maximum of 50 characters.', 50)->setRequired('Plase enter an email');
+		$form->addText('username', 'Username:')->addRule($form::MaxLength, 'Username is limited to a maximum of 50 characters.', 50)->setRequired('Please enter a username');
+		$form->addPassword('password', 'Password:')->addRule($form::MaxLength, 'Password is limited to a maximum of 50 characters.', 50)->setRequired('Plase enter your password')->addRule($form::MinLength, 'Password must be at least %d characters long.', 8);
 		$form->addSubmit('signup', 'Sign up');
 		
 		$form->onSuccess[] = [$this, 'validateSignUp']; 

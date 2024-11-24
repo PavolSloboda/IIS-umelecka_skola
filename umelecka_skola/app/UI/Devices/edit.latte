@@ -1,9 +1,11 @@
 <div  hx-target="this" hx-swap= "outerHTML">
-<hr>
     <div id="cancel_header">
             <h2 id="cancel_nadpis">Edit device</h2>
             <button type="button" hx-get="{link Devices:devices}" hx-target="#device_body" hx-select="#device_body">Cancel</button>
     </div>
+{if isset($device)}
+    <p>Your device is: {$device->name}</p>
+{/if}
 {control editDeviceForm}
     <h2> Users can borrow this device </h2>
     {if count($not_forbidden_users) > 0}
