@@ -53,6 +53,7 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
 
         $usersEmails = array();
         $userId = $this->getUser()->getId();
+        bdump($userId);
 
         $usersEmails = $this->profileService->getAllEmails($userId);
 

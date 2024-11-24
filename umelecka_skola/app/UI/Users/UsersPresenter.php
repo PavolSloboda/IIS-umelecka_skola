@@ -41,13 +41,13 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 	protected function createComponentEditUserForm(): Form
 	{
         $form = new Form;
-        $form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();
 
-        $userId = $this->getUser()->getId();
+        $form->addHidden('user_id');
+        $form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();
 
         $usersEmails = array();
 
-        $usersEmails = $this->usersService->getAllEmails($userId);
+        $usersEmails = $this->usersService->getAllEmails(intval($form->getUntrustedValues()->user_id));
 
         $form->addEmail('email', 'Email:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->addRule($form::IsNotIn, "Email already exist", $usersEmails)->setRequired();
 
@@ -57,10 +57,10 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         // Přidání možnosti "Žádná role"
         $roles[''] = 'No role'; // Případ pro "Žádnou roli" (prázdný klíč bude znamenat žádnou roli)
 
-        $form->addSelect('role', 'Role:', $roles)
-            ->setRequired('Please select a role.');
-        $form->addSelect('role2', 'Role:', $roles)
-            ->setRequired('Please select a role.');
+        $form->addSelect('role', 'Role:', $roles);
+            //->setRequired('Please select a role.');
+        $form->addSelect('role2', 'Role:', $roles);
+            //->setRequired('Please select a role.');
 
         $form->addSubmit('submit', 'Save');
         $form->onSuccess[] = [$this, 'processEditUserForm'];
@@ -113,6 +113,7 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
             'name' => $user->name,
             'email' => $user->email,
             'role' => $roleId, // Nastavení aktuální role
+            'user_id' => $user->user_id,
         ]);
 	}
 
