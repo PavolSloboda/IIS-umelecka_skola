@@ -171,6 +171,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	
 		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter the end date and time.')
 		->addRule([$this, 'validateLoanEndDate'], 'The end date must be after the start date.' )
+		->addRule([$this, 'validateIsLoan'], 'The device is already loaned at this time.')
 		->addRule([$this, 'validateLoanDuration'], 'The loan duration cannot exceed the maximum allowed days.');
 		
 		$form->addSubmit('submit', 'Borrow Device');
@@ -182,6 +183,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		return $form;
 		
 	}
+
+	
 
 	public function validateLoanStartDate($item,$value): bool
 	{
@@ -362,34 +365,67 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	{
 		$form = new Form;
 
+		date_default_timezone_set('Europe/Prague');
+		//$loanStart = new \DateTime($form->getValues()->loan_start);
+		//$loanEnd = new \DateTime($form->getValues()->loan_end);
 		$form->addHidden('loan_id');
 		$form->addHidden('loan_start');
 		$form->addHidden('device_id');
 		
-		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))
-        ->setRequired('Please enter new end date and time.');
+		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter new end date and time.')
+		->addRule([$this, 'validateLoanEndDate'], 'The end date must be after the start date.')
+		->addRule([$this, 'validateIsLoanEdit'], 'The device is already loaned at this time.')
+		->addRule([$this, 'validateLoanDuration'], 'The loan duration cannot exceed the maximum allowed days.');
+		
 		
 		$form->addSubmit('submit', 'Change end date');
-
-		$form->onValidate[] = [$this, 'validateEditLoanEndDateForm'];
+		
+		//$form->onValidate[] = [$this, 'validateEditLoanEndDateForm'];
 		$form->onSuccess[] = [$this, 'processEditLoanEndDateForm'];
 		
 		return $form;
 		
 	}
 
+	public function validateIsLoan($item): bool
+	{
+		$loanEnd = $item->value;
+		$loanStart = new \DateTime($item->getForm()->getUntrustedValues()->loan_start);
+		$deviceLoans = $this->devices->showDeviceLoans(intval($item->getForm()->getUntrustedValues()->device_id));
+
+		foreach($deviceLoans as $loan)
+		{
+			if(!(($loan->loan_start > $loanStart && $loan->loan_start > $loanEnd) || ($loan->loan_end < $loanStart && $loan->loan_end < $loanEnd)))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public function validateIsLoanEdit($item): bool
+	{
+		$loanEnd = $item->value;
+		$loanStart = new \DateTime($item->getForm()->getUntrustedValues()->loan_start);
+		$deviceLoans = $this->devices->showDeviceLoans(intval($item->getForm()->getUntrustedValues()->device_id));
+
+		foreach($deviceLoans as $loan)
+		{
+			if($item->getForm()->getUntrustedValues()->loan_id != $loan->loan_id)
+			{
+				if(!(($loan->loan_start > $loanStart && $loan->loan_start > $loanEnd) || ($loan->loan_end < $loanStart && $loan->loan_end < $loanEnd)))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	public function validateEditLoanEndDateForm(Form $form, \stdClass $values): void
 	{
-		date_default_timezone_set('Europe/Prague');
-		$loanStart = new \DateTime($form->getValues()->loan_start);
-		$loanEnd = new \DateTime($form->getValues()->loan_end);
-
-		$retval = $this->DevicesService->validateEditDate(intval($values->loan_id),$loanStart,$loanEnd,intval($values->device_id));
-		if($retval !== null)
-		{
-			$form->addError($retval);
-		}
 		
+
 	}
 
 	public function processEditLoanEndDateForm(Form $form, \stdClass $values): void
