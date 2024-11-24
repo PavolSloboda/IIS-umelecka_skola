@@ -177,7 +177,6 @@ final class DevicesService
 
         if ($device && !$device->loan) {
             $this->database->table('loan')->insert(['user_id' => $userId,'device_id' => $deviceId,'loan_start' => $loanStart,'loan_end' => $loanEnd,'status_id' => $reservationStatusId,]);
-            $device->update(['loaned' => TRUE,]);
         }
     }
 
@@ -236,7 +235,7 @@ final class DevicesService
 	{
 		$device_id = $this->database->table('loan')->get($id)->device_id;
 		$this->database->table('loan')->where('loan_id', $id)->delete();
-		$this->database->table('devices')->where('device_id', $device_id)->update(['loaned' => false]);
+		$this->database->table('devices')->where('device_id', $device_id)->update(['loan' => false]);
 	}
 
 	public function getGroupById(int $group_id): \Nette\Database\Table\ActiveRow
