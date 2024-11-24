@@ -118,23 +118,27 @@ final class MyProfileService
     }
 
     //request
-    public function getUserAtelierRequests(int $userId): array
+    public function getRequestsByUser(int $userId): array
     {
         // Načtení všech žádostí uživatele o ateliér
-        return $this->database->table('user_atelier')
+        return $this->database->table('wanted_devices')
             ->where('user_id', $userId)
             ->fetchAll();
     }
 
-    public function createAtelierRequest(int $userId, string $atelierName): void
+    public function createDeviceRequest(int $userId, string $name, string $description): void
     {
-        // Vytvoření žádosti o nový ateliér
-        $this->database->table('user_atelier')->insert([
-            'user_id' => $userId,
-            'atelier_ID' => null,  // Až bude schváleno, přiřadí se ID skutečného ateliéru
-            'name' => $atelierName
-        ]);
+    $this->database->table('wanted_devices')->insert([
+        'user_id' => $userId,
+        'name' => $name,
+        'description' => $description,
+    ]);
     }
     
+    public function deleteRequest(int $requestId): void
+    {
+        // Delete a device request by ID
+        $this->database->table('wanted_devices')->where('ID', $requestId)->delete();
+    }
     
 }

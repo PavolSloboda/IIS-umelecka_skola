@@ -31,6 +31,7 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         
         $userId = $this->getUser()->getId();
         $this->profile = $this->profileService->getUserProfile($userId);
+        $this->template->userRequests = $this->profileService->getRequestsByUser($userId);
     }
 
     public function actionMyProfile(): void
@@ -172,7 +173,7 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
 
     public function handleDeleteRequest(int $requestId): void
     {
-        $this->profileServicee->deleteRequest($requestId);
+        $this->profileService->deleteRequest($requestId);
         $this->redirect('this');
     }
 
@@ -192,20 +193,28 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     $this->redirect('myprofile-section');
     }
 
-    public function renderAtelierRequests(): void
+    protected function createComponentDeviceRequestForm(): Form
     {
-        // Načtení žádostí uživatele
-        $userId = $this->getUser()->getId();
-        $this->template->atelierRequests = $this->profileService->getUserAtelierRequests($userId);
+    $form = new Form;
+    $form->addText('name', 'Název zařízení:')
+        ->setRequired('Zadejte název zařízení.');
+
+    $form->addTextArea('description', 'Popis zařízení:')
+        ->setRequired('Zadejte popis zařízení.');
+
+    $form->addSubmit('send', 'Odeslat žádost');
+    $form->onSuccess[] = [$this, 'processDeviceRequestForm'];
+
+    return $form;
     }
 
-    public function handleCreateAtelierRequest(): void
+public function processDeviceRequestForm(Form $form, \stdClass $values): void
     {
-        // Zpracování žádosti o nový ateliér
-        $userId = $this->getUser()->getId();
-        $atelierName = $this->getParameter('atelierName'); // Získání jména z formuláře
-        $this->profileService->createAtelierRequest($userId, $atelierName);
-        $this->redirect('this');
+    $userId = $this->getUser()->getId();
+    $this->profileService->createDeviceRequest($userId, $values->name, $values->description);
+    $this->flashMessage('Žádost o zařízení byla odeslána.', 'success');
+    $this->redirect('this');
     }
+
 
 }

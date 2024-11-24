@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="{$basePath}/css/style.css">
 </block>
 
+<div id="myprofile-section">
 <!-- Profilová sekce -->
 <h2>Profile Information</h2>
 <div id="profile-section">
@@ -32,21 +33,21 @@
         <p>You have no ateliers assigned.</p>
 {/if}
 
+
 <!-- Sekce pro editaci profilu -->
-<h2>Edit Profile</h2>
-<div>
-    {control profileForm}
+<div id="edit-profile-section">
+    <form method="POST"
+      action="{$basePath}/myProfile/editProfile, {$basePath}/myProfile/passwordChange"
+      hx-post="{$basePath}/myProfile/editProfile"
+      hx-target="#edit-profile-section"
+      hx-swap="outerHTML">
+        <h2>Edit Profile</h2>
+        {control profileForm}
+        <h3>Change Password</h3>
+        {control changePasswordForm}
+    </form>
 </div>
 
-<hr>
-
-<!-- Formulář pro změnu hesla -->
-<h3>Change Password</h3>
-<div>
-    {control changePasswordForm}
-</div>
-
-<hr>
 
 <div class="atelier-requests">
     <h2>Vytvořit žádost o zařízení</h2>
@@ -127,6 +128,7 @@
             <p>No past loans.</p>
         {/if}
     </div>
+</div>
 </div>
 
 {/block}
