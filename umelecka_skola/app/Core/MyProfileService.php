@@ -140,5 +140,14 @@ final class MyProfileService
         // Delete a device request by ID
         $this->database->table('wanted_devices')->where('ID', $requestId)->delete();
     }
+
+    public function getAllMyEmails(): array
+    {
+        // Výběr všech emailů z tabulky users
+        return $this->database
+            ->table('users')
+            ->select('email')
+            ->fetchPairs(null, 'email'); // Vrátí pole pouze s hodnotami sloupce email
+    }
     
 }

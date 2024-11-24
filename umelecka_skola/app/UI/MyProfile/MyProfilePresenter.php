@@ -50,12 +50,18 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     protected function createComponentProfileForm(): Form
     {
         $form = new Form;
+
+        $usersEmails = array();
+
+        $usersEmails = $this->profileService->getAllMyEmails();
+
         $form->addText('name', 'Name:')
             ->setRequired()
             ->setDefaultValue($this->profile->name);
         $form->addText('email', 'Email:')
             ->setRequired()
-            ->setDefaultValue($this->profile->email);
+            ->setDefaultValue($this->profile->email)
+            ->addRule($form::IsIn, "Email already exist", $usersEmails);
         $form->addSubmit('submit', 'Save Changes');
         $form->onSuccess[] = [$this, 'processProfileForm'];
         return $form;
@@ -64,10 +70,7 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     public function processProfileForm(Form $form, \stdClass $values): void
     {
         $userId = $this->getUser()->getId();
-        if (!$this->profileService->isEmailUnique($values->email, $userId)) {
-            $form->addError('The email address is already in use by another account.'); //----------kontrola mailu
-            return;
-        }
+
         $this->profileService->updateUserProfileEditForm($userId, [
             'name' => $values->name,
             'email' => $values->email,
@@ -153,7 +156,7 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     $userId = $this->getUser()->getId();
     $name = $this->getHttpRequest()->getPost('name');
     $description = $this->getHttpRequest()->getPost('description');
-    
+
     $this->profileService->createRequest($userId, $name, $description);
 
     $this->redirect('myprofile-section');
@@ -180,6 +183,4 @@ public function processDeviceRequestForm(Form $form, \stdClass $values): void
     $this->profileService->createDeviceRequest($userId, $values->name, $values->description);
     $this->redirect('this');
     }
-
-
 }
