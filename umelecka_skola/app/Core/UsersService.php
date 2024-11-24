@@ -56,10 +56,10 @@ final class UsersService
     if ($rolesAssigned === 0) {        
         // Smazání uživatele, pokud není přiřazen k žádné jiné tabulce
         $this->database->table('users')->where('user_id', $userId)->delete();
-    } else {
+    } //else {
         // Pokud má uživatel nějaké přiřazené role, neprovádíme smazání
-        throw new \Exception('User cannot be deleted because they have assigned roles.');
-    }
+        //throw new \Exception('User cannot be deleted because they have assigned roles.');
+    //}
 	}
 
 
@@ -133,13 +133,13 @@ final class UsersService
         ->delete();
 	}
 
-	public function getAllEmails(): array
+	public function getAllEmails(int $user_id): array
     {
         // Výběr všech emailů z tabulky users
         return $this->database
             ->table('users')
-            ->select('email')
-            ->fetchPairs(null, 'email'); // Vrátí pole pouze s hodnotami sloupce email
+            ->select('email')->where('NOT user_id', $user_id)
+            ->fetchPairs('email', null); // Vrátí pole pouze s hodnotami sloupce email
     }
 
 }

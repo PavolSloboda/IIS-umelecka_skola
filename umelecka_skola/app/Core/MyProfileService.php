@@ -153,13 +153,13 @@ final class MyProfileService
         $this->database->table('wanted_devices')->where('ID', $requestId)->delete();
     }
 
-    public function getAllMyEmails(): array
+    public function getAllEmails(int $user_id): array
     {
         // Výběr všech emailů z tabulky users
         return $this->database
             ->table('users')
-            ->select('email')
-            ->fetchPairs(null, 'email'); // Vrátí pole pouze s hodnotami sloupce email
+            ->select('email')->where('NOT user_id', $user_id)
+            ->fetchPairs('email', null); // Vrátí pole pouze s hodnotami sloupce email
     }
     
 }

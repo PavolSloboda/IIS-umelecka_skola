@@ -52,8 +52,9 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
         $form = new Form;
 
         $usersEmails = array();
+        $userId = $this->getUser()->getId();
 
-        $usersEmails = $this->profileService->getAllMyEmails();
+        $usersEmails = $this->profileService->getAllMyEmails($userId);
 
         $form->addText('name', 'Name:')
             ->setRequired()
