@@ -208,13 +208,10 @@ final class DevicesService
 		$result = array();
 		foreach ($user_ateliers as $user_atelier)
 		{
- 			$tmp_ateliers = $this->database->table('ateliers')->where('atelier_id', $user_atelier->atelier_id)->fetchPairs('atelier_id', 'name');
-			foreach ($tmp_ateliers as $curr_atelier)
-			{
-				$result[] = $curr_atelier;
-			}
-		}
+ 			$tmp_ateliers = $this->database->table('ateliers')->where('atelier_id', $user_atelier->atelier_id)->fetch();
 
+			$result[$tmp_ateliers->atelier_id] = $tmp_ateliers->name;
+		}
 		return $result;
 	}
 
