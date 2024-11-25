@@ -11,17 +11,43 @@ use Nette\Application\UI\Form;
 use App\Core\UsersService;
 
 
+/**
+ * Presenter for managing device-related actions and views.
+ */
 final class DevicesPresenter extends Nette\Application\UI\Presenter
 {
-	private $devices; 
-	private DevicesService $DevicesService;
-	private $roles;
-	private $users;
-	private $curr_edit;
-	private $curr_stat;
-	private $curr_reserve;
-	private $wanted_devices;
+	/** @var DevicesService Device service instance */
+    private $devices;
+    
+    /** @var DevicesService Second device service instance */
+    private DevicesService $DevicesService;
+    
+    /** @var RolesService Role service instance */
+    private $roles;
+    
+    /** @var UsersService User service instance */
+    private $users;
+    
+    /** @var int|null ID of the device currently being edited */
+    private $curr_edit;
+    
+    /** @var int|null ID of the device for which statistics are displayed */
+    private $curr_stat;
+    
+    /** @var int|null ID of the device being reserved */
+    private $curr_reserve;
+    
+    /** @var mixed Array of device requests */
+    private $wanted_devices;
 
+	/**
+     * Constructor for initializing services and setting default values.
+     *
+     * @param DevicesService $devices Service for managing devices
+     * @param RolesService $roles Service for managing roles
+     * @param DevicesService $DevicesService Another instance of device service
+     * @param UsersService $users Service for managing users
+     */
 	public function __construct(DevicesService $devices, RolesService $roles, DevicesService $DevicesService, UsersService $users)
 	{
 		$this->devices = $devices;
@@ -34,6 +60,10 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		//$this->wanted_devices = $wanted_devices;
 	}
 
+	/**
+     * Startup method called when the presenter is initialized.
+     * Ensures the user is logged in and sets template functions.
+     */
 	protected function startup() : void
 	{
 		parent::startup();
@@ -54,7 +84,9 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->devices->changeStateReservation();
 	}
 
-	//vypis vsech dostupnych zarizeni
+	/**
+     * Renders the list of all available devices.
+     */
 	public function renderDevices() : void
 	{
 		$this->template->devices = $this->devices->showAllDevices();
@@ -64,18 +96,27 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->template->wanted_devices = $this->devices->getDeviceRequests();
 	}
 
+	/**
+     * Renders the edit page with forbidden and non-forbidden users for the current device.
+     */
 	public function renderEdit() : void
 	{
 		$this->template->forbidden_users = $this->devices->get_forbidden_users(intval($this->curr_edit));
 		$this->template->not_forbidden_users = $this->devices->get_not_forbidden_users(intval($this->curr_edit));
 	}
 
+	/**
+     * Renders device requests for teachers to review.
+     */
 	public function renderRequests(): void
 	{
     // Fetch all pending device requests for the teacher
     $this->template->wanted_devices = $this->devices->getDeviceRequests();
 	}
 
+	/**
+     * Renders statistics related to device usage.
+     */
 	public function renderStats() : void
 	{
 		//nejcasteji vypujceno od
@@ -91,6 +132,12 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		//nejkratsi vypujcka
 		$this->template->shortest_loan_time = $this->devices->get_shortest_loan_time(intval($this->curr_stat));
 	}
+
+	 /**
+     * Sets the device ID for the statistics view.
+     *
+     * @param int $deviceId ID of the device
+     */
 	public function actionStats($deviceId): void
 	{
 		$device = $this->devices->getDeviceById(intval($deviceId));
@@ -98,6 +145,11 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->curr_stat = $deviceId;
 	}
 
+	/**
+     * Creates the form for adding a new device.
+     *
+     * @return Form The form for adding a new device
+     */
 	public function createComponentAddDeviceForm() : Form
 	{
 		$form = new Form;
@@ -121,6 +173,12 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 	}
 
+	/**
+     * Processes the form for adding a new device.
+     *
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values
+     */
 	public function processAddDeviceForm(Form $form, \stdClass $values): void
 	{
 		$userId = $this->getUser()->getId();
@@ -129,6 +187,11 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->redirect('Devices:devices');
 	}
 
+	/**
+     * Creates the form for adding a new device group.
+     *
+     * @return Form The form for adding a new device group
+     */
 	public function createComponentAddGroupForm() : Form
 	{
 		$form = new Form;
@@ -143,6 +206,12 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 	}
 
+	/**
+     * Processes the form for adding a new device group.
+     *
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values
+     */
 	public function processAddGroupForm(Form $form, \stdClass $values): void
 	{
 		$this->DevicesService->addGroup($values->name, $values->description);
@@ -153,7 +222,14 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	
 
 
-	//formular na pujceni zarizeni
+	/**
+ 	* Creates a form for borrowing a device.
+ 	*
+ 	* This method creates a form that allows users to request a device loan by selecting the start and end dates for the loan.
+ 	* It includes validation rules for the start date and time, ensuring the reservation does not start in the past.
+ 	* 
+ 	* @return Form The form for borrowing a device.
+ 	*/
 	public function createComponentAddDeviceLoanForm() : Form
 	{
 		$form = new Form;
@@ -196,6 +272,16 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	//	return $loanStart >= $formatToday;
 	//}
 	
+	
+	/**
+ 	* Validates whether the end date is after the start date.
+ 	*
+ 	* This method checks if the end date and time of the loan is later than the start date and time.
+ 	* It is used as a validation rule in the form for borrowing a device.
+ 	*
+ 	* @param FormControl $item The form control for the end date.
+ 	* @return bool True if the end date is after the start date, otherwise false.
+ 	*/
 	public function validateLoanEndDate($item): bool
 	{
 		$loanStart = new \DateTime($item->getForm()->getUntrustedValues()->loan_start);
@@ -204,7 +290,17 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	
 		return $loanEnd > $formatLoanStart;
 	}
+
 	
+	/**
+	 * Processes the form data when the device loan form is submitted.
+	 *
+	 * This method processes the form data for borrowing a device. It checks if the device is available during the requested time range,
+	 * and stores the loan request if the device is available.
+	*
+	 * @param Form $form The submitted form.
+	 * @return void
+ 	*/
 	public function validateLoanDuration($item): bool
 	{
 		$loanStart = new \DateTime($item->getForm()->getUntrustedValues()->loan_start);
@@ -217,6 +313,13 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		return $interval->days <= $maxLoanDuration;
 	}
 
+	/**
+	 * Creates a form for adding a new device.
+	 *
+	 * This method creates a form for adding a new device to the system, including fields for the device name, description, and other relevant details.
+	 *
+	 * @return Form The form for adding a device.
+	 */
 	public function validateAddDeviceLoanForm(Form $form, \stdClass $values): void
 	{
 		date_default_timezone_set('Europe/Prague');
@@ -232,6 +335,14 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	}
 	
 
+	/**
+	 * Processes the form data when the add device form is submitted.
+	 *
+	 * This method processes the form data when a new device is added, storing the details of the new device in the database.
+	 *
+	 * @param Form $form The submitted form.
+	 * @return void
+	 */
 	public function processAddDeviceLoanForm(Form $form, \stdClass $values): void
 	{
 		$userId = $this->getUser()->getId();
@@ -248,6 +359,13 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 	}
 
+	/**
+	 * Reserves a device by setting the current device ID for reservation and pre-filling the reservation form with device data.
+	 * 
+	 * @param int $deviceId The ID of the device being reserved.
+	 * 
+	 * @return void
+	 */
 	public function actionReserve($deviceId): void
 	{
 		$this->curr_reserve = $deviceId;
@@ -259,6 +377,12 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 	}
 
+	/**
+	 * Creates a form for editing a device's details.
+	 * The form allows users to edit fields such as the device's name, description, manufacture year, price, and group.
+	 * 
+	 * @return Form The form for editing a device.
+	 */
 	public function createComponentEditDeviceForm() : Form
 	{
 		$form = new Form;
@@ -278,6 +402,14 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		return $form;
 	}
 
+	/**
+	 * Processes the device edit form and updates the device details in the database.
+	 * 
+	 * @param Form $form The form being processed.
+	 * @param \stdClass $values The form values containing the edited device data.
+	 * 
+	 * @return void
+	 */
 	public function processDeviceEditForm(Form $form, \stdClass $values): void
 	{
 			$this->DevicesService->editDevice(intval($values->device_id), $values->name, $values->description, intval($values->max_loan_duration), intval($values->group_id),$values->atelier_id , $values->loan, intval($values->price), intval($values->manufactured));
@@ -286,6 +418,13 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 			$this->redirect('Devices:devices');
 	}
 
+	/**
+	 * Pre-fills the device edit form with the current details of the specified device for editing.
+	 * 
+	 * @param int $deviceId The ID of the device being edited.
+	 * 
+	 * @return void
+	 */
 	public function actionEdit($deviceId): void
 	{
 		$device = $this->devices->getDeviceById(intval($deviceId));
@@ -295,6 +434,11 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->curr_edit = $deviceId;
 	}
 
+	/**
+	 * Creates a form for editing a device group, allowing the user to modify its name and description.
+	 * 
+	 * @return Form The form for editing a device group.
+	 */
 	public function createComponentEditGroupForm() : Form
 	{
 		$form = new Form;
@@ -310,6 +454,14 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 	}
 
+	/**
+	 * Processes the group edit form and updates the group details in the database.
+	 * 
+	 * @param Form $form The form being processed.
+	 * @param \stdClass $values The form values containing the edited group data.
+	 * 
+	 * @return void
+	 */
 	public function processGroupEditForm(Form $form, \stdClass $values): void
 	{
 		$this->DevicesService->editGroup(intval($values->group_id), $values->name, $values->description);
@@ -318,6 +470,14 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->redirect('Devices:devices');
 	}
 
+	/**
+	 * Processes the group edit form and updates the group details in the database.
+	 * 
+	 * @param Form $form The form being processed.
+	 * @param \stdClass $values The form values containing the edited group data.
+	 * 
+	 * @return void
+	 */
 	public function actionEditGroup($groupId): void
 	{
 		$group = $this->devices->getGroupById(intval($groupId));
@@ -325,6 +485,15 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->setDefaults(['group_id' => $group->group_id, 'name' => $group->name, 'description' => $group->description]);
 	}
 
+	/**
+	 * Creates the form for editing a reservation.
+	 * 
+	 * This form allows the user to modify the status of a device reservation.
+	 * The form includes a hidden field for the loan ID, a select input for the status,
+	 * and a submit button to submit the changes.
+	 *
+	 * @return Form The form for editing the reservation.
+	 */
 	public function createComponentEditReservationForm() : Form
 	{
 		$form = new Form;
@@ -336,6 +505,16 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		return $form;
 	}
 	
+	/**
+	 * Processes the form submission for editing a reservation.
+	 *
+	 * This method handles the form submission for editing a reservation, 
+	 * updates the reservation status in the database, and redirects to 
+	 * the devices list page with a success message.
+	 *
+	 * @param Form $form The form being submitted.
+	 * @param \stdClass $values The form values.
+	 */
 	public function processReservationEditForm(Form $form, \stdClass $values): void
 	{
 		$this->DevicesService->editReservation(intval($values->loan_id), intval($values->status));
@@ -344,6 +523,14 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->redirect('Devices:devices');
 	}
 	
+	/**
+	 * Loads the reservation data into the edit reservation form.
+	 *
+	 * This method retrieves the reservation details from the database and 
+	 * populates the edit reservation form with the existing data.
+	 *
+	 * @param int $reservationId The ID of the reservation to be edited.
+	 */
 	public function actionEditReservation($reservationId): void
 	{
 		$device = $this->devices->getLoanById(intval($reservationId));
@@ -354,6 +541,15 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->setDefaults(['loan_id' => $device->loan_id, 'loan_end' => $device->loan_end, 'device_id' => $device->device_id,]);
 	}
 	
+	/**
+	 * Creates the form for editing the loan end date.
+	 *
+	 * This form allows the user to modify the end date and time of the loan.
+	 * The form includes hidden fields for the loan ID, loan start date, and device ID,
+	 * a date-time picker for the loan end date, and a submit button to apply the changes.
+	 *
+	 * @return Form The form for editing the loan end date.
+	 */
 	public function createComponentEditLoanEndDateForm() : Form
 	{
 		$form = new Form;
@@ -380,6 +576,18 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 	}
 
+	/**
+	 * Validates if the provided loan end date is valid by checking if it does not overlap
+	 * with any existing loans for the specified device.
+	 *
+	 * This method checks if the new loan's end date does not conflict with the start and end
+	 * dates of any existing loans for the same device. The function assumes that the device's 
+	 * loan history is available and compares the new loan's dates against it.
+	 * 
+	 * @param  mixed $item The form element representing the loan end date input.
+	 * @return bool        Returns true if the loan end date is valid (i.e., it does not overlap 
+	 *                    with other loans), false otherwise.
+	 */
 	public function validateIsLoan($item): bool
 	{
 		$loanEnd = $item->value;
@@ -396,6 +604,15 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		return true;
 	}
 	
+	/**
+	 * Validates if the end date of the loan does not overlap with existing loans.
+	 *
+	 * This method checks if the end date of the loan being edited overlaps with any 
+	 * other existing loans for the same device.
+	 *
+	 * @param mixed $item The form input item being validated.
+	 * @return bool True if the end date is valid, false otherwise.
+	 */
 	public function validateIsLoanEdit($item): bool
 	{
 		$loanEnd = $item->value;
@@ -421,6 +638,16 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 	}
 
+	/**
+	 * Processes the form submission for editing the loan end date.
+	 *
+	 * This method handles the form submission for editing the loan's end date, 
+	 * updates the loan end date in the database, and redirects to the devices 
+	 * list page with a success message.
+	 *
+	 * @param Form $form The form being submitted.
+	 * @param \stdClass $values The form values.
+	 */
 	public function processEditLoanEndDateForm(Form $form, \stdClass $values): void
 	{
 		$this->DevicesService->EditLoanEndDate(intval($values->loan_id), $values->loan_end);
@@ -429,31 +656,76 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->redirect('Devices:devices');
 	}
 
+	/**
+	 * Deletes a device from the database.
+	 *
+	 * This method removes a device from the database by its ID.
+	 *
+	 * @param int $id The ID of the device to be deleted.
+	 */
 	public function handleDeleteDevice(int $id) : void
 	{
 		$this->devices->deleteDevice($id);
 	}
 
+	/**
+	 * Deletes a device group from the database.
+	 *
+	 * This method removes a device group from the database by its ID.
+	 *
+	 * @param int $id The ID of the device group to be deleted.
+	 */
 	public function handleDeleteGroup(int $id) : void
 	{
 		$this->devices->deleteGroup($id);
 	}
 
+	/**
+	 * Deletes a reservation from the database.
+	 *
+	 * This method removes a reservation from the database by its ID.
+	 *
+	 * @param int $id The ID of the reservation to be deleted.
+	 */
 	public function handleDeleteReservation(int $id) : void
 	{
 		$this->devices->deleteReservation($id);
 	}
 
+	/**
+	 * Allows a user to borrow a device.
+	 *
+	 * This method allows a user, identified by their user ID, to borrow a device.
+	 * The device ID is determined by the current edit context.
+	 *
+	 * @param int $user_id The ID of the user who wants to borrow the device.
+	 */
 	public function handleAdd(int $user_id) : void
 	{
 		$this->devices->UserWithIdCanBorrowDeviceWithId($user_id, intval($this->curr_edit));
 	}	
 
+	/**
+	 * Prevents a user from borrowing a device.
+	 *
+	 * This method prevents a user, identified by their user ID, from borrowing
+	 * a device. The device ID is determined by the current edit context.
+	 *
+	 * @param int $user_id The ID of the user who should no longer be allowed to borrow the device.
+	 */
 	public function handleRemove(int $user_id) : void
 	{
 		$this->devices->UserWithIdCanNotBorrowDeviceWithId($user_id, intval($this->curr_edit));
 	}
 
+	/**
+	 * Redirects to the add device form with pre-filled data from a request.
+	 *
+	 * This method fetches a device request by its ID and redirects to the add device form
+	 * with the request's name and description pre-filled.
+	 *
+	 * @param int $requestId The ID of the device request.
+	 */
     public function actionFulfillRequest(int $requestId): void
     {
         $request = $this->devices->getRequestById($requestId);
@@ -461,6 +733,13 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
         $this->redirect('add', ['name' => $request->name, 'description' => $request->description]);
 	}
 
+	/**
+	 * Deletes a device request from the database.
+	 *
+	 * This method removes a device request from the database by its ID.
+	 *
+	 * @param int $requestId The ID of the device request to be deleted.
+	 */
     public function handleDeleteRequest(int $requestId): void
     {
         $this->devices->deleteRequest($requestId);
