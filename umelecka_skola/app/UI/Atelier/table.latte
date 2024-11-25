@@ -25,8 +25,8 @@
 {else}
 	<p>No Atieliers currently in the system</p>
 {/if}
-<h2>Add Atelier</h2>
 {if hasCurrUserRole('admin') || hasCurrUserRole('atelier_manager')}
+<h2>Add Atelier</h2>
 	{control addAtelierForm}
 {/if}
 </div>
