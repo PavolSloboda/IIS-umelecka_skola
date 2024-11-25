@@ -191,10 +191,19 @@ final class UsersService
      * @param int $userId User ID
      * @return int|null Role ID or null if not assigned
      */
-	public function getUserRoleId(int $userId): ?int
+	public function getUserRoleId(int $userId): array
 	{
-    $userRole = $this->database->table('user_role')->where('user_id', $userId)->fetch();
-    return $userRole ? $userRole->role_id : null;
+        $userRole = array();
+        $roles_got = $this->database->table('user_role')->where('user_id', $userId)->fetchAll();
+        foreach ($roles_got as $role){
+            $userRole[] = $role->role_id;
+        }
+
+    while(count($userRole) < 2)
+    {
+        $userRole[] = '';
+    }
+    return $userRole;
 	}
 
 	/**
@@ -232,7 +241,7 @@ final class UsersService
             return true;
         } else if(($roleId == 0 && $roleId2 != '') || ($roleId == 4 && $roleId2 != '') || ($roleId == 2 && $roleId2 != '') || ($roleId == 3 && $roleId2 != '') || ($roleId == 3 && $roleId2 != '') || ($roleId == '' && $roleId2 != '')){
             return false;
-        }else if(($roleId2 == 0 && $roleId != '') || ($roleId2 == 4 && $roleId != '') || ($roleId2 == 2 && $roleId != '') || ($roleId2 == 2 && $roleId != 3) || ($roleId2 == 3 && $roleId != 2)  || ($roleId2 == 3 && $roleId != '')){
+        }else if(($roleId2 == 0 && $roleId != '') || ($roleId2 == 4 && $roleId != '') || ($roleId2 == 2 && $roleId != '') || ($roleId2 == 3 && $roleId != 2)  || ($roleId2 == 3 && $roleId != '')){
             return false;
         }
         return true;

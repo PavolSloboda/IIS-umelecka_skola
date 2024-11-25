@@ -195,10 +195,12 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         }
         $this->template->userToEdit = $user;
 
+        bdump($roleId);
         $this['editUserForm']->setDefaults([
             'name' => $user->name,
             'email' => $user->email,
-            'role' => $roleId, // Nastavení aktuální role
+            'role' => $roleId[0],
+            'role2' => $roleId[1], // Nastavení aktuální role
             'user_id' => $user->user_id,
         ]);
 	}
