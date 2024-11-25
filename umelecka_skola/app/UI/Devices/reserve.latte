@@ -4,6 +4,7 @@
 </div>
 {if isset($device)}
     <p>Your device is: {$device->name}</p>
+	<p>With maximum loan time: {$loantime} days</p>
 {/if}
 {snippet form}
 {control addDeviceLoanForm}

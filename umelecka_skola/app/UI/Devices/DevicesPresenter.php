@@ -322,6 +322,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->curr_reserve = $deviceId;
 		$device = $this->devices->getDeviceById(intval($deviceId));
 		$this->template->device = $device;
+		$this->template->loantime = $device->max_loan_duration;
 		$form = $this->getComponent('addDeviceLoanForm');
 		$form->setDefaults(['device_id' => $device->device_id]);
 		
