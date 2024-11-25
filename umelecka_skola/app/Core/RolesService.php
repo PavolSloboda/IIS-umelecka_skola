@@ -55,7 +55,7 @@ final class RolesService
     $roles = $this->database->table('roles')->fetchPairs('role_id', 'name');
 
     // Přidání "Registrovaný uživatel" (role bez role)
-    $roles[0] = 'Registrovaný uživatel';  // Můžete použít '0' jako ID pro tuto roli
+    $roles[0] = 'Registred user';  // Můžete použít '0' jako ID pro tuto roli
 
     // Seřazení rolí podle ID (nebo jiným způsobem, pokud je to potřeba)
     ksort($roles);
