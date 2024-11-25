@@ -204,7 +204,17 @@ final class DevicesService
      */
 	public function getUserAtelier(int $userId) : array
 	{
-		$result = $this->database->table('ateliers')->where('admin_id', $userId)->fetchPairs('atelier_id', 'name');
+		$user_ateliers = $this->database->table('user_atelier')->where('user_id',$userId)->fetchAll();
+		$result = array();
+		foreach ($user_ateliers as $user_atelier)
+		{
+ 			$tmp_ateliers = $this->database->table('ateliers')->where('atelier_id', $user_atelier->atelier_id)->fetchPairs('atelier_id', 'name');
+			foreach ($tmp_ateliers as $curr_atelier)
+			{
+				$result[] = $curr_atelier;
+			}
+		}
+
 		return $result;
 	}
 
