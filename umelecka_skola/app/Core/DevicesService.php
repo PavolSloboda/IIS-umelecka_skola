@@ -281,7 +281,7 @@ final class DevicesService
 	 * 
 	 * @return void
 	 */
-	public function editDevice( int $deviceId, string $name, string $description, int $max_loan_duration, int $group_id, int $atelier_id, bool $loan, int $price, int $manufactured): void
+	public function editDevice( int $deviceId, string $name, string $description, int $max_loan_duration, int $group_id, int $atelier_id, bool $loan, ?int $price, ?int $manufactured): void
     {
         $device = $this->database->table('devices')->get($deviceId);
 
@@ -529,7 +529,7 @@ final class DevicesService
      * @param int $price The price of the device.
      * @param int $manufactured The year the device was manufactured.
      */
-	public function addDevice(int $user_id, string $name,string $description, int $max_loan_duration,int $group_id, int $atelier_id,  bool $loan, int $price, int $manufactured) : void
+	public function addDevice(int $user_id, string $name,string $description, int $max_loan_duration,int $group_id, int $atelier_id,  bool $loan, ?int $price, ?int $manufactured) : void
     {
         $this->database->table('devices')->insert(['price' => $price, 'manufactured' => $manufactured, 'name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id, 'atelier_id' => $atelier_id, 'loan' => $loan]);
     }
