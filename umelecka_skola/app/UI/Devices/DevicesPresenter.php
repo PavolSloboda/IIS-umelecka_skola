@@ -19,6 +19,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	private $users;
 	private $curr_edit;
 	private $curr_stat;
+	private $curr_reserve;
 	private $wanted_devices;
 
 	public function __construct(DevicesService $devices, RolesService $roles, DevicesService $DevicesService, UsersService $users)
@@ -29,6 +30,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$this->users = $users;
 		$this->curr_edit = null;
 		$this->curr_stat = null;
+		$this->curr_reserve = null;
 		//$this->wanted_devices = $wanted_devices;
 	}
 
@@ -106,6 +108,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		
 		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired()->setDefaultValue($name);
 		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50)->setDefaultValue($description);
+		$form->addInteger('manufactured','Year of manufacture:')->addRule($form::Max,'Year of manufacture  isn not valid.',date('Y'));
+		$form->addInteger('price','Purchase price (kč):')->addRule($form::Min,'Price must be positive',0);
 		$form->addInteger('max_loan_duration', 'Max loan duration:')->addRule($form::Range, 'Loan duration must be between %d and %d.', [1, 90])->setRequired();
 		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
 		$form->addSelect('atelier_id', 'Atelier:', $this->devices->getUserAtelier($this->getUser()->getId()))->setRequired();
@@ -121,7 +125,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	{
 		try {
 			$userId = $this->getUser()->getId();
-			$this->DevicesService->addDevice($userId, $values->name, $values->description, intval($values->max_loan_duration), $values->group_id, $values->atelier_id, $values->loan);
+			$this->DevicesService->addDevice($userId, $values->name, $values->description, intval($values->max_loan_duration), $values->group_id, $values->atelier_id, $values->loan, $values->price, $values->manufactured);
 			$this->flashMessage('Device has been successfully edited.', 'success');
 			$this->redirect('Devices:devices');
 		}catch(Nette\Security\AuthenticationException $e)
@@ -165,35 +169,42 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form = new Form;
 
 		$form->addHidden('device_id');
-		// Zadání začátku výpůjčky (datum a čas)
-		$form->addDateTime('loan_start', 'Start Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter the start date and time.')
-		->addRule([$this, 'validateLoanStartDate'],'The earliest possible reservation start date is today.' );
-	
-		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter the end date and time.')
-		->addRule([$this, 'validateLoanEndDate'], 'The end date must be after the start date.' )
-		->addRule([$this, 'validateIsLoan'], 'The device is already loaned at this time.')
-		->addRule([$this, 'validateLoanDuration'], 'The loan duration cannot exceed the maximum allowed days.');
+		
+		
+		$form->addDateTime('loan_start', 'Start Date and Time:')->setFormat('Y-m-d H:i:s')->setRequired('Please enter the start date and time.')
+		->addRule(Form::Min,'The earliest possible reservation start date is today.',(new \DateTime())->format('Y-m-d H:i:s'));
+
+		//$deviceId = intval($this->curr_reserve);
+		//$maxLoanDuration = $this->devices->getDeviceById($deviceId)->max_loan_duration; 
+		//$loanStart = new \DateTime($form->getUntrustedValues()->loan_start);
+		//$maxLoanEnd = (clone $loanStart)->modify("+{$maxLoanDuration} days");
+
+		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter the end date and time.');
+		//->addRule(Form::Range, 'The loan duration cannot exceed the maximum allowed days.',[$loanStart->format('Y-m-d H:i:s'), $maxLoanEnd->format('Y-m-d H:i:s')]);
 		
 		$form->addSubmit('submit', 'Borrow Device');
 
-		//$form->onValidate[] = [$this, 'validateAddDeviceLoanForm'];
+		$form->onValidate[] = [$this, 'validateAddDeviceLoanForm'];
 
 		$form->onSuccess[] = [$this, 'processAddDeviceLoanForm'];
 
 		return $form;
-		
+	
 	}
 
 	
 
-	public function validateLoanStartDate($item,$value): bool
-	{
-		$today = new \DateTime();
-		$formatToday = $today->format('Y-m-d H:i:s');
-		$loanStart = $item->value;
 	
-		return $loanStart >= $formatToday;
-	}
+	//->addRule([$this, 'validateLoanEndDate'], 'The end date must be after the start date.' )
+		//->addRule([$this, 'validateIsLoan'], 'The device is already loaned at this time.')
+	//public function validateLoanStartDate($item,$value): bool
+	//{
+	//	$today = new \DateTime();
+	//	$formatToday = $today->format('Y-m-d H:i:s');
+	//	$loanStart = $item->value;
+	//
+	//	return $loanStart >= $formatToday;
+	//}
 	
 	public function validateLoanEndDate($item): bool
 	{
@@ -221,14 +232,15 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		date_default_timezone_set('Europe/Prague');
 		$loanStart = new \DateTime($form->getValues()->loan_start);
 		$loanEnd = new \DateTime($form->getValues()->loan_end);
-
-		$retval = $this->DevicesService->validateDate($loanStart,$loanEnd,intval($values->device_id));
-		if($retval !== null)
-		{
+	
+		$retval = $this->DevicesService->validateDate($loanStart, $loanEnd, intval($values->device_id));
+	
+		if ($retval !== null) {
+			// Přidání chyby do formuláře
 			$form->addError($retval);
 		}
-		
 	}
+	
 
 	public function processAddDeviceLoanForm(Form $form, \stdClass $values): void
 	{
@@ -248,10 +260,13 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 	public function actionReserve($deviceId): void
 	{
+		$this->curr_reserve = $deviceId;
 		$device = $this->devices->getDeviceById(intval($deviceId));
 		$this->template->device = $device;
 		$form = $this->getComponent('addDeviceLoanForm');
 		$form->setDefaults(['device_id' => $device->device_id]);
+		
+		
 	}
 
 	public function createComponentEditDeviceForm() : Form
@@ -261,6 +276,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->addHidden('device_id');
 		$form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();
 		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50);
+		$form->addInteger('manufactured','Year of manufacture:')->addRule($form::Max,'Year of manufacture  isn not valid.',date('Y'));
+		$form->addInteger('price','Purchase price (kč):')->addRule($form::Min,'Price must be positive',0);
 		$form->addInteger('max_loan_duration', 'Max loan duration:')->addRule($form::Range, 'Loan duration must be between %d and %d.', [1, 90])->setRequired();
 		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
 		$form->addSelect('atelier_id', 'Atelier:', $this->devices->getUserAtelier($this->getUser()->getId()))->setRequired();
@@ -274,7 +291,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function processDeviceEditForm(Form $form, \stdClass $values): void
 	{
 		try {
-			$this->DevicesService->editDevice(intval($values->device_id), $values->name, $values->description, intval($values->max_loan_duration), intval($values->group_id),$values->atelier_id , $values->loan);
+			$this->DevicesService->editDevice(intval($values->device_id), $values->name, $values->description, intval($values->max_loan_duration), intval($values->group_id),$values->atelier_id , $values->loan, $values->price, $values->manufactured);
 			$this->flashMessage('Device has been successfully edited.', 'success');
 			
 			$this->redirect('Devices:devices');
@@ -289,7 +306,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$device = $this->devices->getDeviceById(intval($deviceId));
 		$this->template->device = $device;
 		$form = $this->getComponent('editDeviceForm');
-		$form->setDefaults(['device_id' => $device->device_id, 'name' => $device->name, 'description' => $device->description, 'max_loan_duration' => $device->max_loan_duration, 'group_id' => $device->group_id,'atelier_id' => $device->atelier_id, 'loan' => $device->loan]);
+		$form->setDefaults(['price' => $device->price,'manufactured' => $device->manufactured, 'device_id' => $device->device_id, 'name' => $device->name, 'description' => $device->description, 'max_loan_duration' => $device->max_loan_duration, 'group_id' => $device->group_id,'atelier_id' => $device->atelier_id, 'loan' => $device->loan]);
 		$this->curr_edit = $deviceId;
 	}
 
@@ -490,7 +507,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 }
 
 //v prohlížečích Chrome a Firefox 
-
+//ruzne atributy devices
+//pridat rok vyroby a nakupni cena
 
 
 

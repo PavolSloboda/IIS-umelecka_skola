@@ -55,17 +55,7 @@
 
 <div class="device_requests">
     <h2>Create device request</h2>
-<form n:name="deviceRequestForm">
-    <div>
-        <label>Device name:</label>
-        <input type="text" id="name" n:name="name" required>
-    </div>
-    <div>
-        <label>Device description:</label>
-        <input type="text" id="description" n:name="description" required>
-    </div>
-    <button type="submit">Submit request</button>
-</form>
+{control deviceRequestForm}
 
 <h3>My device requests</h3>
 <table>

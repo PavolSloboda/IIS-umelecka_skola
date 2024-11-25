@@ -167,11 +167,9 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
     protected function createComponentDeviceRequestForm(): Form
     {
     $form = new Form;
-    $form->addText('name', 'Device name: ')
-        ->setRequired();
+    $form->addText('name', 'Device name: ')->setRequired();
 
-    $form->addTextArea('description', 'Device description: ')
-        ->setRequired();
+    $form->addText('description', 'Device description: ');
 
     $form->addSubmit('send', 'Submit request');
     $form->onSuccess[] = [$this, 'processDeviceRequestForm'];
