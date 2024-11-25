@@ -6,8 +6,14 @@
 	<h2 id="cancel_nadpis">User editing</h2>
 	<button type="button" hx-get="{link Users:users}" hx-target="#form-container" hx-select="#form-container">Cancel</button>
 </div>
+{snippet form}
 {control editUserForm}
-
+{/snippet}
 </div>
 {/block}
 <script src="{$basePath}/js/netteForms.min.js"></script>
+<script>
+		$(function () {
+			$.nette.init();
+		});
+	</script>

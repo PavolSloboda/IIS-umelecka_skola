@@ -76,6 +76,7 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 	protected function createComponentEditUserForm(): Form
 	{
         $form = new Form;
+        $form->getElementPrototype()->class('ajax');
 
         $form->addHidden('user_id');
         $form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();
@@ -97,6 +98,7 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
             //->setRequired('Please select a role.');
 
         $form->addSubmit('submit', 'Save');
+        $form->onValidate[] = [$this, 'validateRoles'];
         $form->onSuccess[] = [$this, 'processEditUserForm'];
 
         return $form;
@@ -122,22 +124,47 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         // Aktualizace role
         $roleId = $values->role;
         $roleId2 = $values->role2;
+
         if(($roleId == 2 && $roleId2 == 3) || ($roleId == 3 && $roleId2 == 2)){
             $this->usersService->updateUserRoletwo($userId, $roleId, $roleId2);
-        } else if(($roleId == 0 && $roleId2 != '') || ($roleId == 4 && $roleId2 != '') || ($roleId == 2 && ($roleId2 != 3 || $roleId2 != '')) || ($roleId == 3 && ($roleId2 != 2 || $roleId2 != ''))|| ($roleId == '' && $roleId2 == '')){
-            $this->redirect('users');
-        }else if(($roleId2 == 0 && $roleId != '') || ($roleId2 == 4 && $roleId != '') || ($roleId2 == 2 && ($roleId != 3 || $roleId != '')) || ($roleId2 == 3 && ($roleId != 2 || $roleId != ''))){
-            $this->redirect('users');
-        }
-        else if ($roleId == 0 || $roleId2 == 0) {  // "0" znamená "Registrovaný uživatel" (žádná role)
+        } else if ($roleId == 0 || $roleId2 == 0) {  // "0" znamená "Registrovaný uživatel" (žádná role)
             $this->usersService->removeUserRole($userId);
         }else if($roleId2 == ''){
         $this->usersService->updateUserRole($userId, $roleId);
         }else{
             $this->usersService->updateUserRole($userId, $roleId2);
         }
+        
+        
         $this->redirect('users');
 	    }
+
+    public function validateRoles(Form $form, \stdClass $values): bool
+    {
+        $roleId = $values->role;
+        $roleId2 = $values->role2;
+
+        if(($roleId == 2 && $roleId2 == 3) || ($roleId == 3 && $roleId2 == 2)){
+            return true;
+        } else if(($roleId == 0 && $roleId2 != '') || ($roleId == 4 && $roleId2 != '') || ($roleId == 2 && ($roleId2 != 3 || $roleId2 != '')) || ($roleId == 3 && ($roleId2 != 2 || $roleId2 != ''))|| ($roleId == '' && $roleId2 == '')){
+            $form->addError("Wrong combination of roles");
+            if($this->presenter->isAjax()) {
+                $this->presenter->redrawControl('form');
+            } else {
+                $this->presenter->redirect('this');
+            }
+            return false;
+        }else if(($roleId2 == 0 && $roleId != '') || ($roleId2 == 4 && $roleId != '') || ($roleId2 == 2 && ($roleId != 3 || $roleId != '')) || ($roleId2 == 3 && ($roleId != 2 || $roleId != ''))){
+            $form->addError("Wrong combination of roles");
+            if($this->presenter->isAjax()) {
+                $this->presenter->redrawControl('form');
+            } else {
+                $this->presenter->redirect('this');
+            }
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Action for editing a specific user.
