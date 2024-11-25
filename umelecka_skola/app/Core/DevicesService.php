@@ -9,12 +9,26 @@ use Nette\Utils\DateTime;
 use App\Core\AtelierService;
 use App\Core\UsersService;
 
+/**
+ * Class DevicesService
+ * 
+ * This service handles operations related to devices, loans, and device types in the system.
+ * It provides methods to view, add, edit, and remove devices, as well as manage device loans and reservations.
+ * 
+ * @package App\Core
+ */
 final class DevicesService
 {
 	private Explorer $database;
 	private $users;
 
 
+	/**
+     * DevicesService constructor.
+     * 
+     * @param Explorer $database The database connection.
+     * @param UsersService $users The user service instance.
+     */
 	public function __construct(Explorer $database, UsersService $users)
 	{
 		$this->database = $database;
@@ -22,15 +36,22 @@ final class DevicesService
 	}
 	
 
-	/*
-	* @return Nette\Database\table\ActiveRow[]
-	*///vypis vsech dostupnych zarizeni
+	/**
+     * Retrieves all available devices that are not marked as deleted.
+     * 
+     * @return Nette\Database\table\ActiveRow[] List of available devices.
+     */
 	public function showAllDevices() : array
 	{
 		$result = $this->database->table('devices')->where('deleted', false)->fetchAll();
 		return $result;
 	}
 
+	/**
+     * Retrieves all loans that are either reserved or currently loaned.
+     * 
+     * @return Nette\Database\table\ActiveRow[] List of loans with status 'reserved' or 'loaned'.
+     */
     public function showAllAvailableLoans(): array
     {
         
@@ -48,6 +69,12 @@ final class DevicesService
             ->fetchAll();
     }
 
+	/**
+     * Retrieves all loans for a specific device that are either reserved or currently loaned.
+     * 
+     * @param int $deviceId The device ID to check.
+     * @return Nette\Database\table\ActiveRow[] List of loans for the specified device.
+     */
 	public function showDeviceLoans(int $deviceId): array
     {
         
@@ -65,6 +92,15 @@ final class DevicesService
             ->fetchAll();
     }
 
+	 /**
+     * Validates if the loan start and end dates are valid for a specific device.
+     * 
+     * @param \DateTime $loanStart The start date of the loan.
+     * @param \DateTime $loanEnd The end date of the loan.
+     * @param int $deviceId The device ID being loaned.
+     * 
+     * @return string|null Error message if validation fails, null if validation is successful.
+     */
 	public function validateDate(\DateTime $loanStart, \DateTime $loanEnd, int $deviceId): ?string
     {
 		$interval = $loanStart->diff($loanEnd);
@@ -97,6 +133,16 @@ final class DevicesService
 		return null;
 	}
 
+	 /**
+     * Validates if the loan start and end dates are valid when editing an existing reservation.
+     * 
+     * @param int $loan_id The ID of the existing loan.
+     * @param \DateTime $loanStart The new start date of the loan.
+     * @param \DateTime $loanEnd The new end date of the loan.
+     * @param int $deviceId The device ID being loaned.
+     * 
+     * @return string|null Error message if validation fails, null if validation is successful.
+     */
 	public function validateEditDate(int $loan_id, \DateTime $loanStart, \DateTime $loanEnd, int $deviceId): ?string
     {
 		$interval = $loanStart->diff($loanEnd);
@@ -126,6 +172,11 @@ final class DevicesService
 		return null;
 	}
 
+	 /**
+     * Retrieves all available device types from the system.
+     * 
+     * @return Nette\Database\table\ActiveRow[] List of device types.
+     */
 	public function showAllAvailableTypes() : array
 	{
 		$result = $this->database->table('device_groups')->fetchAll();
@@ -133,6 +184,11 @@ final class DevicesService
 		return $result;
 	}
 
+	/**
+     * Retrieves a list of all device types, returning an associative array of group IDs and their names.
+     * 
+     * @return array Associative array of device group IDs and names.
+     */
 	public function getDeviceTypes() : array
 	{
 		$result = $this->database->table('device_groups')->fetchPairs('group_id', 'name');
@@ -140,12 +196,21 @@ final class DevicesService
 		return $result;
 	}
 
+	/**
+     * Retrieves a list of ateliers managed by a specific user.
+     * 
+     * @param int $userId The user ID to check.
+     * @return array List of ateliers the user manages.
+     */
 	public function getUserAtelier(int $userId) : array
 	{
 		$result = $this->database->table('ateliers')->where('admin_id', $userId)->fetchPairs('atelier_id', 'name');
 		return $result;
 	}
 
+	/**
+     * Changes the reservation status of loans that are reserved or completed based on the current time.
+     */
 	public function changeStateReservation(): void
 	{
 		date_default_timezone_set('Europe/Prague');
@@ -164,6 +229,11 @@ final class DevicesService
 	}
 
 	
+	/**
+     * Retrieves the list of loan statuses in the system.
+     * 
+     * @return array Associative array of loan status IDs and names.
+     */
 	public function getLoanStatus(): array
     {
         return $this->database->table('loan_status')->fetchPairs('status_id', 'name');
