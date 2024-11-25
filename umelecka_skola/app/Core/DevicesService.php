@@ -239,8 +239,21 @@ final class DevicesService
         return $this->database->table('loan_status')->fetchPairs('status_id', 'name');
     }
 	
-	//pujceni zarizeni, todo maximalni doba vypujcky, zarizeni ktera nejdou vypujcit nebo omezit na atelier, spravovani zarizeni majitelem a spravuje vraceni a pujceni
-    public function borrowDevice(int $userId, int $deviceId, string $loanStart, string $loanEnd): void
+	/**
+	 * Borrow a device for a user by creating a loan reservation.
+	 *
+	 * This method checks if the device is available for borrowing (i.e., not already loaned),
+	 * and if so, creates a loan record with the provided user ID, device ID, loan start date,
+	 * and loan end date. The loan status is set to "reserved".
+	 *
+	 * @param int $userId The ID of the user borrowing the device.
+	 * @param int $deviceId The ID of the device being borrowed.
+	 * @param string $loanStart The start date of the loan (format: YYYY-MM-DD).
+	 * @param string $loanEnd The end date of the loan (format: YYYY-MM-DD).
+	 * 
+	 * @return void
+	 */    
+	public function borrowDevice(int $userId, int $deviceId, string $loanStart, string $loanEnd): void
     {
         $device = $this->database->table('devices')->get($deviceId);
 		$reservationStatusId = $this->database->table('loan_status')->where('name', 'reserved')->fetch()->status_id;
@@ -250,6 +263,24 @@ final class DevicesService
         }
     }
 
+	/**
+	 * Edit device details.
+	 *
+	 * This method allows updating the device's attributes such as name, description, 
+	 * maximum loan duration, group, atelier, loan status, price, and manufacturing year.
+	 *
+	 * @param int $deviceId The ID of the device to be updated.
+	 * @param string $name The new name of the device.
+	 * @param string $description The new description of the device.
+	 * @param int $max_loan_duration The new maximum loan duration for the device.
+	 * @param int $group_id The ID of the device group.
+	 * @param int $atelier_id The ID of the atelier to which the device belongs.
+	 * @param bool $loan The loan status of the device.
+	 * @param int $price The new price of the device.
+	 * @param int $manufactured The new manufacturing year of the device.
+	 * 
+	 * @return void
+	 */
 	public function editDevice( int $deviceId, string $name, string $description, int $max_loan_duration, int $group_id, int $atelier_id, bool $loan, int $price, int $manufactured): void
     {
         $device = $this->database->table('devices')->get($deviceId);
@@ -259,6 +290,17 @@ final class DevicesService
         }
     }
 
+	/**
+	 * Edit device group details.
+	 *
+	 * This method allows updating the name and description of a device group.
+	 *
+	 * @param int $group_id The ID of the group to be updated.
+	 * @param string $name The new name of the device group.
+	 * @param string $description The new description of the device group.
+	 * 
+	 * @return void
+	 */
 	public function editGroup( int $group_id, string $name, string $description): void
     {
         $group = $this->database->table('device_groups')->get($group_id);
@@ -268,6 +310,16 @@ final class DevicesService
         }
     }
 	
+	/**
+	 * Edit the status of a loan reservation.
+	 *
+	 * This method updates the status of a loan reservation (e.g., approved, pending, etc.).
+	 *
+	 * @param int $group_id The ID of the loan group to be updated.
+	 * @param int $status_id The new status ID to be assigned to the loan.
+	 * 
+	 * @return void
+	 */
 	public function editReservation( int $group_id, int $status_id): void
     {
         $loan = $this->database->table('loan')->get($group_id);
@@ -275,32 +327,87 @@ final class DevicesService
         $loan->update(['status_id' => $status_id]);
 	}
 	
+	/**
+	 * Edit the end date of a loan.
+	 *
+	 * This method updates the end date of a loan for the specified loan ID.
+	 *
+	 * @param int $loan_id The ID of the loan to be updated.
+	 * @param string $loan_end The new end date of the loan (format: YYYY-MM-DD).
+	 * 
+	 * @return void
+	 */
 	public function editLoanEndDate( int $loan_id, string $loan_end): void
     {
 		$loan = $this->database->table('loan')->get($loan_id);
         $loan->update(['loan_end' => $loan_end]);
 	}
 
+	/**
+	 * Get a device by its ID.
+	 *
+	 * This method retrieves the device record with the specified device ID.
+	 *
+	 * @param int $device_id The ID of the device to retrieve.
+	 * 
+	 * @return \Nette\Database\Table\ActiveRow The device record.
+	 */
 	public function getDeviceById(int $device_id): \Nette\Database\Table\ActiveRow
     {
         return $this->database->table('devices')->get($device_id);
     }
 
+	/**
+	 * Get a loan by its ID.
+	 *
+	 * This method retrieves the loan record with the specified loan ID.
+	 *
+	 * @param int $loan_id The ID of the loan to retrieve.
+	 * 
+	 * @return \Nette\Database\Table\ActiveRow The loan record.
+	 */
 	public function getLoanById(int $loan_id): \Nette\Database\Table\ActiveRow
     {
         return $this->database->table('loan')->get($loan_id);
     }
 
+	/**
+	 * Delete a device by its ID.
+	 *
+	 * This method marks the device as deleted and clears its group association.
+	 *
+	 * @param int $id The ID of the device to delete.
+	 * 
+	 * @return void
+	 */
 	public function deleteDevice(int $id) : void
 	{
 		$this->database->table('devices')->where('device_id', $id)->update(['deleted' => true,'group_id' => null]);
 	}
 	
+	/**
+	 * Delete a device group by its ID.
+	 *
+	 * This method deletes the specified device group.
+	 *
+	 * @param int $id The ID of the device group to delete.
+	 * 
+	 * @return void
+	 */
 	public function deleteGroup(int $id) : void
 	{
 		$this->database->table('device_groups')->where('group_id', $id)->delete();
 	}
 	
+	/**
+	 * Delete a reservation (loan) by its ID.
+	 *
+	 * This method deletes the specified loan reservation and updates the associated device to not be on loan.
+	 *
+	 * @param int $id The ID of the reservation (loan) to delete.
+	 * 
+	 * @return void
+	 */
 	public function deleteReservation(int $id) : void
 	{
 		$device_id = $this->database->table('loan')->get($id)->device_id;
@@ -308,21 +415,57 @@ final class DevicesService
 		$this->database->table('devices')->where('device_id', $device_id)->update(['loan' => false]);
 	}
 
+	/**
+	 * Get a device group by its ID.
+	 *
+	 * This method retrieves the device group record with the specified group ID.
+	 *
+	 * @param int $group_id The ID of the device group to retrieve.
+	 * 
+	 * @return \Nette\Database\Table\ActiveRow The device group record.
+	 */
 	public function getGroupById(int $group_id): \Nette\Database\Table\ActiveRow
     {
         return $this->database->table('device_groups')->get($group_id);
     }
 	
+	/**
+	 * Get loan status by its ID.
+	 *
+	 * This method retrieves the loan status record with the specified status ID.
+	 *
+	 * @param int $status_id The ID of the loan status to retrieve.
+	 * 
+	 * @return \Nette\Database\Table\ActiveRow The loan status record.
+	 */
 	public function getStatusById(int $status_id): \Nette\Database\Table\ActiveRow
     {
         return $this->database->table('loan_status')->get($status_id);
     }
 
+	/**
+	 * Get an atelier by its ID.
+	 *
+	 * This method retrieves the atelier record with the specified atelier ID.
+	 *
+	 * @param int $atelier_id The ID of the atelier to retrieve.
+	 * 
+	 * @return \Nette\Database\Table\ActiveRow The atelier record.
+	 */
 	public function getAtelierById(int $atelier_id): \Nette\Database\Table\ActiveRow
     {
         return $this->database->table('ateliers')->get($atelier_id);
     }
 
+	/**
+	 * Check if a device is not reserved for loan.
+	 *
+	 * This method checks if the device is available for loan (not already loaned or reserved).
+	 *
+	 * @param int $device_id The ID of the device to check.
+	 * 
+	 * @return bool `true` if the device is not reserved, `false` otherwise.
+	 */
 	public function isNotDeviceReserve(int $device_id): bool
 	{
 		$device = $this->database->table('devices')->where('device_id', $device_id)->where('loaned', false)->fetch();
@@ -330,6 +473,12 @@ final class DevicesService
     	return $device !== null;
 	}
 	
+	 /**
+     * Checks if a device group is empty.
+     *
+     * @param int $group_id The ID of the device group.
+     * @return bool Returns true if the group is empty, false otherwise.
+     */
 	public function isGroupEmpty(int $group_id): bool
 	{
 		$device = $this->database->table('devices')->where('group_id', $group_id)->fetch();
@@ -337,6 +486,13 @@ final class DevicesService
     	return $device == null;
 	}
 	
+	/**
+     * Checks if a device is in one of the user's ateliers.
+     *
+     * @param int $user_id The ID of the user.
+     * @param int $device_id The ID of the device.
+     * @return bool Returns true if the device is in one of the user's ateliers, false otherwise.
+     */
 	public function isDeviceInMyAtelier(int $user_id, int $device_id): bool
 	{
 		$userAteliers = $this->database->table('user_atelier')
@@ -360,28 +516,63 @@ final class DevicesService
 		return false;
 	}
 
-	
+	/**
+     * Adds a new device to the database.
+     *
+     * @param int $user_id The ID of the user adding the device.
+     * @param string $name The name of the device.
+     * @param string $description A description of the device.
+     * @param int $max_loan_duration The maximum loan duration for the device.
+     * @param int $group_id The group ID the device belongs to.
+     * @param int $atelier_id The atelier ID where the device is located.
+     * @param bool $loan Whether the device is available for loan.
+     * @param int $price The price of the device.
+     * @param int $manufactured The year the device was manufactured.
+     */
 	public function addDevice(int $user_id, string $name,string $description, int $max_loan_duration,int $group_id, int $atelier_id,  bool $loan, int $price, int $manufactured) : void
     {
         $this->database->table('devices')->insert(['price' => $price, 'manufactured' => $manufactured, 'name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id, 'atelier_id' => $atelier_id, 'loan' => $loan]);
     }
 	
+	/**
+     * Adds a new device group to the database.
+     *
+     * @param string $name The name of the group.
+     * @param string $description The description of the group.
+     */
 	public function addGroup(string $name,string $description) : void
     {
         $this->database->table('device_groups')->insert(['name' => $name, 'description' => $description]);
     }
 
-	
+	/**
+     * Allows a user to borrow a device by removing any restrictions on borrowing.
+     *
+     * @param int $user_id The ID of the user.
+     * @param int $device_id The ID of the device.
+     */
 	public function UserWithIdCanBorrowDeviceWithId(int $user_id, int $device_id): void //add
 	{
 		$this->database->table('forbidden_user_devices')->where('user_id', $user_id)->where('device_id', $device_id)->delete();
 	}
 
+	/**
+     * Prevents a user from borrowing a specific device.
+     *
+     * @param int $user_id The ID of the user.
+     * @param int $device_id The ID of the device.
+     */
 	public function UserWithIdCanNotBorrowDeviceWithId(int $user_id, int $device_id) : void
 	{
 		$this->database->table('forbidden_user_devices')->insert(['user_id' => $user_id, 'device_id' => $device_id]);
 	}
 
+	/**
+     * Gets a list of users who are forbidden from borrowing a specific device.
+     *
+     * @param int $device_id The ID of the device.
+     * @return array An array of forbidden users.
+     */
 	public function get_forbidden_users(int $device_id): array
 	{
 		$atelier_id = $this->database->table('devices')->where('device_id', $device_id)->fetch()->atelier_id;
@@ -398,6 +589,12 @@ final class DevicesService
 		return $forbidden_users;
 	}
 
+	/**
+     * Gets a list of users who are not forbidden from borrowing a specific device.
+     *
+     * @param int $device_id The ID of the device.
+     * @return array An array of users not forbidden from borrowing the device.
+     */
 	public function get_not_forbidden_users(int $device_id) : array 
 	{
 		$atelier_id = $this->database->table('devices')->where('device_id', $device_id)->fetch()->atelier_id;
@@ -414,25 +611,47 @@ final class DevicesService
 		return $not_forbidden_users;
 	}
 
-	//request
+	/**
+     * Fetches all device requests from the database.
+     *
+     * @return array A list of all device requests.
+     */
 	public function getDeviceRequests(): array
     {
         // Fetch device requests from the database
         return $this->database->table('wanted_devices')->fetchAll();
     }
 
+	/**
+     * Retrieves a specific device request by its ID.
+     *
+     * @param int $requestId The ID of the device request.
+     * @return \Nette\Database\Table\ActiveRow The device request.
+     */
     public function getRequestById(int $requestId)
     {
         // Retrieve a specific device request by ID
         return $this->database->table('wanted_devices')->get($requestId);
     }
 
+	/**
+     * Retrieves a specific device request by its ID.
+     *
+     * @param int $requestId The ID of the device request.
+     * @return \Nette\Database\Table\ActiveRow The device request.
+     */
     public function deleteRequest(int $requestId): void
     {
         // Delete a device request by ID
         $this->database->table('wanted_devices')->where('ID', $requestId)->delete();
     }
 
+	/**
+     * Finds the most loyal customer for a specific device based on the number of loans.
+     *
+     * @param int $device_id The ID of the device.
+     * @return array A list of users who have borrowed the device the most, with their loan counts.
+     */
 	public function get_loyal_customer(int $device_id): array
 	{
 		// Nejprve zjistíme maximální počet výpůjček
@@ -474,6 +693,12 @@ final class DevicesService
 		return $users;
 	}
 	
+	/**
+     * Returns the number of times a specific device has been loaned out.
+     *
+     * @param int $device_id The ID of the device.
+     * @return int The number of loans for the device.
+     */
 	public function get_number_of_device_loans(int $device_id): int
 	{
 		$count = $this->database->table('loan')->where('device_id', $device_id)->count('*');
@@ -482,6 +707,11 @@ final class DevicesService
 		return $count;
 	}
 	
+	/**
+     * Returns the total number of loans across all devices.
+     *
+     * @return int The total number of loans.
+     */
 	public function get_number_of_loans(): int
 	{
 		$count = $this->database->table('loan')->count('*');
@@ -490,6 +720,12 @@ final class DevicesService
 		return $count;
 	}
 	
+	/**
+     * Calculates the average loan time for a specific device.
+     *
+     * @param int $device_id The ID of the device.
+     * @return float The average loan time for the device, or 0 if no loans exist.
+     */
 	public function get_avg_loan_time(int $device_id): ?float
 	{
 		$avg = $this->database->table('loan')->where('device_id', $device_id)->where('loan_end IS NOT NULL')->aggregation('AVG(DATEDIFF(loan_end, loan_start))');
@@ -500,6 +736,15 @@ final class DevicesService
 		return 0;
 	}
 	
+	/**
+     * Retrieves the longest loan time for a specific device.
+     *
+     * This function finds the loan with the longest duration for a given device,
+     * based on the difference between the `loan_start` and `loan_end` dates.
+     *
+     * @param int $device_id The ID of the device.
+     * @return float The longest loan duration in days, or 0 if no loan exists for the device.
+     */
 	public function get_longest_loan_time(int $device_id): float
 	{
 		$loan = $this->database->table('loan')
@@ -516,6 +761,15 @@ final class DevicesService
 		return 0;	
 	}
 	
+	/**
+     * Retrieves the shortest loan time for a specific device.
+     *
+     * This function finds the loan with the shortest duration for a given device,
+     * based on the difference between the `loan_start` and `loan_end` dates.
+     *
+     * @param int $device_id The ID of the device.
+     * @return float The shortest loan duration in days, or 0 if no loan exists for the device.
+     */
 	public function get_shortest_loan_time(int $device_id): float
 	{
 		$loan = $this->database->table('loan')
