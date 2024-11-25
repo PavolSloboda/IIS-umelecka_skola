@@ -25,39 +25,45 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		$this->curr_edit = null;
 	}
 
+	//initializes the presenter
 	protected function startup() : void
 	{
 		parent::startup();
+		//if the user is not logged in, redirects to login
 		if(!$this->getUser()->isLoggedIn())
 		{
 			$this->redirect('Login:login');
 		}
+		//adds all the necessary functions to the template
 		$this->template->addFunction('getAdminEmailById', function (int $id) {return $this->atelier->getAdminEmailByAtelierId(intval($id));});
 		$this->template->addFunction('isCurrUserAdmin', function (int $id) {return $this->atelier->isCurrUserAdminOfAtelierWithId(intval($id), $this->getUser()->getId());});
 		$this->template->addFunction('hasCurrUserRole', function (string $role_name) {return $this->roles->userWithIdHasRoleWithId($this->getUser()->getId(), $this->roles->getRoleIdWithName($role_name));});
 		$this->template->addFunction('atelier_is_empty', function (int $id) {return $this->atelier->isAtelierEmpty($id);});
 	}
 
+	//prepares the ateliers for displaying
 	public function renderAtelier() : void
 	{
 		$this->template->result = $this->atelier->showAllAteliers();
 	}
 
+	//prepares the ateliers for displaying
 	public function renderTable() : void
 	{
 		$this->template->result = $this->atelier->showAllAteliers();
 	}
 
+	//prepares the users belonging and not belonging to an atelier
 	public function renderEdit(): void
 	{
 		$this->template->user_items = $this->users->getUsersBelongingToAtelier(intval($this->curr_edit));
 		$this->template->user_items_not = $this->users->getUsersNotBelongingToAtelier(intval($this->curr_edit));
 	}
 
+	//creates the form for atelier editting
 	protected function createComponentEditAtelierForm(): Form
 	{
 		$form = new Form;
-		///otestovat a prespsat mna to druhe misto
 	
 		$adminAtelierEmails = $this->atelier->getAdminAtelierEmails();
 
@@ -72,6 +78,7 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		return $form;
 	}
 
+	//creates the form for adding the atelier
 	protected function createComponentAddAtelierForm(): Form
 	{
 		$form = new Form;
@@ -89,54 +96,43 @@ final class AtelierPresenter extends Nette\Application\UI\Presenter
 		return $form;
 	}
 
+	//processes the add atelier form
 	public function processAddAtelierForm(Form $form, \stdClass $data) : void
 	{
-		try
-		{
-			$this->atelier->createAtelier($data->name, $data->admin_email);
-		}
-		catch (\Exception $e)
-		{
-
-		}
+		$this->atelier->createAtelier($data->name, $data->admin_email);
 		$this->forward('Atelier:atelier');
 	}
 
+	//processes the edit atelier form
 	public function processEditAtelierForm(Form $form, \stdClass $data) : void
 	{
-		try
-		{
-			$this->atelier->editAtelier(intval($data->atelier_id), $data->name, $data->admin_email);
-		}
-		catch (\Exception $e)
-		{
-
-		}
+		$this->atelier->editAtelier(intval($data->atelier_id), $data->name, $data->admin_email);
 		$this->redirect('Atelier:atelier');
 	}
 
+	//handles the deletion of the atelier
 	public function handleDelete(int $id) : void
 	{
 		$this->atelier->deleteAtelier($id);
 		$this->forward('Atelier:table');
 	}	
 
+	//handles the editing of the atelier
 	public function actionEdit(string $atelierId) : void
 	{
 		$atelier = $this->atelier->getAtelierById(intval($atelierId));
 		$form = $this->getComponent('editAtelierForm');
 		$form->setDefaults(['atelier_id' => $atelier->atelier_id, 'name' => $atelier->name, 'admin_email' => $this->atelier->getAdminEmailByAtelierId($atelier->atelier_id)]);
 		$this->curr_edit = $atelierId;
-		//$form->onSuccess[] = [$this, 'editFormSucceeded'];
 	}
 
-
-
+	//handles adding a user to the atelier
 	public function handleAdd(int $user_id) : void
 	{
 		$this->atelier->addUserWithIdToAtelierWithId($user_id, intval($this->curr_edit));
 	}	
 
+	//handles removing the user from the atelier
 	public function handleRemove(int $user_id) : void
 	{
 		$this->atelier->removeUserWithIdFromAtelierWithId($user_id, intval($this->curr_edit));

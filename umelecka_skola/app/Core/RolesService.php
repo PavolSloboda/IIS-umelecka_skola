@@ -15,11 +15,15 @@ final class RolesService
 		$this->database = $database;
 	}
 
+	//returns whether the user with the specified id
+	//has the role with the specified id
 	public function userWithIdHasRoleWithId(int $user_id, int $role_id) : bool
 	{
 		return !is_null($this->database->table('user_role')->where('user_id', $user_id)->where('role_id', $role_id)->fetch());
 	}
 
+	//returns whether the user with the specified email
+	//has the role with the specified name
 	public function userWithEmailHasRoleWithName(string $email, string $name) : bool
 	{
 		$user = $this->database->table('users')->where('email', $email)->fetch();
@@ -31,6 +35,7 @@ final class RolesService
 		return $this->userWithIdHasRoleWithId($user->user_id, $role_id);
 	}
 
+	//returns the id of the role using the provided name
 	public function getRoleIdWithName(string $name) : int
 	{
 		$role = $this->database->table('roles')->where('name', $name)->fetch();
@@ -41,6 +46,7 @@ final class RolesService
 		return $role->role_id;
 	}
 
+	//returns the roles of the user with the specified id
 	public function getMyRoles(int $id) : \Nette\Database\Table\Selection
 	{
 		$user_roles = $this->database->table('user_role')->where('user_id', $id);
