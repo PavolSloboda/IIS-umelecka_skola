@@ -1,6 +1,53 @@
 {layout '../layout.latte'}
 {block content}
-	<h2>Ola</h2>
+	<h2>INFORMAČNÍ SYSTÉM UMĚLECKÉ ŠKOLY</h2>
+	<h3>Dobrý den, vítejte v informačním systému pro správu výpůjček technických pomůcek a vybavení.</h3>
+	
+	<p>Cílem tohoto systému je umožnit efektivní správu výpůjček vybavení, které vlastní různé ateliéry. Každý ateliér může vlastnit specifické vybavení. Systém umožňuje spravovat maximální dobu výpůjčky zařízení.</p>
+	
+	<p>Uživatelé jsou rozděleni do několika rolí, z nichž každá má odlišná oprávnění.</p>
+	<br>
+	<h2>Role a oprávnění</h2>
+	
+	<ul>
+		<li><strong>Administrátor</strong>
+			<ul>
+				<li>Spravuje uživatele a ateliéry.</li>
+				<li>Má práva pro přiřazení rolí správce ateliéru a dalších uživatelských oprávnění.</li>
+				<li>Má také všechna práva správců ateliérů, vyučujících a registrovaných uživatelů.</li>
+			</ul>
+		</li>
+		<li><strong>Správce ateliéru</strong>
+			<ul>
+				<li>Vkládá a spravuje typy zařízení a přiřazuje vyučující v rámci svého ateliéru.</li>
+				<li>Má práva registrovaného uživatele.</li>
+			</ul>
+		</li>
+		<li><strong>Vyučující</strong>
+			<ul>
+				<li>Spravuje zařízení, může dočasně zakázat jejich půjčování.</li>
+				<li>Může schvalovat zařízení, které si lidi přejí přidělit.</li>
+				<li>Má práva registrovaného uživatele.</li>
+			</ul>
+		</li>
+		<li><strong>Registrovaný uživatel</strong>
+			<ul>
+				<li>Může prohlížet dostupné vybavení, rezervovat si jej a sledovat stav svých výpůjček.</li>
+				<li>Má právo požádat o přidání nového zařízení.</li>
+				<li>Má možnost upravit svůj profil a přístup k právům neregistrovaného uživatele.</li>
+			</ul>
+		</li>
+		<li><strong>Neregistrovaný uživatel</strong>
+			<ul>
+				<li>Má možnost zaregistrovat se v systému a následně získat další oprávnění.</li>
+			</ul>
+		</li>
+	</ul>
+	
+	<h2>Funkce systému</h2>
+	<p>Informační systém nabízí široké možnosti pro správu a sledování výpůjček, včetně možnosti rezervace zařízení, prodloužení doby trvání výpůjček a přidávání žádostí o nové zařízení. Navíc je k dispozici analytický modul, který umožňuje zobrazit údaje o četnosti a době výpůjček jednotlivých zařízení, což usnadňuje efektivní využívání vybavení v každém ateliéru.</p>
+
+	<p>Doufáme, že tento informační systém vám usnadní práci a zlepší správu výpůjček vybavení. Pokud máte jakékoliv dotazy nebo potřebujete asistenci, neváhejte nás kontaktovat.</p>
 
 
 {/block}

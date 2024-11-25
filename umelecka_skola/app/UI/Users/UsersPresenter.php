@@ -14,6 +14,7 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 {
 	private UsersService $usersService;
 	private $roles;
+    private int $userId_edit;
 
 	public function __construct(UsersService $usersService, RolesService $roles)
 	{
@@ -46,8 +47,8 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         $form->addText('name', 'Name:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->setRequired();
 
         $usersEmails = array();
-
-        $usersEmails = $this->usersService->getAllEmails(intval($form->getUntrustedValues()->user_id));
+        bdump($this->userId_edit);
+        $usersEmails = $this->usersService->getAllEmails($this->userId_edit);
 
         $form->addEmail('email', 'Email:')->addRule($form::MaxLength, 'Name is limited to a maximum of 50 characters.', 50)->addRule($form::IsNotIn, "Email already exist", $usersEmails)->setRequired();
 
@@ -101,6 +102,7 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 
 	public function actionEdit(int $userId): void
 	{
+        $this->userId_edit = $userId;
         $user = $this->usersService->getUserById($userId);
         $roleId = $this->usersService->getUserRoleId($userId); // Získejte aktuální `role_id`
 
