@@ -252,7 +252,18 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	
 	}
 	
-
+	/**
+     * Validates the form for adding a device loan.
+     *
+     * This function validates the loan start and end dates in the form, ensuring
+     * that the dates are valid and the device is available for the specified period.
+     * If the validation fails, an error message is added to the form, and the form is
+     * either redrawn via AJAX or the page is redirected to the current one, depending on the request type.
+     *
+     * @param Form $form The form instance being validated.
+     * @param \stdClass $values The form values, containing information about the loan.
+     * @return bool Returns true if the form is valid, false if validation fails and an error is added.
+     */
 	public function validateAddDeviceLoanForm(Form $form, \stdClass $values): bool
 	{
 		date_default_timezone_set('Europe/Prague');
@@ -512,7 +523,18 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	}
 
 
-
+	/**
+     * Validates the form for editing the loan end date.
+     *
+     * This function validates the start and end dates of a loan when editing an existing loan.
+     * It checks if the dates are valid and if the device is available for the specified period.
+     * If the validation fails, an error message is added to the form, and the form is either
+     * redrawn via AJAX or the page is redirected to the current one, depending on the request type.
+     *
+     * @param Form $form The form instance being validated.
+     * @param \stdClass $values The form values, containing information about the loan.
+     * @return bool Returns true if the form is valid, false if validation fails and an error is added.
+     */
 	public function validateEditLoanEndDateForm(Form $form, \stdClass $values): bool
 	{
 		date_default_timezone_set('Europe/Prague');
