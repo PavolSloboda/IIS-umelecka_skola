@@ -213,8 +213,6 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 	public function actionDelete(int $userId): void
 	{
 		$this->usersService->deleteUser($userId);
-
-        $this->usersService->removeUserRole($userId);
 		$this->redirect('users');
 	}
 }
