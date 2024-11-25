@@ -47,7 +47,7 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		try
 		{
 			$this->getUser()->setAuthenticator($this->loginService)->login($data->email, $data->password);
-			$this->getUser()->setExpiration('10 minutes');
+			$this->getUser()->setExpiration('30 minutes');
 			$this->redirect('MainPage:mainpage');
 		}
 		catch (Nette\Security\AuthenticationException $e)
