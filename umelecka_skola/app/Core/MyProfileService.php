@@ -15,7 +15,6 @@ final class MyProfileService
     public function __construct(Explorer $database, Passwords $passwords)
     {
         $this->database = $database;
-        bdump($database);
         $this->passwords = $passwords;
     }
 
@@ -23,7 +22,6 @@ final class MyProfileService
     public function getUserProfile(int $userId): ?\Nette\Database\Table\ActiveRow
     {
         $my_user = $this->database->table('users')->get($userId);
-        bdump($my_user);
         return $my_user;
     }
 
