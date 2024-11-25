@@ -135,7 +135,6 @@ final class UsersService
 
 	public function getAllEmails(int $user_id): array
     {
-		bdump($user_id);
     // Výběr všech emailů z tabulky users kromě zadaného user_id
     return $this->database
         ->table('users')

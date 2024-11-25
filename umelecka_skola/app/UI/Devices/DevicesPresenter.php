@@ -123,15 +123,10 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 	public function processAddDeviceForm(Form $form, \stdClass $values): void
 	{
-		try {
-			$userId = $this->getUser()->getId();
-			$this->DevicesService->addDevice($userId, $values->name, $values->description, intval($values->max_loan_duration), $values->group_id, $values->atelier_id, $values->loan, $values->price, $values->manufactured);
-			$this->flashMessage('Device has been successfully edited.', 'success');
-			$this->redirect('Devices:devices');
-		}catch(Nette\Security\AuthenticationException $e)
-		{
-			$form->addError('An error occured');
-		}
+		$userId = $this->getUser()->getId();
+		$this->DevicesService->addDevice($userId, $values->name, $values->description, intval($values->max_loan_duration), $values->group_id, $values->atelier_id, $values->loan, $values->price, $values->manufactured);
+		$this->flashMessage('Device has been successfully edited.', 'success');
+		$this->redirect('Devices:devices');
 	}
 
 	public function createComponentAddGroupForm() : Form
@@ -150,15 +145,10 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 	public function processAddGroupForm(Form $form, \stdClass $values): void
 	{
-		try {
-			$this->DevicesService->addGroup($values->name, $values->description);
-			$this->flashMessage('Device has been successfully edited.', 'success');
-			
-			$this->redirect('Devices:devices');
-		}catch(Nette\Security\AuthenticationException $e)
-		{
-			$form->addError('An error occured');
-		}
+		$this->DevicesService->addGroup($values->name, $values->description);
+		$this->flashMessage('Device has been successfully edited.', 'success');
+		
+		$this->redirect('Devices:devices');
 	}
 	
 
@@ -290,15 +280,10 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 	public function processDeviceEditForm(Form $form, \stdClass $values): void
 	{
-		try {
 			$this->DevicesService->editDevice(intval($values->device_id), $values->name, $values->description, intval($values->max_loan_duration), intval($values->group_id),$values->atelier_id , $values->loan, $values->price, $values->manufactured);
 			$this->flashMessage('Device has been successfully edited.', 'success');
 			
 			$this->redirect('Devices:devices');
-		}catch(Nette\Security\AuthenticationException $e)
-		{
-			$form->addError('An error occured');
-		}
 	}
 
 	public function actionEdit($deviceId): void
@@ -327,15 +312,10 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 	public function processGroupEditForm(Form $form, \stdClass $values): void
 	{
-		try {
-			$this->DevicesService->editGroup(intval($values->group_id), $values->name, $values->description);
-			$this->flashMessage('Device has been successfully edited.', 'success');
-			
-			$this->redirect('Devices:devices');
-		}catch(Nette\Security\AuthenticationException $e)
-		{
-			$form->addError('An error occured');
-		}
+		$this->DevicesService->editGroup(intval($values->group_id), $values->name, $values->description);
+		$this->flashMessage('Device has been successfully edited.', 'success');
+		
+		$this->redirect('Devices:devices');
 	}
 
 	public function actionEditGroup($groupId): void
@@ -358,14 +338,10 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	
 	public function processReservationEditForm(Form $form, \stdClass $values): void
 	{
-		try {
-			$this->DevicesService->editReservation(intval($values->loan_id), intval($values->status));
-			$this->flashMessage('Device has been successfully edited.', 'success');
-			
-			$this->redirect('Devices:devices');
-		} catch(Nette\Security\AuthenticationException $e) {
-			$form->addError('An error occurred');
-		}
+		$this->DevicesService->editReservation(intval($values->loan_id), intval($values->status));
+		$this->flashMessage('Device has been successfully edited.', 'success');
+		
+		$this->redirect('Devices:devices');
 	}
 	
 	public function actionEditReservation($reservationId): void
@@ -447,15 +423,10 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 	public function processEditLoanEndDateForm(Form $form, \stdClass $values): void
 	{
-		try {
-			$this->DevicesService->EditLoanEndDate(intval($values->loan_id), $values->loan_end);
-			$this->flashMessage('End date has been successfully changed.', 'success');
-			
-			$this->redirect('Devices:devices');
-		}catch(Nette\Security\AuthenticationException $e)
-		{
-			$form->addError('An error occured');
-		}
+		$this->DevicesService->EditLoanEndDate(intval($values->loan_id), $values->loan_end);
+		$this->flashMessage('End date has been successfully changed.', 'success');
+		
+		$this->redirect('Devices:devices');
 	}
 
 	public function handleDeleteDevice(int $id) : void
@@ -486,20 +457,13 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
     public function actionFulfillRequest(int $requestId): void
     {
         $request = $this->devices->getRequestById($requestId);
-        if ($request) 
-		{
-            $this->redirect('add', ['name' => $request->name, 'description' => $request->description]);
-        } else 
-		{
-            $this->flashMessage("Device request not found.", "error");
-            $this->redirect('requests');
-        }
+
+        $this->redirect('add', ['name' => $request->name, 'description' => $request->description]);
 	}
 
     public function handleDeleteRequest(int $requestId): void
     {
         $this->devices->deleteRequest($requestId);
-        //$this->flashMessage("Request deleted successfully.", "success");
         $this->redirect('Devices:devices');
     }
 
