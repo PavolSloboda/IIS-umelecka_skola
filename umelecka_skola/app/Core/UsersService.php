@@ -226,4 +226,16 @@ final class UsersService
         ->fetchPairs('email', 'email'); // Vrátí pole, kde klíče i hodnoty jsou emaily
     }
 
+    public function checkRoleposibilities($roleId, $roleId2): bool
+    {
+        if(($roleId == 2 && $roleId2 == 3) || ($roleId == 3 && $roleId2 == 2)){
+            return true;
+        } else if(($roleId == 0 && $roleId2 != '') || ($roleId == 4 && $roleId2 != '') || ($roleId == 2 && $roleId2 != '') || ($roleId == 3 && $roleId2 != '') || ($roleId == 3 && $roleId2 != '') || ($roleId == '' && $roleId2 != '')){
+            return false;
+        }else if(($roleId2 == 0 && $roleId != '') || ($roleId2 == 4 && $roleId != '') || ($roleId2 == 2 && $roleId != '') || ($roleId2 == 2 && $roleId != 3) || ($roleId2 == 3 && $roleId != 2)  || ($roleId2 == 3 && $roleId != '')){
+            return false;
+        }
+        return true;
+    }
+
 }

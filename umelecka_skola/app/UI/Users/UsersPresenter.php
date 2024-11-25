@@ -166,26 +166,17 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         $roleId = $values->role;
         $roleId2 = $values->role2;
 
-        if(($roleId == 2 && $roleId2 == 3) || ($roleId == 3 && $roleId2 == 2)){
+        if(!$this->usersService->checkRoleposibilities($roleId, $roleId2)){
+            $form->addError("Wrong combination of roles");
+            if($this->presenter->isAjax()) {
+                $this->presenter->redrawControl('form');
+            } else {
+                $this->presenter->redirect('this');
+            }
+            return false;
+        }else{
             return true;
-        } else if(($roleId == 0 && $roleId2 != '') || ($roleId == 4 && $roleId2 != '') || ($roleId == 2 && ($roleId2 != 3 || $roleId2 != '')) || ($roleId == 3 && ($roleId2 != 2 || $roleId2 != ''))|| ($roleId == '' && $roleId2 == '')){
-            $form->addError("Wrong combination of roles");
-            if($this->presenter->isAjax()) {
-                $this->presenter->redrawControl('form');
-            } else {
-                $this->presenter->redirect('this');
-            }
-            return false;
-        }else if(($roleId2 == 0 && $roleId != '') || ($roleId2 == 4 && $roleId != '') || ($roleId2 == 2 && ($roleId != 3 || $roleId != '')) || ($roleId2 == 3 && ($roleId != 2 || $roleId != ''))){
-            $form->addError("Wrong combination of roles");
-            if($this->presenter->isAjax()) {
-                $this->presenter->redrawControl('form');
-            } else {
-                $this->presenter->redirect('this');
-            }
-            return false;
         }
-        return true;
     }
 
     /**
