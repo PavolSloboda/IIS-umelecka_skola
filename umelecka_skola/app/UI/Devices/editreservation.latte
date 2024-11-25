@@ -8,7 +8,8 @@
         {control editReservationForm}
         
     {/if}
-    {if $loan->status == '2'}
+    
+    {if getStatusById($loan->status_id)->name == 'loaned'}
         <p>Reservation start date: {$loan->loan_start}</p>
         {snippet form}
         {control editLoanEndDateForm}
