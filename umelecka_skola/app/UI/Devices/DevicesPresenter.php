@@ -162,7 +162,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->addText('description', 'Description:')->addRule($form::MaxLength, 'Description is limited to a maximum of 50 characters.', 50)->setDefaultValue($description);
 		$form->addInteger('manufactured','Year of manufacture:')->addRule($form::Max,'Year of manufacture  isn not valid.',date('Y'));
 		$form->addInteger('price','Purchase price (kč):')->addRule($form::Min,'Price must be positive',0);
-		$form->addInteger('max_loan_duration', 'Max loan duration:')->addRule($form::Range, 'Loan duration must be between %d and %d.', [1, 90])->setRequired();
+		$form->addInteger('max_loan_duration', 'Max loan duration: (days)')->addRule($form::Range, 'Loan duration must be between %d and %d.', [1, 90])->setRequired();
 		$form->addSelect('group_id', 'Group device:', $this->devices->getDeviceTypes())->setRequired();
 		$form->addSelect('atelier_id', 'Atelier:', $this->devices->getUserAtelier($this->getUser()->getId()))->setRequired();
 		$form->addCheckbox('loan', 'Device can not be borrowed');
