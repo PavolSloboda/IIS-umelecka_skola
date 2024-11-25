@@ -139,6 +139,28 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         $this->redirect('users');
 	    }
 
+    
+    /**
+     * Validates the combination of roles in the form values.
+     * 
+     * This method checks if the selected roles (role and role2) form a valid combination.
+     * It returns `true` if the combination is valid, or `false` if it's invalid. In the case of invalid combinations,
+     * an error is added to the form, and the page is either refreshed (for AJAX requests) or redirected (for non-AJAX requests).
+     * 
+     * Valid combinations:
+     * - Role 2 and Role 3
+     * - Role 0 with any non-empty Role 2
+     * - Role 4 with any non-empty Role 2
+     * - Role 2 with any role except Role 3
+     * - Role 3 with any role except Role 2
+     * 
+     * Invalid combinations result in a "Wrong combination of roles" error.
+     * 
+     * @param Form $form The form being validated.
+     * @param \stdClass $values The form values, including role and role2.
+     * 
+     * @return bool `true` if the roles combination is valid, `false` otherwise.
+     */
     public function validateRoles(Form $form, \stdClass $values): bool
     {
         $roleId = $values->role;
