@@ -124,7 +124,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function processAddDeviceForm(Form $form, \stdClass $values): void
 	{
 		$userId = $this->getUser()->getId();
-		$this->DevicesService->addDevice($userId, $values->name, $values->description, intval($values->max_loan_duration), $values->group_id, $values->atelier_id, $values->loan, $values->price, $values->manufactured);
+		$this->DevicesService->addDevice($userId, $values->name, $values->description, intval($values->max_loan_duration), $values->group_id, $values->atelier_id, $values->loan, intval($values->price), intval($values->manufactured));
 		$this->flashMessage('Device has been successfully edited.', 'success');
 		$this->redirect('Devices:devices');
 	}
@@ -280,7 +280,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 
 	public function processDeviceEditForm(Form $form, \stdClass $values): void
 	{
-			$this->DevicesService->editDevice(intval($values->device_id), $values->name, $values->description, intval($values->max_loan_duration), intval($values->group_id),$values->atelier_id , $values->loan, $values->price, $values->manufactured);
+			$this->DevicesService->editDevice(intval($values->device_id), $values->name, $values->description, intval($values->max_loan_duration), intval($values->group_id),$values->atelier_id , $values->loan, intval($values->price), intval($values->manufactured));
 			$this->flashMessage('Device has been successfully edited.', 'success');
 			
 			$this->redirect('Devices:devices');
