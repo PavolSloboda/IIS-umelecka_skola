@@ -106,7 +106,7 @@
 				<td> {$item->loan_start} </td>
 				<td> {$item->loan_end} </td>
 				<td> {getStatusById($item->status_id)->name} </td>
-				{if hasCurrUserRole('teacher') || hasCurrUserRole('admin') || (getCurrUser() == $item->user_id)}
+				{if (hasCurrUserRole('teacher') && isDeviceInMyAtelier($item->device_id)) || hasCurrUserRole('admin') || (getCurrUser() == $item->user_id)}
 					<td> <button hx-get="{link Devices:editreservation $item->loan_id}">Edit</button> </td>
 					{if getStatusById($item->status_id)->name == 'reserved'}
 						<td> <button hx-get="{link deleteReservation! $item->loan_id}" hx-target="#device_body" hx-select="#device_body">Delete</button> </td>

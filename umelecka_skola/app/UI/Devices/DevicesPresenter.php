@@ -267,8 +267,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function validateAddDeviceLoanForm(Form $form, \stdClass $values): bool
 	{
 		date_default_timezone_set('Europe/Prague');
-		$loanStart = new \DateTime($form->getValues()->loan_start);
-		$loanEnd = new \DateTime($form->getValues()->loan_end);
+		$loanStart = new \DateTime($form->getUntrustedValues()->loan_start);
+		$loanEnd = new \DateTime($form->getUntrustedValues()->loan_end);
 	
 		$retval = $this->DevicesService->validateDate($loanStart, $loanEnd, intval($values->device_id));
 	
