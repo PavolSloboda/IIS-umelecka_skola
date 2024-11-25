@@ -180,12 +180,12 @@ final class DevicesService
         }
     }
 
-	public function editDevice( int $deviceId, string $name, string $description, int $max_loan_duration, int $group_id, int $atelier_id, bool $loan): void
+	public function editDevice( int $deviceId, string $name, string $description, int $max_loan_duration, int $group_id, int $atelier_id, bool $loan, int $price, int $manufactured): void
     {
         $device = $this->database->table('devices')->get($deviceId);
 
         if ($device) {
-            $device->update(['name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id,'atelier_id' => $atelier_id, 'loan' => $loan]);
+            $device->update(['price' => $price, 'manufactured' => $manufactured, 'name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id,'atelier_id' => $atelier_id, 'loan' => $loan]);
         }
     }
 
@@ -291,9 +291,9 @@ final class DevicesService
 	}
 
 	
-	public function addDevice(int $user_id, string $name,string $description, int $max_loan_duration,int $group_id, int $atelier_id,  bool $loan) : void
+	public function addDevice(int $user_id, string $name,string $description, int $max_loan_duration,int $group_id, int $atelier_id,  bool $loan, int $price, int $manufactured) : void
     {
-        $this->database->table('devices')->insert(['name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id, 'atelier_id' => $atelier_id, 'loan' => $loan]);
+        $this->database->table('devices')->insert(['price' => $price, 'manufactured' => $manufactured, 'name' => $name, 'description' => $description, 'max_loan_duration' => $max_loan_duration, 'group_id' => $group_id, 'atelier_id' => $atelier_id, 'loan' => $loan]);
     }
 	
 	public function addGroup(string $name,string $description) : void

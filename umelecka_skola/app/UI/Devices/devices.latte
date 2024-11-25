@@ -14,6 +14,8 @@
 				<th scope = "col">Name</th>
 				<th scope = "col">Description</th>
 				<th scope = "col">Max loan period</th>
+				<th scope = "col">Purchase price</th>
+				<th scope = "col">Year of manufacture</th>
 				<th scope = "col">Group</th>
 				<th scope = "col">Atelier</th>
 			</tr>
@@ -23,6 +25,8 @@
 				<td> {$item->name} </td>
 				<td> {$item->description} </td>
 				<td> {$item->max_loan_duration} </td>
+				<td> {$item->price} </td>
+				<td> {$item->manufactured} </td>
 				<td> {getGroupById($item->group_id)->name} </td>
 				<td> {getAtelierById($item->atelier_id)->name} </td>
 				{if (hasCurrUserRole('teacher') && isDeviceInMyAtelier($item->device_id)) || hasCurrUserRole('admin')}
@@ -44,9 +48,9 @@
 <!-- Devices Template - devices.latte -->
 
 <h2>Requested Devices</h2>
-
-<table>
 	{if count($wanted_devices) > 0}
+<table>
+
     <thead>
         <tr>
             <th>ID</th>
@@ -76,10 +80,11 @@
 			{/if}
 		{/foreach}
     </tbody>
-		{else}
-        <p>You have no wanted devices assigned.</p>
-		{/if}
 </table>
+	{else}
+        <p>You have no requested devices at the moment.</p>
+	{/if}
+	
 
 <!-- Container for the Add Device Form (dynamically loaded by HTMX) -->
 <div id="deviceFormContainer"></div>
@@ -114,9 +119,11 @@
 		<p>No Loans currently in the system</p>
 	{/if}
 	<h2>Device groups</h2>
+
 	{if hasCurrUserRole('atelier_manager') || hasCurrUserRole('admin')}
 		<button hx-get="{link Devices:addgroup}">Add</button>
 	{/if}
+		<div id="device_groups">
 	{if count($types) > 0}
 	<table>
 		<thead>
@@ -132,7 +139,7 @@
 				{if hasCurrUserRole('atelier_manager') || hasCurrUserRole('admin')}
 					<td> <button hx-get="{link Devices:editgroup $item->group_id}">Edit</button> </td>
 					{if isGroupEmpty($item->group_id)}
-						<td> <button hx-get="{link deleteGroup! $item->group_id}"  hx-target="closest tr" hx-swap="delete">Delete</button> </td>
+						<td> <button hx-get="{link deleteGroup! $item->group_id}"  hx-target="#device_groups" hx-select="#device_groups">Delete</button> </td>
 					{/if}
 				{/if}
 			</tr>
@@ -141,6 +148,7 @@
 	{else}
 		<p>No Device groups currently in the system</p>
 	{/if}
+	</div>
 	</div>
 	</div>
 {/block}
