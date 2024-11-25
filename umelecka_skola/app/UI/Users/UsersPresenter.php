@@ -2,6 +2,14 @@
 
 declare(strict_types=1);
 
+/**
+ * UsersPresenter handles user-related actions in the application, 
+ * including user listing, editing, and deletion.
+ * It also provides forms for editing users and updating roles.
+ *
+ * @package App\UI\Users
+ */
+
 namespace App\UI\Users;
 
 use App\Core\UsersService;
@@ -12,16 +20,35 @@ use App\Core\RolesService;
 
 final class UsersPresenter extends Nette\Application\UI\Presenter
 {
+    /**
+     * @var UsersService Service for handling user-related database operations.
+     */
 	private UsersService $usersService;
+    /**
+     * @var RolesService Service for handling role-related operations.
+     */
 	private $roles;
+    /**
+     * @var int The ID of the user being edited.
+     */
     private int $userId_edit;
 
+    /**
+     * Constructor for UsersPresenter.
+     *
+     * @param UsersService $usersService The user service instance.
+     * @param RolesService $roles The roles service instance.
+     */
 	public function __construct(UsersService $usersService, RolesService $roles)
 	{
 		$this->usersService = $usersService;
 		$this->roles = $roles;
 	}
 
+    /**
+     * Initializes the presenter and checks if the user is logged in.
+     * If not, redirects to the login page.
+     */
 	protected function startup() : void
 	{
 		parent::startup();
@@ -33,12 +60,19 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
 		$this->template->addFunction('hasCurrUserRole', function (string $role_name) {return $this->roles->userWithIdHasRoleWithId($this->getUser()->getId(), $this->roles->getRoleIdWithName($role_name));});
 	}
 
+    /**
+     * Renders the list of users.
+     */
 	public function renderUsers(): void
 	{
 		$this->template->users = $this->usersService->getUsers();
 	}
 
-	// Formulář pro editaci uživatele
+	/**
+     * Creates the form for editing a user, allowing to edit name, email, and role.
+     *
+     * @return Form The form for editing a user.
+     */
 	protected function createComponentEditUserForm(): Form
 	{
         $form = new Form;
@@ -68,6 +102,12 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         return $form;
         }
 
+        /**
+        *  Processes the edit user form and updates the user data and roles.
+        *
+        * @param Form $form The form instance.
+        * @param \stdClass $values The values submitted by the form.
+        */
         public function processEditUserForm(Form $form, \stdClass $values): void
         {
             //$userId = $this->getUser()->getId();
@@ -99,6 +139,11 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         $this->redirect('users');
 	    }
 
+    /**
+     * Action for editing a specific user.
+     *
+     * @param int $userId The ID of the user to edit.
+     */
 	public function actionEdit(int $userId): void
 	{
         $this->userId_edit = $userId;
@@ -118,6 +163,11 @@ final class UsersPresenter extends Nette\Application\UI\Presenter
         ]);
 	}
 
+    /**
+     * Action for deleting a specific user.
+     *
+     * @param int $userId The ID of the user to delete.
+     */
 	public function actionDelete(int $userId): void
 	{
 		$this->usersService->deleteUser($userId);
