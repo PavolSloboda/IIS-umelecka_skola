@@ -382,7 +382,7 @@ final class DevicesService
 	 */
 	public function deleteDevice(int $id) : void
 	{
-		$this->database->table('devices')->where('device_id', $id)->update(['deleted' => true,'group_id' => null]);
+		$this->database->table('devices')->where('device_id', $id)->update(['deleted' => true,'group_id' => null, 'atelier_id' => null]);
 	}
 	
 	/**

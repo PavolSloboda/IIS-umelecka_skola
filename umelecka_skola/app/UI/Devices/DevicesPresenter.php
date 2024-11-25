@@ -238,7 +238,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$form->addHidden('device_id');
 		
 		
-		$form->addDateTime('loan_start', 'Start Date and Time:')->setFormat('Y-m-d H:i:s')->setRequired('Please enter the start date and time.')
+		$form->addDateTime('loan_start', 'Start Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter the start date and time.')
 		->addRule(Form::Min,'The earliest possible reservation start date is today.',(new \DateTime())->format('Y-m-d H:i:s'));
 
 		$form->addDateTime('loan_end', 'End Date and Time:')->setFormat('Y-m-d H:i:s')->setDefaultValue((new \DateTime())->format('Y-m-d H:i:s'))->setRequired('Please enter the end date and time.');
