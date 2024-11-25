@@ -191,22 +191,16 @@ final class MyProfileService
      */
     public function getUserAteliers(int $userId): array
     {
-        $sql = "
-            SELECT a.atelier_id, a.name, a.admin_id
-            FROM Ateliers a
-            JOIN user_atelier ua ON a.atelier_id = ua.atelier_ID
-            WHERE ua.user_id = ?
-        ";
         $ateliers = $this->database->table('user_atelier')->where('user_id', $userId)->fetchAll();
 
         $out_ateliers = [];
 
         foreach ($ateliers as $atelier)
         {
-            array_push($out_ateliers, $this->database->table('atelier')->where('atelier_id', $atelier->atelier_id)->fetch());
+            array_push($out_ateliers, $this->database->table('ateliers')->where('atelier_id', $atelier->atelier_id)->fetch());
         }
 
-        return $out_ateliers;//$this->database->query($sql, $userId)->fetchAll();
+        return $out_ateliers;
     }
 
     /**
