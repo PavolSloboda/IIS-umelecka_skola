@@ -7,7 +7,6 @@
 <table>
     <thead>
         <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Email</th>
         </tr>
@@ -15,7 +14,6 @@
     <tbody>
     {foreach $users as $user_loop}
         <tr id="user-{$user_loop->user_id}">
-            <td>{$user_loop->user_id}</td>
             <td>{$user_loop->name}</td>
             <td>{$user_loop->email}</td>
 			{if hasCurrUserRole('admin')}
