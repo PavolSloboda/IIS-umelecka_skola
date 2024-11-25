@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * LoginPresenter class
+ * 
+ * This presenter manages the login and signup processes for the application.
+ * It provides forms for user authentication, including login and registration,
+ * and utilizes the LoginService for handling authentication logic.
+ * 
+ * @package App\UI\Login
+ */
 declare(strict_types=1);
 
 namespace App\UI\Login;
@@ -11,14 +20,27 @@ use App\Core\LoginService;
 final class LoginPresenter extends Nette\Application\UI\Presenter
 {
 
+	/**
+     * @var LoginService $loginService Service for handling user authentication.
+     */
 	private $loginService;
 
+	/**
+     * Constructor for the LoginPresenter.
+     * 
+     * @param LoginService $loginService Injected service for handling login functionality.
+     */
 	public function __construct(LoginService $loginService)
 	{
 		//initialises the login service
 		$this->loginService = $loginService;
 	}
 
+	/**
+     * Creates the login form component.
+     * 
+     * @return Form The login form with fields for email and password.
+     */
 	public function createComponentLoginForm() : Form
 	{
 		$form = new Form;
@@ -32,16 +54,33 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		return $form;
 	}
 
+	/**
+     * Handles the signup click action, redirecting to the signup page.
+     * 
+     * @return void
+     */
 	public function handleSignupClicked() : void
 	{
 		$this->redirect('Login:signup');
 	}
 
+	/**
+     * Handles the login click action, redirecting to the login page.
+     * 
+     * @return void
+     */
 	public function handleLoginClicked() : void
 	{
 		$this->redirect('Login:login');
 	}
 
+	 /**
+     * Validates the login form data and logs the user in if valid.
+     * 
+     * @param Form $form The login form component.
+     * @param \stdClass $data The data submitted through the login form.
+     * @return void
+     */
 	public function validateLogin(Form $form, \stdClass $data) : void
 	{
 		try
@@ -56,6 +95,11 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		}
 	}
 
+	/**
+     * Creates the signup form component.
+     * 
+     * @return Form The signup form with fields for email, username, and password.
+     */
 	public function createComponentSignUpForm() : Form
 	{
 		
@@ -70,6 +114,13 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		return $form;
 	}
 
+	/**
+     * Validates the signup form data and registers the user if valid.
+     * 
+     * @param Form $form The signup form component.
+     * @param \stdClass $data The data submitted through the signup form.
+     * @return void
+     */
 	public function validateSignUp(Form $form, \stdClass $data) : void
 	{
 		try
@@ -83,16 +134,35 @@ final class LoginPresenter extends Nette\Application\UI\Presenter
 		}
 	}
 
+	/**
+     * Renders the login page.
+     * 
+     * Sets a specific CSS class for the login page template.
+     *
+     * @return void
+     */
 	public function renderLogin(): void
 	{
 		$this->template->pageClass = 'login-page'; // Pro přihlášení
 	}
 
+	/**
+     * Renders the signup page.
+     * 
+     * Sets a specific CSS class for the signup page template.
+     *
+     * @return void
+     */
 	public function renderSignup(): void
 	{
 		$this->template->pageClass = 'signup-page'; // Pro registraci
 	}
 
+	/**
+     * Logs out the user and redirects to the login page.
+     * 
+     * @return void
+     */
 	public function actionOut(): void
 	{
 		$this->getUser()->logout();
