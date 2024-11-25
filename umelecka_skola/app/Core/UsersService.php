@@ -83,15 +83,15 @@ final class UsersService
 		$currentDate->format('Y-m-d')
 	) // Nadcházející nebo probíhající výpůjčky
 	->count(); // Počet probíhajících nebo nadcházejících výpůjček
-
+    $rolesAssigned += $this->database->table('ateliers')
+        ->where('admin_id', $userId)
+        ->count(); // Počet přiřazených rolí pro tohoto uživatele
     // Pokud uživatel nemá žádnou roli, pokračujeme ve smazání
     if ($rolesAssigned === 0) {        
         // Smazání uživatele, pokud není přiřazen k žádné jiné tabulce
+        $this->removeUserRole($userId);
         $this->database->table('users')->where('user_id', $userId)->delete();
-    } //else {
-        // Pokud má uživatel nějaké přiřazené role, neprovádíme smazání
-        //throw new \Exception('User cannot be deleted because they have assigned roles.');
-    //}
+    }
 	}
 
 
