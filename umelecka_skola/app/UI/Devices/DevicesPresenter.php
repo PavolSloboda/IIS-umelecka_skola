@@ -538,8 +538,8 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function validateEditLoanEndDateForm(Form $form, \stdClass $values): bool
 	{
 		date_default_timezone_set('Europe/Prague');
-		$loanStart = new \DateTime($form->getValues()->loan_start);
-		$loanEnd = new \DateTime($form->getValues()->loan_end);
+		$loanStart = new \DateTime($form->getUntrustedValues()->loan_start);
+		$loanEnd = new \DateTime($form->getUntrustedValues()->loan_end);
 		$retval = $this->DevicesService->validateEditDate( intval($values->loan_id),$loanStart, $loanEnd, intval($values->device_id));
 		bdump($retval);
 		if ($retval !== null) {
