@@ -105,6 +105,7 @@ final class MyProfilePresenter extends Nette\Application\UI\Presenter
             'name' => $values->name,
             'email' => $values->email,
         ]);
+        $this->redirect('myprofile');
     }
 
     /**
