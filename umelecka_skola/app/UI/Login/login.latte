@@ -1,13 +1,21 @@
-<block head>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
 	<link rel="stylesheet" href="{$basePath}/css/style.css">
-</block>
+</head>
 
-<div class="container {$pageClass}">
-    <div class="centered-content">
-        <h1>Login to Your Account</h1>
-        <p>Welcome back! Please enter your credentials to access your account.</p>
-        {control loginForm}
-        <p>Don't have an account? <a href="{$presenter->link('Login:signup')}">Sign up here</a>.</p>
+<body>
+    <div class="container {$pageClass}">
+        <div class="centered-content">
+            <h1>Login to Your Account</h1>
+            <p>Welcome back! Please enter your credentials to access your account.</p>
+            {control loginForm}
+            <p>Don't have an account? <a href="{$presenter->link('Login:signup')}">Sign up here</a>.</p>
+        </div>
     </div>
-</div>
-<script src="{$basePath}/js/netteForms.min.js"></script>
+	<script src="{$basePath}/js/netteForms.min.js"></script>
+	<script src="https://unpkg.com/htmx.org@2.0.3"></script>
+</body>
+</html>
