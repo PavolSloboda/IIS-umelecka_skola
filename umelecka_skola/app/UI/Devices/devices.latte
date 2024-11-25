@@ -62,6 +62,7 @@
     <tbody>
         <!-- Loop through each requested device in wanted_devices -->
         {foreach $wanted_devices as $device}
+		<tr id="device-{$device->ID}">
             <td>{$device->ID}</td>
             <td>{$device->name}</td>
             <td>{$device->description}</td>
@@ -78,6 +79,7 @@
                 </button>
             </td>
 			{/if}
+			</tr>
 		{/foreach}
     </tbody>
 </table>
