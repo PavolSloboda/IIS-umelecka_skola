@@ -519,7 +519,7 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 		$loanStart = new \DateTime($form->getValues()->loan_start);
 		$loanEnd = new \DateTime($form->getValues()->loan_end);
 		$retval = $this->DevicesService->validateEditDate( intval($values->loan_id),$loanStart, $loanEnd, intval($values->device_id));
-	
+		bdump($retval);
 		if ($retval !== null) {
 			// Přidání chyby do formuláře
 			$form->addError($retval);
@@ -547,8 +547,6 @@ final class DevicesPresenter extends Nette\Application\UI\Presenter
 	public function processEditLoanEndDateForm(Form $form, \stdClass $values): void
 	{
 		$this->DevicesService->EditLoanEndDate(intval($values->loan_id), $values->loan_end);
-		$this->flashMessage('End date has been successfully changed.', 'success');
-		
 		$this->redirect('Devices:devices');
 	}
 

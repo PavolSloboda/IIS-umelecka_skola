@@ -4,16 +4,22 @@
             <button type="button" hx-get="{link Devices:devices}" hx-target="#device_body" hx-select="#device_body">Cancel</button>
     </div>
     {if hasCurrUserRole('teacher') || hasCurrUserRole('admin')}
-        {snippet form}
+        
         {control editReservationForm}
-        {/snippet}
+        
     {/if}
     {if $loan->status == '2'}
         <p>Reservation start date: {$loan->loan_start}</p>
+        {snippet form}
         {control editLoanEndDateForm}
+        {/snippet}
     {/if}
 </div>
-<script src="{$basePath}/js/netteForms.min.js"></script>
+
+	<script src="{$basePath}/js/jquery-3.7.1.min.js"></script>
+	<script src="{$basePath}/js/netteForms.min.js"></script>
+	<script src="https://unpkg.com/htmx.org@2.0.3"></script>
+	<script src="{$basePath}/js/nette.ajax.js"></script>
 	<script>
 		$(function () {
 			$.nette.init();
